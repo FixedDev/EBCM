@@ -3,6 +3,7 @@ package me.fixeddev.ebcm.part;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import me.fixeddev.ebcm.Command;
+import me.fixeddev.ebcm.util.ListAppender;
 
 import java.util.List;
 
@@ -33,6 +34,8 @@ public abstract class SubCommandPart implements LineConsumingPart {
     @AutoValue.Builder
     public abstract static class Builder {
 
+        private ListAppender<Command> commandsToCallAppender = new ListAppender<>();
+
         final Builder named(String name) {
             return setName(name);
         }
@@ -47,8 +50,26 @@ public abstract class SubCommandPart implements LineConsumingPart {
 
         public abstract Builder setDescription(String newDescription);
 
-        public abstract Builder setCommandsToCall(List<Command> commands);
+        public Builder addCommandToCall(Command command){
+            commandsToCallAppender.add(command);
 
-        public abstract SubCommandPart build();
+            return this;
+        }
+
+        public Builder setCommands(List<Command> commands){
+            commandsToCallAppender.set(commands);
+
+            return this;
+        }
+
+        abstract Builder setCommandsToCall(List<Command> commands);
+
+        public SubCommandPart build() {
+            setCommandsToCall(commandsToCallAppender.toList());
+
+            return autoBuild();
+        }
+
+        public abstract SubCommandPart autoBuild();
     }
 }
