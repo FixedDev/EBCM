@@ -42,6 +42,8 @@ public abstract class Command {
     @AutoValue.Builder
     public abstract static class Builder {
 
+        private ListAppender<CommandPart> partListAppender = new ListAppender<>();
+
         final Builder withData(CommandData.Builder dataBuilder) {
             return setData(dataBuilder.build());
         }
@@ -56,12 +58,10 @@ public abstract class Command {
 
         abstract Builder setParts(List<CommandPart> newParts);
 
-        abstract ListAppender<CommandPart> partBuilder();
-
         public abstract Command autoBuild();
 
         public Builder setCommandParts(List<CommandPart> newParts){
-            partBuilder().set(newParts);
+            partListAppender.set(newParts);
 
             return this;
         }
@@ -71,13 +71,13 @@ public abstract class Command {
                 throw new IllegalArgumentException("The provided part is null");
             }
 
-            partBuilder().add(part);
+            partListAppender.add(part);
 
             return this;
         }
 
         public Command build() {
-            setParts(partBuilder().toList());
+            setParts(partListAppender.toList());
 
             return autoBuild();
         }
