@@ -36,7 +36,8 @@ public abstract class Command {
         return new AutoValue_Command.Builder()
                 .withData(dataBuilder)
                 .setPermission("")
-                .setPermissionMessage("No permission.");
+                .setPermissionMessage("No permission.")
+                .setAction(params -> true);
     }
 
     @AutoValue.Builder
