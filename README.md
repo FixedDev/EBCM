@@ -5,7 +5,7 @@ The purpose of the EBCM is:
   * Fix some problems of my previous command manager
   * Allow things that weren't possible on the previous version
 # Current State
-While the commannd manager is working, it's not complete yet, there are a lot of features missing from the old command manager,
+While the command manager is working, it's not complete yet, there are a lot of features missing from the old command manager,
 like the parametric commands, and still has some bugs that will be solved with the time. But, since it's relatively functional I released it
 # TODO
 - [ ] Fix the bug that's related to subcommands and optional arguments
