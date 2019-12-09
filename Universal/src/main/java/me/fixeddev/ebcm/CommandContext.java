@@ -21,6 +21,10 @@ public interface CommandContext extends NamespaceAccesor {
 
     boolean has(CommandPart part);
 
+    default List<CommandPart> getParts(String name){
+        return getCommand().getPartWithName(name);
+    }
+
     Optional<List<String>> getRaw(CommandPart part);
 
     <V> Optional<V> getValue(CommandPart part);
