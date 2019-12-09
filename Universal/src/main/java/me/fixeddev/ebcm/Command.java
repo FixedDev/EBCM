@@ -2,6 +2,7 @@ package me.fixeddev.ebcm;
 
 import com.google.auto.value.AutoValue;
 import me.fixeddev.ebcm.part.CommandPart;
+import me.fixeddev.ebcm.util.ListAppender;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,8 +55,33 @@ public abstract class Command {
 
         public abstract Builder setAction(CommandAction newAction);
 
-        public abstract Builder setParts(List<CommandPart> newParts);
+        abstract Builder setParts(List<CommandPart> newParts);
 
-        public abstract Command build();
+        abstract ListAppender<CommandPart> partBuilder();
+
+        public abstract Command autoBuild();
+
+        public Builder setCommandParts(List<CommandPart> newParts){
+            partBuilder().set(newParts);
+
+            return this;
+        }
+
+        public Builder addPart(CommandPart part) {
+            if(part == null) {
+                throw new IllegalArgumentException("The provided part is null");
+            }
+
+            partBuilder().add(part);
+
+            return this;
+        }
+
+        public Command build() {
+            setParts(partBuilder().toList());
+
+            return autoBuild();
+        }
+
     }
 }
