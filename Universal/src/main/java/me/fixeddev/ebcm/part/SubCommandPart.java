@@ -50,7 +50,7 @@ public abstract class SubCommandPart implements LineConsumingPart {
 
         public abstract Builder setDescription(String newDescription);
 
-        public Builder addCommandToCall(Command command){
+        public Builder addCommand(Command command){
             commandsToCallAppender.add(command);
 
             return this;
