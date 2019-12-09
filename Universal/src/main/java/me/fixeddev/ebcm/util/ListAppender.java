@@ -41,13 +41,16 @@ public class ListAppender<T> {
             throw new IllegalArgumentException("The provided object is null");
         }
 
-        grow(1);
+        if (size >= content.length - 1)
+            grow(1);
         content[size++] = object;
 
         return this;
     }
 
     public List<T> toList() {
+        content = Arrays.copyOf(content, size);
+
         return new ArrayList(Arrays.asList(content));
     }
 }
