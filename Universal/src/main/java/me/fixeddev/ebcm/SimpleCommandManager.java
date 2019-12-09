@@ -5,7 +5,7 @@ import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.internal.CommandLineParser;
-import me.fixeddev.ebcm.namespace.SimpleCommandContext;
+import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.util.UsageBuilder;
 

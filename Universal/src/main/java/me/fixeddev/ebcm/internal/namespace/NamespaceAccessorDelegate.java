@@ -1,4 +1,4 @@
-package me.fixeddev.ebcm.namespace;
+package me.fixeddev.ebcm.internal.namespace;
 
 import me.fixeddev.ebcm.NamespaceAccesor;
 

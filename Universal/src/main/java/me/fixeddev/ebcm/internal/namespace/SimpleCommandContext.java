@@ -1,4 +1,4 @@
-package me.fixeddev.ebcm.namespace;
+package me.fixeddev.ebcm.internal.namespace;
 
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandContext;
@@ -6,6 +6,7 @@ import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
 import me.fixeddev.ebcm.part.CommandPart;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +17,22 @@ public class SimpleCommandContext extends NamespaceAccessorDelegate implements C
     private List<String> rawArguments;
     private String label;
 
+    private Map<String, List<CommandPart>> allParts;
     private Map<CommandPart, List<String>> rawBindings;
     private Map<CommandPart, Object> valueBindings;
 
     public SimpleCommandContext(NamespaceAccesor namespace, ParseResult result) {
         super(namespace);
+
+        allParts = new HashMap<>();
+
+        for (CommandPart part : result.getCommandToExecute().getParts()) {
+            allParts.computeIfAbsent(part.getName(), k -> new ArrayList<>()).add(part);
+        }
+
+        for (CommandPart part : result.getMainCommand().getParts()) {
+            allParts.computeIfAbsent(part.getName(), k -> new ArrayList<>()).add(part);
+        }
 
         rawBindings = new HashMap<>();
 
@@ -53,6 +65,11 @@ public class SimpleCommandContext extends NamespaceAccessorDelegate implements C
     @Override
     public boolean has(CommandPart part) {
         return rawBindings.containsKey(part);
+    }
+
+    @Override
+    public List<CommandPart> getParts(String name) {
+        return allParts.computeIfAbsent(name, k -> new ArrayList<>());
     }
 
     @Override
