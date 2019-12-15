@@ -91,6 +91,8 @@ public class SimpleCommandManager implements CommandManager {
             if (!action.execute(context)) {
                 usage = true;
             }
+        }catch (CommandException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new CommandException(ex);
         }
