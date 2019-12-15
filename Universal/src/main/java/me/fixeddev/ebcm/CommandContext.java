@@ -27,5 +27,7 @@ public interface CommandContext extends NamespaceAccesor {
 
     Optional<List<String>> getRaw(CommandPart part);
 
+    List<CommandPart> getBoundParts();
+
     <V> Optional<V> getValue(CommandPart part);
 }

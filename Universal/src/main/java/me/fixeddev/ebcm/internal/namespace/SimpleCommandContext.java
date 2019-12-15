@@ -8,18 +8,21 @@ import me.fixeddev.ebcm.part.CommandPart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class SimpleCommandContext extends NamespaceAccessorDelegate implements CommandContext {
-    private Command executedCommand;
-    private List<String> rawArguments;
-    private String label;
+    private final Command executedCommand;
+    private final List<String> rawArguments;
+    private final String label;
 
-    private Map<String, List<CommandPart>> allParts;
-    private Map<CommandPart, List<String>> rawBindings;
-    private Map<CommandPart, Object> valueBindings;
+    private final Map<String, List<CommandPart>> allParts;
+    private final Map<CommandPart, List<String>> rawBindings;
+    private final Map<CommandPart, Object> valueBindings;
+
+    private List<CommandPart> boundParts;
 
     public SimpleCommandContext(NamespaceAccesor namespace, ParseResult result) {
         super(namespace);
@@ -75,6 +78,15 @@ public class SimpleCommandContext extends NamespaceAccessorDelegate implements C
     @Override
     public Optional<List<String>> getRaw(CommandPart part) {
         return Optional.ofNullable(rawBindings.get(part));
+    }
+
+    @Override
+    public List<CommandPart> getBoundParts() {
+        if (boundParts == null) {
+            boundParts = new ArrayList<>(valueBindings.keySet());
+        }
+
+        return boundParts;
     }
 
     @Override
