@@ -31,7 +31,7 @@ public class SimpleCommandManager implements CommandManager {
         this((namespace, permission) -> true, registry);
     }
 
-    public SimpleCommandManager(){
+    public SimpleCommandManager() {
         this(ParameterProviderRegistry.createRegistry());
     }
 
@@ -39,7 +39,7 @@ public class SimpleCommandManager implements CommandManager {
     public void registerCommand(Command command) {
         CommandData data = command.getData();
 
-        if(commandMap.containsKey(data.getName())){
+        if (commandMap.containsKey(data.getName())) {
             throw new IllegalArgumentException("A command with the name " + data.getName() + " is already registered!");
         }
 
@@ -48,6 +48,13 @@ public class SimpleCommandManager implements CommandManager {
         data.getAliases().forEach(alias -> {
             commandMap.putIfAbsent(alias, command);
         });
+    }
+
+    @Override
+    public void registerCommands(List<Command> commandList) {
+        for (Command command : commandList) {
+            registerCommand(command);
+        }
     }
 
     @Override
@@ -91,10 +98,10 @@ public class SimpleCommandManager implements CommandManager {
             if (!action.execute(context)) {
                 usage = true;
             }
-        }catch (CommandException ex) {
+        } catch (CommandException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new CommandException("An exception occurred while executing the command",ex);
+            throw new CommandException("An exception occurred while executing the command", ex);
         }
 
         if (usage) {
