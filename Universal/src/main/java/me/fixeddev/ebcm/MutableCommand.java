@@ -1,8 +1,5 @@
-package me.fixeddev.ebcm.parametric;
+package me.fixeddev.ebcm;
 
-import me.fixeddev.ebcm.Command;
-import me.fixeddev.ebcm.CommandAction;
-import me.fixeddev.ebcm.CommandData;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.util.ListAppender;
 
