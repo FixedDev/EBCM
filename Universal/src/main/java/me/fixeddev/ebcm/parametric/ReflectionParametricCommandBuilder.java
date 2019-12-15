@@ -64,12 +64,16 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
     @Override
     public List<Command> fromClass(CommandClass commandClass) {
         List<Command> commands = new ArrayList<>();
-        for (Method method : commandClass.getClass().getMethods()) {
+        for (Method method : commandClass.getClass().getDeclaredMethods()) {
             if (Modifier.isStatic(method.getModifiers()) || !Modifier.isPublic(method.getModifiers())) {
                 continue;
             }
 
             if (method.getReturnType() != boolean.class && method.getReturnType() != Boolean.class) {
+                continue;
+            }
+
+            if(!method.isAnnotationPresent(ACommand.class)){
                 continue;
             }
 
