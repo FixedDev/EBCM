@@ -21,7 +21,7 @@ public abstract class CommandData {
     }
 
     @AutoValue.Builder
-    abstract static class Builder {
+    public abstract static class Builder {
         final Builder named(String name) {
             return setName(name);
         }
