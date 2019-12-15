@@ -116,11 +116,17 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
             int i = 0;
             for (CommandPart part : parameters.getCommand().getParts()) {
                 if (part instanceof FlagPart || part instanceof ArgumentPart)
-                    params[i++] = part;
+                    params[i++] = parameters.getValue(part).get();
             }
 
+            boolean accessible = method.isAccessible();
+
             try {
-                return (boolean) method.invoke(commandClass, method);
+                method.setAccessible(true);
+                boolean result = (boolean) method.invoke(commandClass, params);
+                method.setAccessible(accessible);
+
+                return result;
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new CommandException("An exception occurred while executing the command", e);
             }
