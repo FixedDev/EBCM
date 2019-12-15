@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class ImmutableCommand implements Command {
 
     public static Builder builder(CommandData.Builder dataBuilder) {
-        return new AutoValue_Command.Builder()
+        return new AutoValue_ImmutableCommand.Builder()
                 .withData(dataBuilder)
                 .setPermission("")
                 .setPermissionMessage("No permission.")
