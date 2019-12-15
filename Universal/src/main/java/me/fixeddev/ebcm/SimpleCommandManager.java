@@ -94,7 +94,7 @@ public class SimpleCommandManager implements CommandManager {
         }catch (CommandException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new CommandException(ex);
+            throw new CommandException("An exception occurred while executing the command",ex);
         }
 
         if (usage) {
