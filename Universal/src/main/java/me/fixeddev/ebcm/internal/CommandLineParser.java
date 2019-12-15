@@ -18,6 +18,7 @@ import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class CommandLineParser {
         argumentsLeft = argumentsLine.size();
 
         bindings = new ArrayList<>();
-        valueBindings = new HashMap<>();
+        valueBindings = new LinkedHashMap<>();
 
         this.commandManager = commandManager;
         this.namespaceAccesor = namespaceAccesor;
