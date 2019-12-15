@@ -92,13 +92,17 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         Flag flag = parameter.getAnnotation(Flag.class);
 
         if (flag != null) {
+            if(type != boolean.class && type != Boolean.class){
+                throw new IllegalArgumentException("The provided parameter has a Flag annotation but it doesn't a boolean!");
+            }
+
             return FlagPart.builder(name, flag.value())
                     .build();
         }
 
         return ArgumentPart.builder(name, type)
                 .setConsumedArguments(consumedArgs)
-                .setRequired(defaultValues.isPresent())
+                .setRequired(!defaultValues.isPresent())
                 .setDefaultValues(Arrays.asList(defaultValues.orElse(new String[0])))
                 .build();
     }
