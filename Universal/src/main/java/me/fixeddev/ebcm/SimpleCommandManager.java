@@ -68,6 +68,11 @@ public class SimpleCommandManager implements CommandManager {
     }
 
     @Override
+    public Authorizer getAuthorizer() {
+        return authorizer;
+    }
+
+    @Override
     public Optional<Command> getCommand(String commandName) {
         return Optional.ofNullable(commandMap.get(commandName));
     }

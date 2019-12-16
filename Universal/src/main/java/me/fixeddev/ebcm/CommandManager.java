@@ -11,11 +11,14 @@ import java.util.Optional;
 public interface CommandManager {
 
     void registerCommand(Command command);
+
     void registerCommands(List<Command> commandList);
 
     boolean exists(String commandName);
 
     ParameterProviderRegistry getProviderRegistry();
+
+    Authorizer getAuthorizer();
 
     Optional<Command> getCommand(String commandName);
 
