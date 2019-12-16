@@ -4,6 +4,7 @@ import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
+import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.internal.CommandLineParser;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
@@ -92,7 +93,7 @@ public class SimpleCommandManager implements CommandManager {
         Command toExecute = result.getCommandToExecute();
 
         if (!authorizer.isAuthorized(accessor, toExecute.getPermission())) {
-            throw new CommandUsageException(toExecute.getPermissionMessage());
+            throw new NoPermissionException(toExecute.getPermissionMessage());
         }
 
         CommandAction action = toExecute.getAction();
