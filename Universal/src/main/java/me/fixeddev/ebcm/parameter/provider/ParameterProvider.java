@@ -1,6 +1,7 @@
 package me.fixeddev.ebcm.parameter.provider;
 
 import me.fixeddev.ebcm.NamespaceAccesor;
+import me.fixeddev.ebcm.part.CommandPart;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.Optional;
 
 public interface ParameterProvider<T> {
 
-    Result<T> transform(List<String> arguments, NamespaceAccesor namespaceAccesor);
+    Result<T> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part);
 
     default List<String> getSuggestions(String startsWith) {
         return Collections.emptyList();

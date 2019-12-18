@@ -263,6 +263,12 @@ public class CommandLineParser {
             if (partToBind instanceof ArgumentPart) {
                 ArgumentPart part = (ArgumentPart) partToBind;
 
+                ParameterProvider provider = providerRegistry.getParameterProvider(part.getArgumentType());
+
+                if (provider == null) {
+                    throw new CommandParseException("Failed to get a provider for the part " + part.getName());
+                }
+
                 List<String> argumentsToUse = new ArrayList<>();
                 boolean usingDefaults = false;
 
@@ -302,13 +308,7 @@ public class CommandLineParser {
                     bindPart(part, argumentsToUse);
                 }
 
-                ParameterProvider provider = providerRegistry.getParameterProvider(part.getArgumentType());
-
-                if (provider == null) {
-                    throw new CommandParseException("Failed to get a provider for the part " + part.getName());
-                }
-
-                ParameterProvider.Result object = provider.transform(argumentsToUse, namespaceAccesor);
+                ParameterProvider.Result object = provider.transform(argumentsToUse, namespaceAccesor, part);
 
                 Optional providedObject = object.getResultObject();
                 Optional<String> message = object.getMessage();

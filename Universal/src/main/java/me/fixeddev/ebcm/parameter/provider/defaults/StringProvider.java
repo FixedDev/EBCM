@@ -2,6 +2,7 @@ package me.fixeddev.ebcm.parameter.provider.defaults;
 
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
+import me.fixeddev.ebcm.part.CommandPart;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ can be joined to form a single string in this form "arg arg2 arg3"
 public class StringProvider implements ParameterProvider<String> {
 
     @Override
-    public Result<String> transform(List<String> arguments, NamespaceAccesor namespaceAccesor) {
+    public Result<String> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part) {
         return Result.createResult(String.join(" ", arguments));
     }
 }
