@@ -35,6 +35,7 @@ public abstract class SubCommandPart implements LineConsumingPart {
     public abstract static class Builder {
 
         private ListAppender<Command> commandsToCallAppender = new ListAppender<>();
+        private ListAppender<String> modifiersAppender = new ListAppender<>();
 
         final Builder named(String name) {
             return setName(name);
@@ -64,8 +65,23 @@ public abstract class SubCommandPart implements LineConsumingPart {
 
         abstract Builder setCommandsToCall(List<Command> commands);
 
+        public Builder setAllModifiers(List<String> modifiers){
+            this.modifiersAppender.set(modifiers);
+
+            return this;
+        }
+
+        public Builder addModifier(String modifier){
+            this.modifiersAppender.add(modifier);
+
+            return this;
+        }
+
+        abstract Builder setModifiers(List<String> modifiers);
+
         public SubCommandPart build() {
             setCommandsToCall(commandsToCallAppender.toList());
+            setModifiers(modifiersAppender.toList());
 
             return autoBuild();
         }

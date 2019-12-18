@@ -2,6 +2,7 @@ package me.fixeddev.ebcm.part;
 
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
+import me.fixeddev.ebcm.util.ListAppender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,8 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        private ListAppender<String> modifiersAppender = new ListAppender<>();
+
         final Builder named(String name) {
             return setName(name);
         }
@@ -55,6 +58,20 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
 
         public abstract Builder setRequired(boolean newRequired);
 
+        public Builder setAllModifiers(List<String> modifiers){
+            this.modifiersAppender.set(modifiers);
+
+            return this;
+        }
+
+        public Builder addModifier(String modifier){
+            this.modifiersAppender.add(modifier);
+
+            return this;
+        }
+
+        abstract Builder setModifiers(List<String> modifiers);
+
         abstract boolean isRequired();
 
         abstract int getConsumedArguments();
@@ -62,9 +79,11 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
         abstract ArgumentPart autoBuild();
 
         public ArgumentPart build() {
-            if(isRequired() && getConsumedArguments() == -1){
+            if (isRequired() && getConsumedArguments() == -1) {
                 throw new IllegalArgumentException("A part can't be required and infinite!");
             }
+
+            setModifiers(modifiersAppender.toList());
 
             return autoBuild();
         }

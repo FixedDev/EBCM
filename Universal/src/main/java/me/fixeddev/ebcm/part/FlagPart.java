@@ -2,6 +2,9 @@ package me.fixeddev.ebcm.part;
 
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
+import me.fixeddev.ebcm.util.ListAppender;
+
+import java.util.List;
 
 @AutoValue
 public abstract class FlagPart implements LineConsumingPart {
@@ -32,6 +35,8 @@ public abstract class FlagPart implements LineConsumingPart {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        private ListAppender<String> modifiersAppender = new ListAppender<>();
+
         final Builder named(String name) {
             return setName(name);
         }
@@ -46,6 +51,26 @@ public abstract class FlagPart implements LineConsumingPart {
 
         public abstract Builder setDescription(String newDescription);
 
-        public abstract FlagPart build();
+        public Builder setAllModifiers(List<String> modifiers){
+            this.modifiersAppender.set(modifiers);
+
+            return this;
+        }
+
+        public Builder addModifier(String modifier){
+            this.modifiersAppender.add(modifier);
+
+            return this;
+        }
+
+        abstract Builder setModifiers(List<String> modifiers);
+
+        abstract FlagPart autoBuild();
+
+        public final FlagPart build() {
+            setModifiers(modifiersAppender.toList());
+
+            return autoBuild();
+        }
     }
 }
