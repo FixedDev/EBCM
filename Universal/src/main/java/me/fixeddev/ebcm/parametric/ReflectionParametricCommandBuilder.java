@@ -9,11 +9,13 @@ import me.fixeddev.ebcm.parametric.annotation.ACommand;
 import me.fixeddev.ebcm.parametric.annotation.ConsumedArgs;
 import me.fixeddev.ebcm.parametric.annotation.Default;
 import me.fixeddev.ebcm.parametric.annotation.Flag;
+import me.fixeddev.ebcm.parametric.annotation.ModifierAnnotation;
 import me.fixeddev.ebcm.parametric.annotation.Named;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -91,12 +93,28 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
         Flag flag = parameter.getAnnotation(Flag.class);
 
+        List<String> modifiers = new ArrayList<>();
+
+        for (Annotation annotation : parameter.getAnnotations()) {
+            Class<? extends Annotation> annotationType = annotation.annotationType();
+
+            ModifierAnnotation modifierAnnotation = annotationType.getAnnotation(ModifierAnnotation.class);
+
+            // This is not a modifier annotation, ignore it
+            if(modifierAnnotation == null){
+                continue;
+            }
+
+            modifiers.add(modifierAnnotation.value());
+        }
+
         if (flag != null) {
             if(type != boolean.class && type != Boolean.class){
                 throw new IllegalArgumentException("The provided parameter has a Flag annotation but it doesn't a boolean!");
             }
 
             return FlagPart.builder(name, flag.value())
+                    .setAllModifiers(modifiers)
                     .build();
         }
 
@@ -104,6 +122,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 .setConsumedArguments(consumedArgs)
                 .setRequired(!defaultValues.isPresent())
                 .setDefaultValues(Arrays.asList(defaultValues.orElse(new String[0])))
+                .setAllModifiers(modifiers)
                 .build();
     }
 
