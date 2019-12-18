@@ -316,7 +316,7 @@ public class CommandLineParser {
 
                 if (!providedObject.isPresent()) {
                     if (lastError.isPresent()) {
-                        throw new CommandParseException("An exception occurred while parsing the part " + part.getName() + " argument!");
+                        throw new CommandParseException("An exception occurred while parsing the part " + part.getName() + " argument!", lastError.get());
                     }
 
                     if (message.isPresent()) {
