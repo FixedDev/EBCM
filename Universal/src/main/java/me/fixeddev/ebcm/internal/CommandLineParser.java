@@ -324,10 +324,6 @@ public class CommandLineParser {
                         throw new CommandUsageException(message.get());
                     }
 
-                    if (part.isRequired()) {
-                        throw new CommandParseException("The provider for the part " + part.getName() + " with type " + part.getArgumentType().getSimpleName() + " provided an empty object for a required part!");
-                    }
-
                     continue;
                 }
 
