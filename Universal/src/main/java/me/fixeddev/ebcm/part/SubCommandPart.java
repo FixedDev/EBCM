@@ -15,7 +15,7 @@ public abstract class SubCommandPart implements LineConsumingPart {
     public static Builder builder(String name) {
         return new AutoValue_SubCommandPart.Builder()
                 .named(name)
-                .required()
+                .setRequired(false)
                 .setDescription("");
     }
 
@@ -43,11 +43,7 @@ public abstract class SubCommandPart implements LineConsumingPart {
 
         abstract Builder setName(String newName);
 
-        final Builder required() {
-            return setRequired(true);
-        }
-
-        abstract Builder setRequired(boolean newRequired);
+        public abstract Builder setRequired(boolean newRequired);
 
         public abstract Builder setDescription(String newDescription);
 
