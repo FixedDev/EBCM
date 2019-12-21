@@ -2,6 +2,7 @@ package me.fixeddev.ebcm.bukkit;
 
 import me.fixeddev.ebcm.Authorizer;
 import me.fixeddev.ebcm.CommandManager;
+import me.fixeddev.ebcm.bukkit.parameter.provider.CommandSenderProvider;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
@@ -43,7 +44,7 @@ public class BukkitCommandWrapper extends Command {
         argumentLine.addAll(Arrays.asList(args));
 
         Namespace namespace = new Namespace();
-        namespace.setObject(CommandSender.class, "sender", commandSender);
+        namespace.setObject(CommandSender.class, CommandSenderProvider.SENDER_NAMESPACE, commandSender);
 
         try {
             if (commandManager.execute(namespace, argumentLine)) {
