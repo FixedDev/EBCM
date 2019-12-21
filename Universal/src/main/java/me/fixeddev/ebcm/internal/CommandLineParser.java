@@ -206,7 +206,7 @@ public class CommandLineParser {
             return new ParseResultData(commandLabel, allArguments, currentCommand, currentCommand, bindings, valueBindings);
         }
 
-        boolean hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart);
+        boolean hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
         int neededArguments = calculateNeededArgs();
         int allNeededArguments = calculateAllNeededArgs();
         // Ok, the name of this is not clear
@@ -239,8 +239,12 @@ public class CommandLineParser {
                 String usage = UsageBuilder.getUsageForCommand(currentCommand, commandLabel);
 
                 if (!hasNextArgument()) {
-                    throw new CommandUsageException("Missing argument for required part " + partToBind.getName()
-                            + ", available values: " + availableValuesString + "\n " + usage);
+                    if(partToBind.isRequired()){
+                        throw new CommandUsageException("Missing argument for required part " + partToBind.getName()
+                                + ", available values: " + availableValuesString + "\n " + usage);
+                    }
+
+                    continue;
                 }
 
                 String argument = nextArgument();
