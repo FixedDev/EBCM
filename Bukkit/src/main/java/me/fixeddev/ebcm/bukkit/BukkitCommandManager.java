@@ -37,6 +37,9 @@ public class BukkitCommandManager implements CommandManager {
 
     public void registerCommand(Command command) {
         delegate.registerCommand(command);
+
+        org.bukkit.command.Command bukkitCommand = new BukkitCommandWrapper(command, this);
+        bukkitCommandMap.register(bukkitCommand.getName(), bukkitCommand);
     }
 
     public void registerCommands(List<Command> commandList) {
