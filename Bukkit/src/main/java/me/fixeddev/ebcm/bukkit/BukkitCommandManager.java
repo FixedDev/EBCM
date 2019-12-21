@@ -21,9 +21,12 @@ public class BukkitCommandManager implements CommandManager {
     private CommandManager delegate;
 
     private CommandMap bukkitCommandMap;
+    private String fallbackPrefix;
 
-    public BukkitCommandManager(CommandManager delegate) {
+
+    public BukkitCommandManager(CommandManager delegate, String fallbackPrefix) {
         this.delegate = delegate;
+        this.fallbackPrefix = fallbackPrefix;
 
         try {
             Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
@@ -39,7 +42,7 @@ public class BukkitCommandManager implements CommandManager {
         delegate.registerCommand(command);
 
         org.bukkit.command.Command bukkitCommand = new BukkitCommandWrapper(command, this);
-        bukkitCommandMap.register(bukkitCommand.getName(), bukkitCommand);
+        bukkitCommandMap.register(fallbackPrefix, bukkitCommand);
     }
 
     public void registerCommands(List<Command> commandList) {
