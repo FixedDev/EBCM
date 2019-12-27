@@ -45,7 +45,7 @@ public abstract class InjectedValuePart implements CommandPart {
             return this;
         }
 
-        abstract FlagPart.Builder setModifiers(List<String> modifiers);
+        abstract Builder setModifiers(List<String> modifiers);
 
         abstract InjectedValuePart autoBuild();
 
