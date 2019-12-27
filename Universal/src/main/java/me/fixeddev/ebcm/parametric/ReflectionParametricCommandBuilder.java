@@ -9,11 +9,13 @@ import me.fixeddev.ebcm.parametric.annotation.ACommand;
 import me.fixeddev.ebcm.parametric.annotation.ConsumedArgs;
 import me.fixeddev.ebcm.parametric.annotation.Default;
 import me.fixeddev.ebcm.parametric.annotation.Flag;
+import me.fixeddev.ebcm.parametric.annotation.Injected;
 import me.fixeddev.ebcm.parametric.annotation.ModifierAnnotation;
 import me.fixeddev.ebcm.parametric.annotation.Named;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
+import me.fixeddev.ebcm.part.InjectedValuePart;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -92,6 +94,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         Optional<String[]> defaultValues = getDefault(parameter);
 
         Flag flag = parameter.getAnnotation(Flag.class);
+        Injected injected = parameter.getAnnotation(Injected.class);
 
         List<String> modifiers = new ArrayList<>();
 
@@ -108,12 +111,23 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
             modifiers.add(modifierAnnotation.value());
         }
 
+        if(injected != null && flag != null){
+            throw new IllegalArgumentException("The provided parameter has a Flag annotation and a Injected annotation, it should have only one of the two!");
+        }
+
         if (flag != null) {
             if(type != boolean.class && type != Boolean.class){
                 throw new IllegalArgumentException("The provided parameter has a Flag annotation but it doesn't a boolean!");
             }
 
             return FlagPart.builder(name, flag.value())
+                    .setAllModifiers(modifiers)
+                    .build();
+        }
+
+        if(injected != null){
+            return InjectedValuePart.builder(name, type)
+                    .setRequired(injected.value())
                     .setAllModifiers(modifiers)
                     .build();
         }
