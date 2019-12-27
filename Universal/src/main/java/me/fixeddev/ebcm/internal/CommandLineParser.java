@@ -13,6 +13,7 @@ import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
+import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
 import me.fixeddev.ebcm.util.UsageBuilder;
 
@@ -239,7 +240,7 @@ public class CommandLineParser {
                 String usage = UsageBuilder.getUsageForCommand(currentCommand, commandLabel);
 
                 if (!hasNextArgument()) {
-                    if(partToBind.isRequired()){
+                    if (partToBind.isRequired()) {
                         throw new CommandUsageException("Missing argument for required part " + partToBind.getName()
                                 + ", available values: " + availableValuesString + "\n " + usage);
                     }
@@ -332,6 +333,21 @@ public class CommandLineParser {
                 }
 
                 valueBindings.put(part, providedObject.get());
+            }
+
+            if (partToBind instanceof InjectedValuePart) {
+                InjectedValuePart part = (InjectedValuePart) partToBind;
+
+                Object object = namespaceAccesor.getObject(part.getType(), part.getInjectedName());
+
+                if (object == null && part.isRequired()) {
+                    throw new CommandParseException("Failed to get the injected value for the part with name " + part.getName() +
+                            "\n injected name: " + part.getInjectedName() +
+                            "\n type: " + part.getType());
+
+                }
+
+                valueBindings.put(partToBind, object);
             }
 
         }
