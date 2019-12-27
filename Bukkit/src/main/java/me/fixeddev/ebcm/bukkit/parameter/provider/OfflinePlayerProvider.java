@@ -1,6 +1,7 @@
 package me.fixeddev.ebcm.bukkit.parameter.provider;
 
 import me.fixeddev.ebcm.NamespaceAccesor;
+import me.fixeddev.ebcm.bukkit.BukkitCommandManager;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
 import me.fixeddev.ebcm.part.CommandPart;
@@ -14,7 +15,7 @@ import java.util.List;
 public class OfflinePlayerProvider implements ParameterProvider<OfflinePlayer> {
     @Override
     public Result<OfflinePlayer> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part) {
-        CommandSender sender = namespaceAccesor.getObject(CommandSender.class, CommandSenderProvider.SENDER_NAMESPACE);
+        CommandSender sender = namespaceAccesor.getObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE);
 
         if (part.getModifiers().contains(PlayerProvider.SENDER_MODIFIER)) {
             if (sender == null) {
