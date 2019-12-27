@@ -23,6 +23,8 @@ public class BukkitCommandManager implements CommandManager {
     private CommandMap bukkitCommandMap;
     private String fallbackPrefix;
 
+    public static final String SENDER_NAMESPACE = "SENDER";
+
 
     public BukkitCommandManager(CommandManager delegate, String fallbackPrefix) {
         this.delegate = delegate;

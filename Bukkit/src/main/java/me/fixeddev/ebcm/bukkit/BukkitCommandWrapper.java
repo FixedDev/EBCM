@@ -44,7 +44,7 @@ public class BukkitCommandWrapper extends Command {
         argumentLine.addAll(Arrays.asList(args));
 
         Namespace namespace = new Namespace();
-        namespace.setObject(CommandSender.class, CommandSenderProvider.SENDER_NAMESPACE, commandSender);
+        namespace.setObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE, commandSender);
 
         try {
             if (commandManager.execute(namespace, argumentLine)) {
