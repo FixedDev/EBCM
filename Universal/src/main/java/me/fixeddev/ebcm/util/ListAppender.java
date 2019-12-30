@@ -32,6 +32,7 @@ public class ListAppender<T> {
 
     public ListAppender<T> set(Collection<? extends T> object) {
         content = object.toArray();
+        size = content.length;
 
         return this;
     }
