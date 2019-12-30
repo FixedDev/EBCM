@@ -237,7 +237,7 @@ public class CommandLineParser {
                 }
 
                 String availableValuesString = String.join(", ", availableValues.keySet());
-                String usage = UsageBuilder.getUsageForCommand(currentCommand, commandLabel);
+                String usage = UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel);
 
                 if (!hasNextArgument()) {
                     if (partToBind.isRequired()) {
@@ -292,7 +292,7 @@ public class CommandLineParser {
                     for (int i = 0; i < part.getConsumedArguments(); i++) {
                         if (!hasNextArgument()) {
                             throw new CommandUsageException("Missing arguments for required part " + partToBind.getName()
-                                    + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(currentCommand, commandLabel));
+                                    + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
                         }
 
                         String argument = nextArgument();
