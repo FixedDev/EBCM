@@ -111,7 +111,7 @@ public class SimpleCommandManager implements CommandManager {
         }
 
         if (usage) {
-            throw new CommandUsageException(UsageBuilder.getUsageForCommand(toExecute, result.getLabel()));
+            throw new CommandUsageException(UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
         }
 
         return true;
