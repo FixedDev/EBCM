@@ -186,19 +186,18 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         return (parameters -> {
             List<CommandPart> commandParts = parameters.getCommand().getParts();
 
-            Object[] params = new Object[commandParts.size()];
+            List<Object> params = new ArrayList<>();
 
-            int i = 0;
-            for (CommandPart part : parameters.getCommand().getParts()) {
+            for (CommandPart part : commandParts) {
                 if (part instanceof FlagPart || part instanceof ArgumentPart)
-                    params[i++] = parameters.getValue(part).get();
+                    params.add(parameters.getValue(part).get());
             }
 
             boolean accessible = method.isAccessible();
 
             try {
                 method.setAccessible(true);
-                boolean result = (boolean) method.invoke(commandClass, params);
+                boolean result = (boolean) method.invoke(commandClass, params.toArray());
                 method.setAccessible(accessible);
 
                 return result;
