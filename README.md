@@ -10,7 +10,8 @@ like the parametric commands, and still has some bugs that will be solved with t
 # TODO
 - [ ] Fix the bug that's related to subcommands and optional arguments
 - [x] Develop the parametric commands
-- [ ] Allow subcommands in the parametric commands
+- [x] Allow subcommands in the parametric commands
+- [ ] Allow more than 1 depth of subcommands in the parametric commands 
 - [ ] Modify the parser so it's more maintainable and has better performance
 - [ ] Refactor some things(command structure, implementations of interfaces) to make the above task easier to complete
 - [x] Allow optional subcommands
