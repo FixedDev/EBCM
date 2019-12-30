@@ -16,6 +16,7 @@ import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.InjectedValuePart;
+import me.fixeddev.ebcm.part.SubCommandPart;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +25,10 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ReflectionParametricCommandBuilder implements ParametricCommandBuilder {
@@ -67,8 +71,13 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
     @Override
     public List<Command> fromClass(CommandClass commandClass) {
-        List<Command> commands = new ArrayList<>();
-        for (Method method : commandClass.getClass().getDeclaredMethods()) {
+        Class<?> clazz = commandClass.getClass();
+
+        ACommand commandAnnotation = clazz.getAnnotation(ACommand.class);
+
+        Map<String, Command> commands = new HashMap<>();
+        List<Command> commandList = new ArrayList<>();
+        for (Method method : clazz.getDeclaredMethods()) {
             if (Modifier.isStatic(method.getModifiers()) || !Modifier.isPublic(method.getModifiers())) {
                 continue;
             }
@@ -81,10 +90,43 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 continue;
             }
 
-            commands.add(fromMethod(commandClass, method));
+            Command command = fromMethod(commandClass, method);
+
+            commands.put(command.getData().getName(), command);
+            commandList.add(command);
         }
 
-        return commands;
+        if(commandAnnotation != null){
+            Command command = commands.get("");
+
+            String[] names = commandAnnotation.names();
+
+            CommandData.Builder dataBuilder = CommandData.builder(commandAnnotation.names()[0])
+                    .setAliases(Arrays.asList(Arrays.copyOfRange(names, 1, names.length)))
+                    .setDescription(commandAnnotation.desc());
+
+            ImmutableCommand.Builder builder = ImmutableCommand.builder(dataBuilder);
+
+            builder.setPermission(commandAnnotation.permission())
+                    .setPermissionMessage(commandAnnotation.permissionMessage());
+
+            if(command != null){
+                commands.remove("");
+                commandList.remove(command);
+
+                builder.setAction(command.getAction())
+                        .setCommandParts(command.getParts());
+            }
+
+
+            builder.addPart(SubCommandPart.builder("subcommand")
+            .setCommands(commandList)
+            .build());
+
+            return Collections.singletonList(builder.build());
+        }
+
+        return commandList;
     }
 
     private CommandPart fromParameter(Parameter parameter) {
