@@ -50,7 +50,7 @@ public class MutableCommand implements Command {
         return new MutableCommand.Builder(dataBuilder.build())
                 .setPermission("")
                 .setPermissionMessage("No permission.")
-                .setAction(params -> true);
+                .setAction(params -> false);
     }
 
     public void setPermission(String permission) {

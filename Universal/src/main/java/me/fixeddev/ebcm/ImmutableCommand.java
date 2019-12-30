@@ -15,7 +15,7 @@ public abstract class ImmutableCommand implements Command {
                 .withData(dataBuilder)
                 .setPermission("")
                 .setPermissionMessage("No permission.")
-                .setAction(params -> true);
+                .setAction(params -> false);
     }
 
     @AutoValue.Builder
