@@ -26,7 +26,7 @@ public class BukkitCommandWrapper extends Command {
         this.setAliases(command.getData().getAliases());
 
         this.setDescription(command.getData().getDescription());
-        this.setUsage(UsageBuilder.getUsageForCommand(command, "<command>"));
+        this.setUsage(UsageBuilder.getUsageForCommand(null, command, "<command>"));
 
         this.setPermission(command.getPermission());
         this.setPermissionMessage(command.getPermissionMessage());
