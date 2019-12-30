@@ -9,6 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <version>${bukkit-version}</version>
+
     <artifactId>ebcm-bukkit</artifactId>
     <build>
         <plugins>
@@ -27,7 +29,7 @@
         <dependency>
             <groupId>me.fixeddev</groupId>
             <artifactId>ebcm-universal</artifactId>
-            <version>${project.version}</version>
+            <version>${universal-version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

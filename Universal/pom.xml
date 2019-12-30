@@ -9,6 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <version>${universal-version}</version>
+
     <artifactId>ebcm-universal</artifactId>
     <build>
         <plugins>
