@@ -278,25 +278,7 @@ public class CommandLineParser {
         }
 
         if (!usingDefaults) {
-            for (int i = 0; i < part.getConsumedArguments(); i++) {
-                if (!hasNextArgument()) {
-                    throw new CommandUsageException("Missing arguments for required part " + partToBind.getName()
-                            + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
-                }
-
-                String argument = nextArgument();
-                argumentsToUse.add(argument);
-
-                /*
-                 * Don't subtract an argument from needed arguments if this part is not required, because it's not counted there
-                 */
-                if (part.isRequired()) {
-                    neededArguments--;
-                } else {
-                    optionalArgumentsToBound--;
-                }
-                allNeededArguments--;
-            }
+            argumentsToUse = getArgumentsToConsume(part);
 
             bindPart(part, argumentsToUse);
         }
@@ -321,6 +303,32 @@ public class CommandLineParser {
         }
 
         valueBindings.put(part, providedObject.get());
+    }
+
+    private List<String> getArgumentsToConsume(ArgumentPart part) throws CommandParseException {
+        List<String> argumentsToUse = new ArrayList<>();
+
+        for (int i = 0; i < part.getConsumedArguments(); i++) {
+            if (!hasNextArgument()) {
+                throw new CommandUsageException("Missing arguments for required part " + part.getName()
+                        + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+            }
+
+            String argument = nextArgument();
+            argumentsToUse.add(argument);
+
+            /*
+             * Don't subtract an argument from needed arguments if this part is not required, because it's not counted there
+             */
+            if (part.isRequired()) {
+                neededArguments--;
+            } else {
+                optionalArgumentsToBound--;
+            }
+            allNeededArguments--;
+        }
+
+        return argumentsToUse;
     }
 
     private void parseSubCommand(CommandPart partToBind) throws CommandParseException {
