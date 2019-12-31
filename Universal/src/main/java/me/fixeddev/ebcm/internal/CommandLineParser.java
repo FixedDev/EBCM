@@ -148,11 +148,7 @@ public class CommandLineParser {
         partsLeft = currentCommandParts.size();
     }
 
-    private void parseFlags() throws CommandParseException {
-        if (!bindings.isEmpty()) {
-            throw new CommandParseException("This method can't be called after one part is bound!");
-        }
-
+    private void parseFlags() {
         Map<Character, FlagPart> flagParts = currentCommandParts.stream()
                 .filter(part -> part instanceof FlagPart)
                 .map(part -> (FlagPart) part).collect(Collectors.toMap(FlagPart::getFlagChar, Function.identity()));
@@ -266,15 +262,18 @@ public class CommandLineParser {
         List<String> argumentsToUse = new ArrayList<>();
         boolean usingDefaults = false;
 
-        // The part is not required so, we check if the part can be bound or not
-        if (!part.isRequired() && ((allNeededArguments != -1 && argumentsLeft < neededArguments + optionalArgumentsToBound) || (optionalArgumentsToBound <= 0 || hasSubCommand))) {
-            if (part.getDefaultValues().isEmpty()) {
-                return;
-            }
 
-            usingDefaults = true;
-            argumentsToUse = part.getDefaultValues();
-            allNeededArguments = allNeededArguments - part.getConsumedArguments();
+        if (!part.isRequired()) {
+            if ((optionalArgumentsToBound <= 0 || argumentsLeft < neededArguments + part.getConsumedArguments()) ||
+                            (allNeededArguments == -1 || part.getConsumedArguments() == -1 || hasSubCommand)) {
+                if (part.getDefaultValues().isEmpty()) {
+                    return;
+                }
+
+                usingDefaults = true;
+                argumentsToUse = part.getDefaultValues();
+                allNeededArguments = allNeededArguments - part.getConsumedArguments();
+            }
         }
 
         if (!usingDefaults) {
@@ -367,6 +366,8 @@ public class CommandLineParser {
         }
 
         useCommand(command);
+        parseFlags();
+
         hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart);
         neededArguments = calculateNeededArgs();
         allNeededArguments = calculateAllNeededArgs();
