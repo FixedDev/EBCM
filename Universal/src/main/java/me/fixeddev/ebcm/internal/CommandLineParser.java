@@ -198,22 +198,27 @@ public class CommandLineParser {
         argumentsIterator.next();
     }
 
+    private boolean hasSubCommand;
+    private int neededArguments;
+    private int allNeededArguments;
+    // Ok, the name of this is not clear
+    // But, this variable it's supposed to mean the quantity of optional parts
+    // that can be bound before only the required parts can be bound
+    private int optionalArgumentsToBound;
+
     public ParseResult parse() throws CommandParseException, CommandNotFound {
         nextArgument();
         currentAsRootCommand();
         parseFlags();
 
+        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
+        neededArguments = calculateNeededArgs();
+        allNeededArguments = calculateAllNeededArgs();
+        optionalArgumentsToBound = argumentsLeft - neededArguments;
+
         if (partsLeft <= 0) {
             return new ParseResultData(commandLabel, allArguments, currentCommand, currentCommand, bindings, valueBindings);
         }
-
-        boolean hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
-        int neededArguments = calculateNeededArgs();
-        int allNeededArguments = calculateAllNeededArgs();
-        // Ok, the name of this is not clear
-        // But, this variable it's supposed to mean the quantity of optional parts
-        // that can be bound before only the required parts can be bound
-        int optionalArgumentsToBound = argumentsLeft - neededArguments;
 
         checkForInvalidInfiniteParts();
 
