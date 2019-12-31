@@ -1,4 +1,4 @@
-# EBCM
+# EBCM [![Codacy Badge](https://api.codacy.com/project/badge/Grade/78392a0229da4390a2069ab0efc24534)](https://www.codacy.com/manual/FixedDev/EBCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=FixedDev/EBCM&amp;utm_campaign=Badge_Grade)
 My new command manager slightly inspired by EngineHub/Piston
 # Purpose
 The purpose of the EBCM is:
