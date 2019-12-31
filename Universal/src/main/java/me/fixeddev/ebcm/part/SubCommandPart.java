@@ -22,13 +22,10 @@ public abstract class SubCommandPart implements LineConsumingPart {
     @Override
     @Memoized
     public String getLineRepresentation() {
-        StringBuilder builder = new StringBuilder(getName().length() + 2);
 
-        builder.append(isRequired() ? "<" : "[")
-                .append(getName())
-                .append(isRequired() ? ">" : "]");
-
-        return builder.toString();
+        return (isRequired() ? "<" : "[") +
+                getName() +
+                (isRequired() ? ">" : "]");
     }
 
     @AutoValue.Builder
@@ -37,11 +34,11 @@ public abstract class SubCommandPart implements LineConsumingPart {
         private ListAppender<Command> commandsToCallAppender = new ListAppender<>();
         private ListAppender<String> modifiersAppender = new ListAppender<>();
 
-        final Builder named(String name) {
+        protected final Builder named(String name) {
             return setName(name);
         }
 
-        abstract Builder setName(String newName);
+        protected abstract Builder setName(String newName);
 
         public abstract Builder setRequired(boolean newRequired);
 
@@ -82,6 +79,6 @@ public abstract class SubCommandPart implements LineConsumingPart {
             return autoBuild();
         }
 
-        public abstract SubCommandPart autoBuild();
+        protected abstract SubCommandPart autoBuild();
     }
 }

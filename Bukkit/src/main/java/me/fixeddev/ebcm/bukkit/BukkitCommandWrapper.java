@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BukkitCommandWrapper extends Command {
-    private me.fixeddev.ebcm.Command command;
     private CommandManager commandManager;
 
     public BukkitCommandWrapper(me.fixeddev.ebcm.Command command, CommandManager dispatcher) {
@@ -30,7 +29,6 @@ public class BukkitCommandWrapper extends Command {
         this.setPermission(command.getPermission());
         this.setPermissionMessage(command.getPermissionMessage());
 
-        this.command = command;
         this.commandManager = dispatcher;
     }
 
@@ -62,7 +60,7 @@ public class BukkitCommandWrapper extends Command {
             throw new org.bukkit.command.CommandException("An unexpected exception occurred while executing the command " + label, e);
         }
 
-        return true;
+        return false;
     }
 
     @Override

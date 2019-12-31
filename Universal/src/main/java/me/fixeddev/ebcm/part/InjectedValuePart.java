@@ -45,9 +45,9 @@ public abstract class InjectedValuePart implements CommandPart {
             return this;
         }
 
-        abstract Builder setModifiers(List<String> modifiers);
+        protected abstract Builder setModifiers(List<String> modifiers);
 
-        abstract InjectedValuePart autoBuild();
+        protected abstract InjectedValuePart autoBuild();
 
         public InjectedValuePart build() {
             setModifiers(modifiersAppender.toList());

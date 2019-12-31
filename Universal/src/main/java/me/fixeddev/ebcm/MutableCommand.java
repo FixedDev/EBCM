@@ -77,7 +77,7 @@ public class MutableCommand implements Command {
 
         private ListAppender<CommandPart> partListAppender = new ListAppender<>();
 
-        Builder(CommandData data) {
+        protected Builder(CommandData data) {
             if (data == null) {
                 throw new NullPointerException("Null data");
             }

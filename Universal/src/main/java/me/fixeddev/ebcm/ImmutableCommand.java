@@ -22,11 +22,11 @@ public abstract class ImmutableCommand implements Command {
 
         private ListAppender<CommandPart> partListAppender = new ListAppender<>();
 
-        final Builder withData(CommandData.Builder dataBuilder) {
+        protected final Builder withData(CommandData.Builder dataBuilder) {
             return setData(dataBuilder.build());
         }
 
-        abstract Builder setData(CommandData newData);
+        protected abstract Builder setData(CommandData newData);
 
         public abstract Builder setPermission(String permission);
 
@@ -34,7 +34,7 @@ public abstract class ImmutableCommand implements Command {
 
         public abstract Builder setAction(CommandAction newAction);
 
-        abstract Builder setParts(List<CommandPart> newParts);
+        protected abstract Builder setParts(List<CommandPart> newParts);
 
         public abstract ImmutableCommand autoBuild();
 

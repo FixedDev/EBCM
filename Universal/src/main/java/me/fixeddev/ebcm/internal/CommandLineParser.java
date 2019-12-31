@@ -167,7 +167,7 @@ public class CommandLineParser {
             }
 
             // Disable the parsing of the next flags
-            if (argument.equals("--")) {
+            if ("--".equals(argument)) {
                 allArguments.remove(argument);
                 argumentsLeft--;
                 break;

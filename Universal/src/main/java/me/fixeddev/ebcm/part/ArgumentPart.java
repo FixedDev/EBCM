@@ -25,30 +25,27 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
     @Override
     @Memoized
     public String getLineRepresentation() {
-        StringBuilder builder = new StringBuilder(getName().length() + 2);
 
-        builder.append(isRequired() ? "<" : "[")
-                .append(getName())
-                .append(isRequired() ? ">" : "]");
-
-        return builder.toString();
+        return (isRequired() ? "<" : "[") +
+                getName() +
+                (isRequired() ? ">" : "]");
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         private ListAppender<String> modifiersAppender = new ListAppender<>();
 
-        final Builder named(String name) {
+        protected final Builder named(String name) {
             return setName(name);
         }
 
-        abstract Builder setName(String newName);
+        protected abstract Builder setName(String newName);
 
-        final Builder argumentType(Class<?> argumentType) {
+        protected final Builder argumentType(Class<?> argumentType) {
             return setArgumentType(argumentType);
         }
 
-        abstract Builder setArgumentType(Class<?> newArgumentType);
+        protected abstract Builder setArgumentType(Class<?> newArgumentType);
 
         public abstract Builder setDefaultValues(List<String> defaultValues);
 
@@ -66,17 +63,17 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
             return this;
         }
 
-        abstract Builder setModifiers(List<String> modifiers);
+        protected abstract Builder setModifiers(List<String> modifiers);
 
-        abstract boolean isRequired();
+        protected abstract boolean isRequired();
 
         public abstract Builder setRequired(boolean newRequired);
 
-        abstract int getConsumedArguments();
+        protected abstract int getConsumedArguments();
 
         public abstract Builder setConsumedArguments(int consumedArguments);
 
-        abstract ArgumentPart autoBuild();
+        protected abstract ArgumentPart autoBuild();
 
         public ArgumentPart build() {
             if (isRequired() && getConsumedArguments() == -1) {

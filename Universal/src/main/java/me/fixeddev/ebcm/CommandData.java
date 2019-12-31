@@ -10,7 +10,7 @@ public abstract class CommandData {
     public static Builder builder(String name) {
         return new AutoValue_CommandData.Builder()
                 .named(name)
-                .setAliases(Collections.EMPTY_LIST)
+                .setAliases(Collections.emptyList())
                 .setDescription("");
     }
 
@@ -22,11 +22,11 @@ public abstract class CommandData {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        final Builder named(String name) {
+        protected final Builder named(String name) {
             return setName(name);
         }
 
-        abstract Builder setName(String name);
+        protected abstract Builder setName(String name);
 
         public abstract Builder setAliases(List<String> aliases);
 
