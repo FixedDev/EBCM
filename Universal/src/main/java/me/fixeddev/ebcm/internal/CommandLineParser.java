@@ -148,11 +148,7 @@ public class CommandLineParser {
         partsLeft = currentCommandParts.size();
     }
 
-    private void parseFlags() throws CommandParseException {
-        if (!bindings.isEmpty()) {
-            throw new CommandParseException("This method can't be called after one part is bound!");
-        }
-
+    private void parseFlags() {
         Map<Character, FlagPart> flagParts = currentCommandParts.stream()
                 .filter(part -> part instanceof FlagPart)
                 .map(part -> (FlagPart) part).collect(Collectors.toMap(FlagPart::getFlagChar, Function.identity()));
@@ -198,22 +194,27 @@ public class CommandLineParser {
         argumentsIterator.next();
     }
 
+    private boolean hasSubCommand;
+    private int neededArguments;
+    private int allNeededArguments;
+    // Ok, the name of this is not clear
+    // But, this variable it's supposed to mean the quantity of optional parts
+    // that can be bound before only the required parts can be bound
+    private int optionalArgumentsToBound;
+
     public ParseResult parse() throws CommandParseException, CommandNotFound {
         nextArgument();
         currentAsRootCommand();
         parseFlags();
 
+        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
+        neededArguments = calculateNeededArgs();
+        allNeededArguments = calculateAllNeededArgs();
+        optionalArgumentsToBound = argumentsLeft - neededArguments;
+
         if (partsLeft <= 0) {
             return new ParseResultData(commandLabel, allArguments, currentCommand, currentCommand, bindings, valueBindings);
         }
-
-        boolean hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
-        int neededArguments = calculateNeededArgs();
-        int allNeededArguments = calculateAllNeededArgs();
-        // Ok, the name of this is not clear
-        // But, this variable it's supposed to mean the quantity of optional parts
-        // that can be bound before only the required parts can be bound
-        int optionalArgumentsToBound = argumentsLeft - neededArguments;
 
         checkForInvalidInfiniteParts();
 
@@ -221,139 +222,160 @@ public class CommandLineParser {
             CommandPart partToBind = nextUnboundPart();
 
             if (partToBind instanceof SubCommandPart) {
-                if (hasNextUnboundPart()) {
-                    throw new CommandParseException("The sub-command should be the last part of the command!");
-                }
-
-                SubCommandPart subCommandPart = (SubCommandPart) partToBind;
-                Map<String, Command> availableValues = new HashMap<>();
-
-                for (Command command : subCommandPart.getCommandsToCall()) {
-                    availableValues.put(command.getData().getName(), command);
-
-                    for (String value : command.getData().getAliases()) {
-                        availableValues.put(value.toLowerCase(), command);
-                    }
-                }
-
-                String availableValuesString = String.join(", ", availableValues.keySet());
-                String usage = UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel);
-
-                if (!hasNextArgument()) {
-                    if (partToBind.isRequired()) {
-                        throw new CommandUsageException("Missing argument for required part " + partToBind.getName()
-                                + ", available values: " + availableValuesString + "\n " + usage);
-                    }
-
-                    continue;
-                }
-
-                String argument = nextArgument();
-                Command command = availableValues.get(argument.toLowerCase());
-
-                if (command == null) {
-                    throw new CommandUsageException("Invalid sub-command, valid values: " + availableValuesString + "\n " + usage);
-                }
-
-                useCommand(command);
-                hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart);
-                neededArguments = calculateNeededArgs();
-                allNeededArguments = calculateAllNeededArgs();
-
-                ParseResult.ParameterBinding parameterBinding = new ParameterBindingData(currentArgument, currentPart);
-                bindings.add(parameterBinding);
-                continue;
-            }
-
-            if (partToBind instanceof ArgumentPart) {
-                ArgumentPart part = (ArgumentPart) partToBind;
-
-                ParameterProvider provider = providerRegistry.getParameterProvider(part.getArgumentType());
-
-                if (provider == null) {
-                    throw new CommandParseException("Failed to get a provider for the part " + part.getName());
-                }
-
-                List<String> argumentsToUse = new ArrayList<>();
-                boolean usingDefaults = false;
-
-                // The part is not required so, we check if the part can be bound or not
-                if (!part.isRequired() && ((allNeededArguments != -1 && argumentsLeft < neededArguments + optionalArgumentsToBound) || (optionalArgumentsToBound <= 0 || hasSubCommand))) {
-                    if (part.getDefaultValues().isEmpty()) {
-                        continue;
-                    }
-
-                    usingDefaults = true;
-                    argumentsToUse = part.getDefaultValues();
-                    allNeededArguments = allNeededArguments - part.getConsumedArguments();
-                }
-
-                if (!usingDefaults) {
-                    for (int i = 0; i < part.getConsumedArguments(); i++) {
-                        if (!hasNextArgument()) {
-                            throw new CommandUsageException("Missing arguments for required part " + partToBind.getName()
-                                    + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
-                        }
-
-                        String argument = nextArgument();
-                        argumentsToUse.add(argument);
-
-
-                        /*
-                         * Don't subtract an argument from needed arguments if this part is not required, because it's not counted there
-                         */
-                        if (part.isRequired()) {
-                            neededArguments--;
-                        } else {
-                            optionalArgumentsToBound--;
-                        }
-                        allNeededArguments--;
-                    }
-
-                    bindPart(part, argumentsToUse);
-                }
-
-                ParameterProvider.Result object = provider.transform(argumentsToUse, namespaceAccesor, part);
-
-                Optional providedObject = object.getResultObject();
-                Optional<String> message = object.getMessage();
-                Optional<Exception> lastError = object.lastError();
-
-                if (!providedObject.isPresent()) {
-                    if (lastError.isPresent()) {
-                        throw new CommandParseException("An exception occurred while parsing the part " + part.getName() + " argument!", lastError.get());
-                    }
-
-                    if (message.isPresent()) {
-                        // TODO: Create a better exception to send messages to the command sender
-                        throw new CommandUsageException(message.get());
-                    }
-
-                    continue;
-                }
-
-                valueBindings.put(part, providedObject.get());
-            }
-
-            if (partToBind instanceof InjectedValuePart) {
-                InjectedValuePart part = (InjectedValuePart) partToBind;
-
-                Object object = namespaceAccesor.getObject(part.getType(), part.getInjectedName());
-
-                if (object == null && part.isRequired()) {
-                    throw new CommandParseException("Failed to get the injected value for the part with name " + part.getName() +
-                            "\n injected name: " + part.getInjectedName() +
-                            "\n type: " + part.getType());
-
-                }
-
-                valueBindings.put(partToBind, object);
+                parseSubCommand(partToBind);
+            } else if (partToBind instanceof ArgumentPart) {
+                parseArgument(partToBind);
+            } else if (partToBind instanceof InjectedValuePart) {
+                parseInjectedPart(partToBind);
+            } else {
+                throw new CommandParseException("Invalid part type provided! Type: " + partToBind.getClass().getSimpleName());
             }
 
         }
 
         return new ParseResultData(commandLabel, allArguments, rootCommand, currentCommand, bindings, valueBindings);
     }
+
+    private void parseInjectedPart(CommandPart partToBind) throws CommandParseException {
+        InjectedValuePart part = (InjectedValuePart) partToBind;
+
+        Object object = namespaceAccesor.getObject(part.getType(), part.getInjectedName());
+
+        if (object == null && part.isRequired()) {
+            throw new CommandParseException("Failed to get the injected value for the part with name " + part.getName() +
+                    "\n injected name: " + part.getInjectedName() +
+                    "\n type: " + part.getType());
+        }
+
+        valueBindings.put(partToBind, object);
+    }
+
+    private void parseArgument(CommandPart partToBind) throws CommandParseException {
+        ArgumentPart part = (ArgumentPart) partToBind;
+
+        ParameterProvider<?> provider = providerRegistry.getParameterProvider(part.getArgumentType());
+
+        if (provider == null) {
+            throw new CommandParseException("Failed to get a provider for the part " + part.getName());
+        }
+
+        List<String> argumentsToUse = new ArrayList<>();
+        boolean usingDefaults = false;
+
+
+        if (!part.isRequired()) {
+            if ((optionalArgumentsToBound <= 0 || argumentsLeft < neededArguments + part.getConsumedArguments()) ||
+                            (allNeededArguments == -1 || part.getConsumedArguments() == -1 || hasSubCommand)) {
+                if (part.getDefaultValues().isEmpty()) {
+                    return;
+                }
+
+                usingDefaults = true;
+                argumentsToUse = part.getDefaultValues();
+                allNeededArguments = allNeededArguments - part.getConsumedArguments();
+            }
+        }
+
+        if (!usingDefaults) {
+            argumentsToUse = getArgumentsToConsume(part);
+
+            bindPart(part, argumentsToUse);
+        }
+
+        ParameterProvider.Result<?> object = provider.transform(argumentsToUse, namespaceAccesor, part);
+
+        Optional<?> providedObject = object.getResultObject();
+        Optional<String> message = object.getMessage();
+        Optional<Exception> lastError = object.lastError();
+
+        if (!providedObject.isPresent()) {
+            if (lastError.isPresent()) {
+                throw new CommandParseException("An exception occurred while parsing the part " + part.getName() + " argument!", lastError.get());
+            }
+
+            if (message.isPresent()) {
+                // TODO: Create a better exception to send messages to the command sender
+                throw new CommandUsageException(message.get());
+            }
+
+            return;
+        }
+
+        valueBindings.put(part, providedObject.get());
+    }
+
+    private List<String> getArgumentsToConsume(ArgumentPart part) throws CommandParseException {
+        List<String> argumentsToUse = new ArrayList<>();
+
+        for (int i = 0; i < part.getConsumedArguments(); i++) {
+            if (!hasNextArgument()) {
+                throw new CommandUsageException("Missing arguments for required part " + part.getName()
+                        + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+            }
+
+            String argument = nextArgument();
+            argumentsToUse.add(argument);
+
+            /*
+             * Don't subtract an argument from needed arguments if this part is not required, because it's not counted there
+             */
+            if (part.isRequired()) {
+                neededArguments--;
+            } else {
+                optionalArgumentsToBound--;
+            }
+            allNeededArguments--;
+        }
+
+        return argumentsToUse;
+    }
+
+    private void parseSubCommand(CommandPart partToBind) throws CommandParseException {
+        if (hasNextUnboundPart()) {
+            throw new CommandParseException("The sub-command should be the last part of the command!");
+        }
+
+        SubCommandPart subCommandPart = (SubCommandPart) partToBind;
+        Map<String, Command> availableValues = new HashMap<>();
+
+        for (Command command : subCommandPart.getCommandsToCall()) {
+            availableValues.put(command.getData().getName(), command);
+
+            for (String value : command.getData().getAliases()) {
+                availableValues.put(value.toLowerCase(), command);
+            }
+        }
+
+        String availableValuesString = String.join(", ", availableValues.keySet());
+        String usage = UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel);
+
+        if (!hasNextArgument()) {
+            if (partToBind.isRequired()) {
+                throw new CommandUsageException("Missing argument for required part " + partToBind.getName()
+                        + ", available values: " + availableValuesString + "\n " + usage);
+            }
+
+            return;
+        }
+
+        String argument = nextArgument();
+        Command command = availableValues.get(argument.toLowerCase());
+
+        if (command == null) {
+            throw new CommandUsageException("Invalid sub-command, valid values: " + availableValuesString + "\n " + usage);
+        }
+
+        useCommand(command);
+        parseFlags();
+
+        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart);
+        neededArguments = calculateNeededArgs();
+        allNeededArguments = calculateAllNeededArgs();
+
+        ParseResult.ParameterBinding parameterBinding = new ParameterBindingData(currentArgument, currentPart);
+        bindings.add(parameterBinding);
+    }
+
 
     private void checkForInvalidInfiniteParts() throws CommandParseException {
         boolean requiredPartFound = false;
