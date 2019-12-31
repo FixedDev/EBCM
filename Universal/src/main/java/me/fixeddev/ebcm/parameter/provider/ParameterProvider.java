@@ -17,14 +17,6 @@ public interface ParameterProvider<T> {
     }
 
     interface Result<T> {
-        Optional<T> getResultObject();
-
-        Optional<String> getMessage();
-
-        List<Exception> getErrors();
-
-        Optional<Exception> lastError();
-
         static <T> Result<T> createResult(T object) {
             return new SimpleResult<>(object);
         }
@@ -36,6 +28,7 @@ public interface ParameterProvider<T> {
         static <T> Result<T> createResult(String message, List<Exception> errors) {
             return new SimpleResult<>(message, errors);
         }
+
         static <T> Result<T> createResult(String message, Exception... errors) {
             return new SimpleResult<>(message, Arrays.asList(errors));
         }
@@ -43,5 +36,13 @@ public interface ParameterProvider<T> {
         static <T> Result<T> createResult(T object, String message, List<Exception> errors) {
             return new SimpleResult<>(object, message, errors);
         }
+
+        Optional<T> getResultObject();
+
+        Optional<String> getMessage();
+
+        List<Exception> getErrors();
+
+        Optional<Exception> lastError();
     }
 }

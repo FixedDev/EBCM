@@ -1,6 +1,6 @@
 package me.fixeddev.ebcm.exception;
 
-public class CommandNotFound extends Exception{
+public class CommandNotFound extends Exception {
     public CommandNotFound() {
         super();
     }

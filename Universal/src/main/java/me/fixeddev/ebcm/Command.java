@@ -16,11 +16,11 @@ public interface Command {
 
     List<CommandPart> getParts();
 
-    default List<CommandPart> getPartWithName(String name){
+    default List<CommandPart> getPartWithName(String name) {
         List<CommandPart> matchingParts = new ArrayList<>();
 
         for (CommandPart part : getParts()) {
-            if(part.getName().equals(name)){
+            if (part.getName().equals(name)) {
                 matchingParts.add(part);
             }
         }

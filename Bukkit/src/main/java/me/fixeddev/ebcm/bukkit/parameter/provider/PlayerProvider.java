@@ -34,7 +34,7 @@ public class PlayerProvider implements ParameterProvider<Player> {
 
         Player player = Bukkit.getPlayer(argument);
 
-        if(player == null){
+        if (player == null) {
             return Result.createResultOfMessage("The player " + argument + " is not online!");
         }
 

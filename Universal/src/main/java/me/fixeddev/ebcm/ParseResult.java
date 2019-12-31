@@ -1,6 +1,5 @@
 package me.fixeddev.ebcm;
 
-import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 
 import java.util.List;

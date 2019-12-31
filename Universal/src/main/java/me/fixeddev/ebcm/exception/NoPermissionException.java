@@ -1,6 +1,6 @@
 package me.fixeddev.ebcm.exception;
 
-public class NoPermissionException extends CommandUsageException{
+public class NoPermissionException extends CommandUsageException {
     public NoPermissionException() {
         this("No permission.");
     }

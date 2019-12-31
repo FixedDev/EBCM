@@ -10,14 +10,14 @@ import java.util.List;
 @AutoValue
 public abstract class SubCommandPart implements LineConsumingPart {
 
-    public abstract List<Command> getCommandsToCall();
-
     public static Builder builder(String name) {
         return new AutoValue_SubCommandPart.Builder()
                 .named(name)
                 .setRequired(false)
                 .setDescription("");
     }
+
+    public abstract List<Command> getCommandsToCall();
 
     @Override
     @Memoized
@@ -47,13 +47,13 @@ public abstract class SubCommandPart implements LineConsumingPart {
 
         public abstract Builder setDescription(String newDescription);
 
-        public Builder addCommand(Command command){
+        public Builder addCommand(Command command) {
             commandsToCallAppender.add(command);
 
             return this;
         }
 
-        public Builder setCommands(List<Command> commands){
+        public Builder setCommands(List<Command> commands) {
             commandsToCallAppender.set(commands);
 
             return this;
@@ -61,13 +61,13 @@ public abstract class SubCommandPart implements LineConsumingPart {
 
         abstract Builder setCommandsToCall(List<Command> commands);
 
-        public Builder setAllModifiers(List<String> modifiers){
+        public Builder setAllModifiers(List<String> modifiers) {
             this.modifiersAppender.set(modifiers);
 
             return this;
         }
 
-        public Builder addModifier(String modifier){
+        public Builder addModifier(String modifier) {
             this.modifiersAppender.add(modifier);
 
             return this;

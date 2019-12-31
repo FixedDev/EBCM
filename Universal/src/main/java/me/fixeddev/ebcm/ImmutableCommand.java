@@ -1,7 +1,6 @@
 package me.fixeddev.ebcm;
 
 import com.google.auto.value.AutoValue;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.util.ListAppender;
 
@@ -39,14 +38,14 @@ public abstract class ImmutableCommand implements Command {
 
         public abstract ImmutableCommand autoBuild();
 
-        public Builder setCommandParts(List<CommandPart> newParts){
+        public Builder setCommandParts(List<CommandPart> newParts) {
             partListAppender.set(newParts);
 
             return this;
         }
 
         public Builder addPart(CommandPart part) {
-            if(part == null) {
+            if (part == null) {
                 throw new IllegalArgumentException("The provided part is null");
             }
 

@@ -7,10 +7,6 @@ import java.util.List;
 
 @AutoValue
 public abstract class InjectedValuePart implements CommandPart {
-    public abstract Class<?> getType();
-
-    public abstract String getInjectedName();
-
     public static Builder builder(String name, Class<?> type) {
         return new AutoValue_InjectedValuePart.Builder()
                 .setName(name)
@@ -18,6 +14,10 @@ public abstract class InjectedValuePart implements CommandPart {
                 .setType(type)
                 .setRequired(true);
     }
+
+    public abstract Class<?> getType();
+
+    public abstract String getInjectedName();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -33,13 +33,13 @@ public abstract class InjectedValuePart implements CommandPart {
 
         public abstract Builder setInjectedName(String newInjectedName);
 
-        public Builder setAllModifiers(List<String> modifiers){
+        public Builder setAllModifiers(List<String> modifiers) {
             this.modifiersAppender.set(modifiers);
 
             return this;
         }
 
-        public Builder addModifier(String modifier){
+        public Builder addModifier(String modifier) {
             this.modifiersAppender.add(modifier);
 
             return this;

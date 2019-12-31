@@ -3,7 +3,6 @@ package me.fixeddev.ebcm.bukkit.parameter.provider;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.parameter.provider.ProvidersModule;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class BukkitModule implements ProvidersModule {

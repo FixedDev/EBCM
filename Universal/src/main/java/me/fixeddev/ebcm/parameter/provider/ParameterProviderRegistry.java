@@ -3,6 +3,10 @@ package me.fixeddev.ebcm.parameter.provider;
 import java.util.Map;
 
 public interface ParameterProviderRegistry {
+    static ParameterProviderRegistry createRegistry() {
+        return new ParameterProviderRegistryImpl();
+    }
+
     Map<Class<?>, ParameterProvider> getRegisteredProviders();
 
     <T> void registerParameterProvider(Class<T> clazz, ParameterProvider<T> parameterProvider);
@@ -13,9 +17,5 @@ public interface ParameterProviderRegistry {
 
     default void installModule(ProvidersModule module) {
         module.configure(this);
-    }
-    
-    static ParameterProviderRegistry createRegistry() {
-        return new ParameterProviderRegistryImpl();
     }
 }

@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface CommandContext extends NamespaceAccesor {
     /**
      * @return The executed command, that means that if you execute a subcommand
-     *          this command will return that subcommand instead of the main command
+     * this command will return that subcommand instead of the main command
      */
     Command getCommand();
 
@@ -21,7 +21,7 @@ public interface CommandContext extends NamespaceAccesor {
 
     boolean has(CommandPart part);
 
-    default List<CommandPart> getParts(String name){
+    default List<CommandPart> getParts(String name) {
         return getCommand().getPartWithName(name);
     }
 

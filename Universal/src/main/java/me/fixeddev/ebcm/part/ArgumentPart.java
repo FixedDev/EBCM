@@ -10,6 +10,16 @@ import java.util.List;
 @AutoValue
 public abstract class ArgumentPart implements ArgumentConsumingPart {
 
+    public static Builder builder(String name, Class<?> argumentType) {
+        return new AutoValue_ArgumentPart.Builder()
+                .named(name)
+                .argumentType(argumentType)
+                .setConsumedArguments(1)
+                .setRequired(false)
+                .setDescription("")
+                .setDefaultValues(new ArrayList<>());
+    }
+
     public abstract int getConsumedArguments();
 
     @Override
@@ -22,16 +32,6 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
                 .append(isRequired() ? ">" : "]");
 
         return builder.toString();
-    }
-
-    public static Builder builder(String name, Class<?> argumentType) {
-        return new AutoValue_ArgumentPart.Builder()
-                .named(name)
-                .argumentType(argumentType)
-                .setConsumedArguments(1)
-                .setRequired(false)
-                .setDescription("")
-                .setDefaultValues(new ArrayList<>());
     }
 
     @AutoValue.Builder
@@ -52,19 +52,15 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
 
         public abstract Builder setDefaultValues(List<String> defaultValues);
 
-        public abstract Builder setConsumedArguments(int consumedArguments);
-
         public abstract Builder setDescription(String newDescription);
 
-        public abstract Builder setRequired(boolean newRequired);
-
-        public Builder setAllModifiers(List<String> modifiers){
+        public Builder setAllModifiers(List<String> modifiers) {
             this.modifiersAppender.set(modifiers);
 
             return this;
         }
 
-        public Builder addModifier(String modifier){
+        public Builder addModifier(String modifier) {
             this.modifiersAppender.add(modifier);
 
             return this;
@@ -74,7 +70,11 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
 
         abstract boolean isRequired();
 
+        public abstract Builder setRequired(boolean newRequired);
+
         abstract int getConsumedArguments();
+
+        public abstract Builder setConsumedArguments(int consumedArguments);
 
         abstract ArgumentPart autoBuild();
 

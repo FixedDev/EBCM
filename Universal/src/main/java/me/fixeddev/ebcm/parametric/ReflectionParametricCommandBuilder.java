@@ -86,7 +86,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 continue;
             }
 
-            if(!method.isAnnotationPresent(ACommand.class)){
+            if (!method.isAnnotationPresent(ACommand.class)) {
                 continue;
             }
 
@@ -96,7 +96,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
             commandList.add(command);
         }
 
-        if(commandAnnotation != null){
+        if (commandAnnotation != null) {
             Command command = commands.get("");
 
             String[] names = commandAnnotation.names();
@@ -110,7 +110,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
             builder.setPermission(commandAnnotation.permission())
                     .setPermissionMessage(commandAnnotation.permissionMessage());
 
-            if(command != null){
+            if (command != null) {
                 commands.remove("");
                 commandList.remove(command);
 
@@ -120,8 +120,8 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
 
             builder.addPart(SubCommandPart.builder("subcommand")
-            .setCommands(commandList)
-            .build());
+                    .setCommands(commandList)
+                    .build());
 
             return Collections.singletonList(builder.build());
         }
@@ -146,19 +146,19 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
             ModifierAnnotation modifierAnnotation = annotationType.getAnnotation(ModifierAnnotation.class);
 
             // This is not a modifier annotation, ignore it
-            if(modifierAnnotation == null){
+            if (modifierAnnotation == null) {
                 continue;
             }
 
             modifiers.add(modifierAnnotation.value());
         }
 
-        if(injected != null && flag != null){
+        if (injected != null && flag != null) {
             throw new IllegalArgumentException("The provided parameter has a Flag annotation and a Injected annotation, it should have only one of the two!");
         }
 
         if (flag != null) {
-            if(type != boolean.class && type != Boolean.class){
+            if (type != boolean.class && type != Boolean.class) {
                 throw new IllegalArgumentException("The provided parameter has a Flag annotation but it doesn't a boolean!");
             }
 
@@ -167,7 +167,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                     .build();
         }
 
-        if(injected != null){
+        if (injected != null) {
             return InjectedValuePart.builder(name, type)
                     .setRequired(injected.value())
                     .setAllModifiers(modifiers)

@@ -2,7 +2,6 @@ package me.fixeddev.ebcm.bukkit;
 
 import me.fixeddev.ebcm.Authorizer;
 import me.fixeddev.ebcm.CommandManager;
-import me.fixeddev.ebcm.bukkit.parameter.provider.CommandSenderProvider;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;

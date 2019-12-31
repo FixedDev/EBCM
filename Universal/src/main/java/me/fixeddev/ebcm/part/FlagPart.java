@@ -9,6 +9,11 @@ import java.util.List;
 @AutoValue
 public abstract class FlagPart implements LineConsumingPart {
 
+    public static Builder builder(String named, char flagChar) {
+        return new AutoValue_FlagPart.Builder().named(named).flagChar(flagChar)
+                .setDescription("");
+    }
+
     @Override
     @Memoized
     public String getLineRepresentation() {
@@ -28,11 +33,6 @@ public abstract class FlagPart implements LineConsumingPart {
 
     public abstract char getFlagChar();
 
-    public static Builder builder(String named, char flagChar) {
-        return new AutoValue_FlagPart.Builder().named(named).flagChar(flagChar)
-                .setDescription("");
-    }
-
     @AutoValue.Builder
     public abstract static class Builder {
         private ListAppender<String> modifiersAppender = new ListAppender<>();
@@ -51,13 +51,13 @@ public abstract class FlagPart implements LineConsumingPart {
 
         public abstract Builder setDescription(String newDescription);
 
-        public Builder setAllModifiers(List<String> modifiers){
+        public Builder setAllModifiers(List<String> modifiers) {
             this.modifiersAppender.set(modifiers);
 
             return this;
         }
 
-        public Builder addModifier(String modifier){
+        public Builder addModifier(String modifier) {
             this.modifiersAppender.add(modifier);
 
             return this;

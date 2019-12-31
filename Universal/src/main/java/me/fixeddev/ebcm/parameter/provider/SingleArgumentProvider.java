@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface SingleArgumentProvider<T> extends ParameterProvider<T> {
     @Override
-    default Result<T> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part){
-        if(arguments.size() != 1){
+    default Result<T> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part) {
+        if (arguments.size() != 1) {
             return Result.createResult("Internal error!",
                     new IllegalArgumentException("A single argument provider should receive only one argument!"));
         }

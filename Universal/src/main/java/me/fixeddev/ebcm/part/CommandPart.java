@@ -14,6 +14,7 @@ public interface CommandPart {
      * The modifiers are properties set at the moment of the part creation
      * Those are used on the parameter providers to do things like joining strings with
      * specific character instead of the generic space
+     *
      * @return The list of modifiers for this part
      */
     List<String> getModifiers();

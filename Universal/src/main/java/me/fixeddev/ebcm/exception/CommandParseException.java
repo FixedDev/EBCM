@@ -1,6 +1,6 @@
 package me.fixeddev.ebcm.exception;
 
-public class CommandParseException extends Exception{
+public class CommandParseException extends Exception {
     public CommandParseException() {
         super();
     }

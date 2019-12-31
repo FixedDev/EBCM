@@ -18,12 +18,10 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 public class BukkitCommandManager implements CommandManager {
+    public static final String SENDER_NAMESPACE = "SENDER";
     private CommandManager delegate;
-
     private CommandMap bukkitCommandMap;
     private String fallbackPrefix;
-
-    public static final String SENDER_NAMESPACE = "SENDER";
 
 
     public BukkitCommandManager(CommandManager delegate, String fallbackPrefix) {

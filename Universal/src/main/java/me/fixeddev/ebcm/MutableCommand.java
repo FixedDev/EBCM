@@ -21,6 +21,13 @@ public class MutableCommand implements Command {
         this.parts = parts;
     }
 
+    public static Builder builder(CommandData.Builder dataBuilder) {
+        return new MutableCommand.Builder(dataBuilder.build())
+                .setPermission("")
+                .setPermissionMessage("No permission.")
+                .setAction(params -> false);
+    }
+
     @Override
     public CommandData getData() {
         return data;
@@ -31,9 +38,17 @@ public class MutableCommand implements Command {
         return permission;
     }
 
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
+
     @Override
     public String getPermissionMessage() {
         return permissionMessage;
+    }
+
+    public void setPermissionMessage(String permissionMessage) {
+        this.permissionMessage = permissionMessage;
     }
 
     @Override
@@ -41,28 +56,13 @@ public class MutableCommand implements Command {
         return action;
     }
 
+    public void setAction(CommandAction action) {
+        this.action = action;
+    }
+
     @Override
     public List<CommandPart> getParts() {
         return parts;
-    }
-
-    public static Builder builder(CommandData.Builder dataBuilder) {
-        return new MutableCommand.Builder(dataBuilder.build())
-                .setPermission("")
-                .setPermissionMessage("No permission.")
-                .setAction(params -> false);
-    }
-
-    public void setPermission(String permission) {
-        this.permission = permission;
-    }
-
-    public void setPermissionMessage(String permissionMessage) {
-        this.permissionMessage = permissionMessage;
-    }
-
-    public void setAction(CommandAction action) {
-        this.action = action;
     }
 
     public void setParts(List<CommandPart> parts) {
