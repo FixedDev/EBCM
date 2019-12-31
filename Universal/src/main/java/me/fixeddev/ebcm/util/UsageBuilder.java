@@ -10,7 +10,7 @@ public class UsageBuilder {
     public static String getUsageForCommand(Command parent, Command command, String label) {
         String parentUsage = null;
 
-        if (parent != null && parent != command) {
+        if (parent != null && !parent.equals(command)) {
             parentUsage = getUsageForCommand(null, parent, label);
         }
 

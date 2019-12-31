@@ -4,6 +4,7 @@ import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.util.ListAppender;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MutableCommand implements Command {
 
@@ -78,35 +79,27 @@ public class MutableCommand implements Command {
         private ListAppender<CommandPart> partListAppender = new ListAppender<>();
 
         protected Builder(CommandData data) {
-            if (data == null) {
-                throw new NullPointerException("Null data");
-            }
+            Objects.requireNonNull(data);
 
             this.data = data;
         }
 
         public Builder setPermission(String permission) {
-            if (permission == null) {
-                throw new NullPointerException("Null permission");
-            }
+            Objects.requireNonNull(permission);
 
             this.permission = permission;
             return this;
         }
 
         public Builder setPermissionMessage(String permissionMessage) {
-            if (permissionMessage == null) {
-                throw new NullPointerException("Null permissionMessage");
-            }
+            Objects.requireNonNull(permissionMessage);
 
             this.permissionMessage = permissionMessage;
             return this;
         }
 
         public Builder setAction(CommandAction action) {
-            if (action == null) {
-                throw new NullPointerException("Null action");
-            }
+            Objects.requireNonNull(action);
 
             this.action = action;
             return this;
@@ -119,9 +112,7 @@ public class MutableCommand implements Command {
         }
 
         public Builder addPart(CommandPart part) {
-            if (part == null) {
-                throw new IllegalArgumentException("The provided part is null");
-            }
+            Objects.requireNonNull(part);
 
             partListAppender.add(part);
 
