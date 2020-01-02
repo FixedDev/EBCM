@@ -69,7 +69,7 @@ public class BukkitCommandWrapper extends Command {
         Authorizer authorizer = commandManager.getAuthorizer();
 
         Namespace namespace = new Namespace();
-        namespace.setObject(CommandSender.class, "sender", target);
+        namespace.setObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE, target);
 
         return authorizer.isAuthorized(namespace, getPermission());
     }
