@@ -11,12 +11,16 @@ public class UsageBuilder {
     public static String getUsageForCommand(Command parent, Command command, String label) {
         String parentUsage = null;
 
-        if (parent != null && !parent.equals(command)) {
+        if (command.equals(parent)) {
+            return getUsageForCommand(null, command, label);
+        }
+
+        if (parent != null) {
             parentUsage = getUsageForCommand(null, parent, label);
         }
 
         String usage = command.getParts().stream()
-                .filter(part -> part instanceof LineConsumingPart && !(part instanceof SubCommandPart))
+                .filter(part -> part instanceof LineConsumingPart && (parent == null || !(part instanceof SubCommandPart)))
                 .map(part -> (LineConsumingPart) part)
                 .map(LineConsumingPart::getLineRepresentation)
                 .collect(Collectors.joining(" "))
