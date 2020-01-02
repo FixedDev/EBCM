@@ -80,14 +80,6 @@ public class CommandLineParser {
         return (currentArgument = argumentsIterator.next());
     }
 
-    public String currentArgument() throws CommandParseException {
-        if (currentArgument == null) {
-            throw new CommandParseException("You must advance at least one argument before calling this method!");
-        }
-
-        return currentArgument;
-    }
-
     public boolean hasNextArgument() {
         return argumentsIterator.hasNext();
     }
@@ -98,18 +90,6 @@ public class CommandLineParser {
         }
 
         return (currentPart = partsIterator.next());
-    }
-
-    public CommandPart currentUnboundPart() throws CommandParseException {
-        if (hasCurrentUnboundPart()) {
-            throw new CommandParseException("The're are no more unbound parts left!");
-        }
-
-        return currentPart;
-    }
-
-    public boolean hasCurrentUnboundPart() {
-        return currentPart != null;
     }
 
     public boolean hasNextUnboundPart() {
@@ -190,8 +170,13 @@ public class CommandLineParser {
 
         flagParts.values().forEach(part -> valueBindings.put(part, false));
         argumentsIterator = allArguments.listIterator();
-        // Move the cursor one time, to prevent that an argument that was already used is being used again
-        argumentsIterator.next();
+
+        int newSize = allArguments.size() - argumentsLeft;
+
+        for(int i = 0; i < newSize; i++) {
+            // Move the cursor to the last position, to prevent that an argument that was already used being used again
+            argumentsIterator.next();
+        }
     }
 
     private boolean hasSubCommand;
