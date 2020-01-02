@@ -12,6 +12,7 @@ public abstract class InjectedValuePart implements CommandPart {
                 .setName(name)
                 .setInjectedName(name)
                 .setType(type)
+                .setDescription("")
                 .setRequired(true);
     }
 
