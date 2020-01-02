@@ -46,7 +46,9 @@ public class BukkitCommandManager implements CommandManager {
     }
 
     public void registerCommands(List<Command> commandList) {
-        delegate.registerCommands(commandList);
+        for (Command command : commandList) {
+            registerCommand(command);
+        }
     }
 
     public boolean exists(String commandName) {
