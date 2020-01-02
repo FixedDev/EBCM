@@ -189,7 +189,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
             List<Object> params = new ArrayList<>();
 
             for (CommandPart part : commandParts) {
-                if (part instanceof FlagPart || part instanceof ArgumentPart)
+                if (part instanceof FlagPart || part instanceof ArgumentPart || part instanceof InjectedValuePart)
                     params.add(parameters.getValue(part).get());
             }
 
