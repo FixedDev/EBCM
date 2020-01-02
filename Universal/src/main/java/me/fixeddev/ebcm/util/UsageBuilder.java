@@ -15,8 +15,10 @@ public class UsageBuilder {
             return getUsageForCommand(null, command, label);
         }
 
-        if (parent != null) {
-            parentUsage = getUsageForCommand(null, parent, label);
+        if (parent != null && !parent.getParts().isEmpty()) {
+            if(parent.getParts().size() > 1 || !(parent.getParts().get(0) instanceof SubCommandPart)){
+                parentUsage = getUsageForCommand(null, parent, label);
+            }
         }
 
         String usage = command.getParts().stream()
