@@ -12,7 +12,7 @@ like the parametric commands, and still has some bugs that will be solved with t
 * [x] Develop the parametric commands
 * [x] Allow subcommands in the parametric commands
 * [ ] Allow more than 1 depth of subcommands in the parametric commands 
-* [ ] Modify the parser so it's more maintainable and has better performance
+* [x] Modify the parser so it's more maintainable and has better performance
 * [ ] Refactor some things(command structure, implementations of interfaces) to make the above task easier to complete
 * [x] Allow optional subcommands
 * [x] Create a bukkit wrapper
