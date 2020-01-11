@@ -16,4 +16,4 @@ like the parametric commands, and still has some bugs that will be solved with t
 * [ ] Refactor some things(command structure, implementations of interfaces) to make the above task easier to complete
 * [x] Allow optional subcommands
 * [x] Create a bukkit wrapper
-* [ ] Create a bungee wrapper
+* [x] Create a bungee wrapper
