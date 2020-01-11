@@ -1,4 +1,5 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/53cb55ef384a4eeab0306ef59652b7cd)](https://www.codacy.com/manual/iYushu/EBCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=yusshu/EBCM&amp;utm_campaign=Badge_Grade)
+# EBCM [![Codacy Badge](https://api.codacy.com/project/badge/Grade/53cb55ef384a4eeab0306ef59652b7cd)](https://www.codacy.com/manual/iYushu/EBCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=yusshu/EBCM&amp;utm_campaign=Badge_Grade)
+
 My new command manager slightly inspired by EngineHub/Piston
 ## Purpose
 The purpose of the EBCM is:
