@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class ParameterProviderRegistryImpl implements ParameterProviderRegistry {
-    private Map<Class<?>, ParameterProvider> parameterProviders;
+    private Map<Class<?>, ParameterProvider<?>> parameterProviders;
 
     ParameterProviderRegistryImpl() {
         parameterProviders = new HashMap<>();
@@ -28,7 +28,7 @@ class ParameterProviderRegistryImpl implements ParameterProviderRegistry {
     }
 
     @Override
-    public Map<Class<?>, ParameterProvider> getRegisteredProviders() {
+    public Map<Class<?>, ParameterProvider<?>> getRegisteredProviders() {
         return parameterProviders;
     }
 

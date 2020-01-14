@@ -7,7 +7,7 @@ public interface ParameterProviderRegistry {
         return new ParameterProviderRegistryImpl();
     }
 
-    Map<Class<?>, ParameterProvider> getRegisteredProviders();
+    Map<Class<?>, ParameterProvider<?>> getRegisteredProviders();
 
     <T> void registerParameterProvider(Class<T> clazz, ParameterProvider<T> parameterProvider);
 
