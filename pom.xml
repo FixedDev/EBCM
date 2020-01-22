@@ -15,6 +15,17 @@
 
     <packaging>pom</packaging>
 
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
     <properties>
         <universal-version>1.2.2</universal-version>
         <bukkit-version>1.2.1</bukkit-version>
