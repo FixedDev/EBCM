@@ -44,6 +44,10 @@ public class ArgumentStack implements Cloneable {
         return originalArguments.get(nextPosition);
     }
 
+    public String current() {
+        return originalArguments.get(position);
+    }
+
     public int getPosition() {
         return position;
     }
