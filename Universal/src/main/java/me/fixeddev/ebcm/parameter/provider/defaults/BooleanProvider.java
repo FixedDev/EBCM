@@ -4,6 +4,7 @@ import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.parameter.provider.SingleArgumentProvider;
 import me.fixeddev.ebcm.part.CommandPart;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,14 @@ public class BooleanProvider implements SingleArgumentProvider<Boolean> {
 
     @Override
     public List<String> getSuggestions(String startsWith) {
-        return suggestions;
+        List<String> newSuggestions = new ArrayList<>();
+
+        for (String suggestion : suggestions) {
+            if(suggestion.startsWith(startsWith)){
+                newSuggestions.add(suggestion);
+            }
+        }
+
+        return newSuggestions;
     }
 }
