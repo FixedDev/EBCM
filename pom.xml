@@ -27,7 +27,7 @@
     </repositories>
 
     <properties>
-        <universal-version>1.2.2</universal-version>
+        <universal-version>1.2.3</universal-version>
         <bukkit-version>1.2.1</bukkit-version>
         <bungee-version>1.2.0</bungee-version>
         <parent-version>${project.version}</parent-version>
