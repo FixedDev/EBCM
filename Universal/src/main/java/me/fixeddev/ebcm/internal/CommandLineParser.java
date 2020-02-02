@@ -19,6 +19,7 @@ import me.fixeddev.ebcm.part.SubCommandPart;
 import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,7 +55,7 @@ public class CommandLineParser {
     private CommandManager commandManager;
 
     private ParameterProviderRegistry providerRegistry;
-    
+
     public CommandLineParser(List<String> argumentsLine, NamespaceAccesor namespaceAccesor, CommandManager commandManager) {
         commandLabel = "";
 
@@ -172,7 +173,7 @@ public class CommandLineParser {
 
         int newSize = argumentStack.getSize() - argumentsLeft;
 
-        for(int i = 0; i < newSize; i++) {
+        for (int i = 0; i < newSize; i++) {
             // Move the cursor to the last position, to prevent that an argument that was already used being used again
             argumentStack.next();
         }
@@ -223,15 +224,24 @@ public class CommandLineParser {
     private void parseInjectedPart(CommandPart partToBind) throws CommandParseException {
         InjectedValuePart part = (InjectedValuePart) partToBind;
 
-        Object object = namespaceAccesor.getObject(part.getType(), part.getInjectedName());
+        ParameterProvider<?> provider = providerRegistry.getParameterProvider(part.getType());
 
-        if (object == null && part.isRequired()) {
+        if (provider == null || !provider.isInjected()) {
+            throw new CommandParseException("Failed to get a provider for the part " + part.getName());
+        }
+
+        ParameterProvider.Result<?> result = provider.transform(Collections.emptyList(), namespaceAccesor, part);
+
+        Optional<?> optionalObject = unwrapObject(result, part);
+
+        if (!optionalObject.isPresent() && part.isRequired()) {
             throw new CommandParseException("Failed to get the injected value for the part with name " + part.getName() +
                     "\n injected name: " + part.getInjectedName() +
                     "\n type: " + part.getType());
         }
 
-        valueBindings.put(partToBind, object);
+
+        valueBindings.put(partToBind, optionalObject.orElse(null));
     }
 
     private void parseArgument(CommandPart partToBind) throws CommandParseException {
@@ -239,7 +249,7 @@ public class CommandLineParser {
 
         ParameterProvider<?> provider = providerRegistry.getParameterProvider(part.getArgumentType());
 
-        if (provider == null) {
+        if (provider == null || provider.isInjected()) {
             throw new CommandParseException("Failed to get a provider for the part " + part.getName());
         }
 
@@ -248,7 +258,7 @@ public class CommandLineParser {
 
         if (!part.isRequired()) {
             if ((optionalArgumentsToBound <= 0 || argumentsLeft < neededArguments + part.getConsumedArguments()) ||
-                            (allNeededArguments == -1 || part.getConsumedArguments() == -1 || hasSubCommand)) {
+                    (allNeededArguments == -1 || part.getConsumedArguments() == -1 || hasSubCommand)) {
                 if (part.getDefaultValues().isEmpty()) {
                     return;
                 }
@@ -267,9 +277,14 @@ public class CommandLineParser {
 
         ParameterProvider.Result<?> object = provider.transform(argumentsToUse, namespaceAccesor, part);
 
-        Optional<?> providedObject = object.getResultObject();
-        Optional<String> message = object.getMessage();
-        Optional<Exception> lastError = object.lastError();
+        valueBindings.put(part, unwrapObject(object, part).orElse(null));
+    }
+
+
+    private Optional<?> unwrapObject(ParameterProvider.Result<?> result, CommandPart part) throws CommandParseException {
+        Optional<?> providedObject = result.getResultObject();
+        Optional<String> message = result.getMessage();
+        Optional<Exception> lastError = result.lastError();
 
         if (!providedObject.isPresent()) {
             if (lastError.isPresent()) {
@@ -281,10 +296,10 @@ public class CommandLineParser {
                 throw new CommandUsageException(message.get());
             }
 
-            return;
+            return Optional.empty();
         }
 
-        valueBindings.put(part, providedObject.get());
+        return providedObject;
     }
 
     private List<String> getArgumentsToConsume(ArgumentPart part) throws CommandParseException {
