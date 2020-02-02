@@ -113,6 +113,10 @@ public class ArgumentStack implements Cloneable {
         this.position = originalArguments.size();
     }
 
+    public List<String> getBacking() {
+        return originalArguments;
+    }
+
     @Override
     public ArgumentStack clone() throws CloneNotSupportedException {
         return (ArgumentStack) super.clone();
