@@ -1,5 +1,6 @@
 package me.fixeddev.ebcm.internal;
 
+import me.fixeddev.ebcm.ArgumentStack;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandManager;
 import me.fixeddev.ebcm.NamespaceAccesor;
@@ -41,10 +42,9 @@ public class CommandLineParser {
     private CommandPart currentPart;
     // Per command fields end
 
+    private ArgumentStack argumentStack;
+
     private int argumentsLeft;
-    private ListIterator<String> argumentsIterator;
-    private List<String> allArguments;
-    private String currentArgument;
 
     private List<ParseResult.ParameterBinding> bindings;
     private Map<CommandPart, Object> valueBindings;
@@ -54,13 +54,12 @@ public class CommandLineParser {
     private CommandManager commandManager;
 
     private ParameterProviderRegistry providerRegistry;
-
-
+    
     public CommandLineParser(List<String> argumentsLine, NamespaceAccesor namespaceAccesor, CommandManager commandManager) {
         commandLabel = "";
-        allArguments = argumentsLine;
 
-        argumentsIterator = argumentsLine.listIterator();
+        argumentStack = new ArgumentStack(argumentsLine);
+
         argumentsLeft = argumentsLine.size();
 
         bindings = new ArrayList<>();
@@ -72,16 +71,12 @@ public class CommandLineParser {
     }
 
     public String nextArgument() throws CommandParseException {
-        if (!argumentsIterator.hasNext()) {
-            throw new NoMoreArgumentsException(allArguments.size(), argumentsIterator.nextIndex() - 1);
-        }
-
         argumentsLeft--;
-        return (currentArgument = argumentsIterator.next());
+        return argumentStack.next();
     }
 
     public boolean hasNextArgument() {
-        return argumentsIterator.hasNext();
+        return argumentStack.hasNext();
     }
 
     public CommandPart nextUnboundPart() throws CommandParseException {
@@ -103,9 +98,7 @@ public class CommandLineParser {
     }
 
     public Command currentAsRootCommand() throws CommandNotFound, CommandParseException {
-        if (currentArgument == null) {
-            throw new CommandParseException("You must advance at least one argument before calling this method!");
-        }
+        String currentArgument = argumentStack.current();
 
         if (rootCommand != null) {
             throw new CommandParseException("The command was already found, no need to execute this method again!");
@@ -122,13 +115,13 @@ public class CommandLineParser {
     public void useCommand(Command command) {
         currentCommand = command;
 
-        commandLabel += " " + currentArgument;
+        commandLabel += " " + argumentStack.current();
         currentCommandParts = new ArrayList<>(command.getParts());
         partsIterator = currentCommandParts.listIterator();
         partsLeft = currentCommandParts.size();
     }
 
-    private void parseFlags() {
+    private void parseFlags() throws NoMoreArgumentsException {
         Map<Character, FlagPart> flagParts = currentCommandParts.stream()
                 .filter(part -> part instanceof FlagPart)
                 .map(part -> (FlagPart) part).collect(Collectors.toMap(FlagPart::getFlagChar, Function.identity()));
@@ -137,14 +130,20 @@ public class CommandLineParser {
         partsIterator = currentCommandParts.listIterator();
         partsLeft = currentCommandParts.size();
 
-        for (String argument : new ArrayList<>(allArguments)) {
+        List<String> newArguments = argumentStack.getBacking().subList(argumentStack.getPosition(), argumentStack.getSize());
+        // We have the arguments already used, now, use them to create a new list
+        newArguments = new ArrayList<>(newArguments);
+
+        while (argumentStack.hasNext()) {
+            String argument = argumentStack.next();
+
             if (!argument.startsWith("-") || argument.length() != 2) {
+                newArguments.add(argument);
                 continue;
             }
 
             // Disable the parsing of the next flags
             if ("--".equals(argument)) {
-                allArguments.remove(argument);
                 argumentsLeft--;
                 break;
             }
@@ -154,10 +153,10 @@ public class CommandLineParser {
 
             // The flag is valid, but it doesn't has a part to be bound
             if (part == null) {
+                newArguments.add(argument);
                 continue;
             }
 
-            allArguments.remove(argument);
             bindings.add(new ParameterBindingData(argument, part));
             valueBindings.put(part, true);
 
@@ -168,14 +167,14 @@ public class CommandLineParser {
             argumentsLeft--;
         }
 
+        this.argumentStack = new ArgumentStack(newArguments);
         flagParts.values().forEach(part -> valueBindings.put(part, false));
-        argumentsIterator = allArguments.listIterator();
 
-        int newSize = allArguments.size() - argumentsLeft;
+        int newSize = argumentStack.getSize() - argumentsLeft;
 
         for(int i = 0; i < newSize; i++) {
             // Move the cursor to the last position, to prevent that an argument that was already used being used again
-            argumentsIterator.next();
+            argumentStack.next();
         }
     }
 
@@ -198,7 +197,7 @@ public class CommandLineParser {
         optionalArgumentsToBound = argumentsLeft - neededArguments;
 
         if (partsLeft <= 0) {
-            return new ParseResultData(commandLabel, allArguments, currentCommand, currentCommand, bindings, valueBindings);
+            return new ParseResultData(commandLabel, argumentStack.getBacking(), currentCommand, currentCommand, bindings, valueBindings);
         }
 
         checkForInvalidInfiniteParts();
@@ -218,7 +217,7 @@ public class CommandLineParser {
 
         }
 
-        return new ParseResultData(commandLabel, allArguments, rootCommand, currentCommand, bindings, valueBindings);
+        return new ParseResultData(commandLabel, argumentStack.getBacking(), rootCommand, currentCommand, bindings, valueBindings);
     }
 
     private void parseInjectedPart(CommandPart partToBind) throws CommandParseException {
@@ -246,7 +245,6 @@ public class CommandLineParser {
 
         List<String> argumentsToUse = new ArrayList<>();
         boolean usingDefaults = false;
-
 
         if (!part.isRequired()) {
             if ((optionalArgumentsToBound <= 0 || argumentsLeft < neededArguments + part.getConsumedArguments()) ||
@@ -298,7 +296,9 @@ public class CommandLineParser {
                         + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
             }
 
-            String argument = nextArgument();
+            String argument = argumentStack.next();
+            argumentsLeft--;
+
             argumentsToUse.add(argument);
 
             /*
@@ -343,7 +343,9 @@ public class CommandLineParser {
             return;
         }
 
-        String argument = nextArgument();
+        String argument = argumentStack.next();
+        argumentsLeft--;
+
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
@@ -357,7 +359,7 @@ public class CommandLineParser {
         neededArguments = calculateNeededArgs();
         allNeededArguments = calculateAllNeededArgs();
 
-        ParseResult.ParameterBinding parameterBinding = new ParameterBindingData(currentArgument, currentPart);
+        ParseResult.ParameterBinding parameterBinding = new ParameterBindingData(argumentStack.current(), currentPart);
         bindings.add(parameterBinding);
     }
 
