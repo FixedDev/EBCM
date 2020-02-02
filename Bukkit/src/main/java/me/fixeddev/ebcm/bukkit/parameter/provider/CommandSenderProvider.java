@@ -3,16 +3,14 @@ package me.fixeddev.ebcm.bukkit.parameter.provider;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.bukkit.BukkitCommandManager;
 import me.fixeddev.ebcm.exception.CommandException;
-import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
+import me.fixeddev.ebcm.parameter.provider.InjectedProvider;
 import me.fixeddev.ebcm.part.CommandPart;
 import org.bukkit.command.CommandSender;
 
-import java.util.List;
-
-public class CommandSenderProvider implements ParameterProvider<CommandSender> {
+public class CommandSenderProvider implements InjectedProvider<CommandSender> {
 
     @Override
-    public Result<CommandSender> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part) {
+    public Result<CommandSender> transform(NamespaceAccesor namespaceAccesor, CommandPart part) {
         CommandSender sender = namespaceAccesor.getObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE);
 
         if (sender == null) {
