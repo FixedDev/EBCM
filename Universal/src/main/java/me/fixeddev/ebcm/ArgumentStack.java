@@ -45,6 +45,10 @@ public class ArgumentStack implements Cloneable {
     }
 
     public String current() {
+        if(position == -1){
+            throw new IllegalStateException("You must advance the stack at least once before using the current() method!");
+        }
+
         return originalArguments.get(position);
     }
 
