@@ -54,8 +54,7 @@ public class CommandLineParser {
     private CommandManager commandManager;
 
     private ParameterProviderRegistry providerRegistry;
-
-
+    
     public CommandLineParser(List<String> argumentsLine, NamespaceAccesor namespaceAccesor, CommandManager commandManager) {
         commandLabel = "";
 
@@ -131,7 +130,9 @@ public class CommandLineParser {
         partsIterator = currentCommandParts.listIterator();
         partsLeft = currentCommandParts.size();
 
-        List<String> newArguments = new ArrayList<>();
+        List<String> newArguments = argumentStack.getBacking().subList(argumentStack.getPosition(), argumentStack.getSize());
+        // We have the arguments already used, now, use them to create a new list
+        newArguments = new ArrayList<>(newArguments);
 
         while (argumentStack.hasNext()) {
             String argument = argumentStack.next();
@@ -245,7 +246,6 @@ public class CommandLineParser {
         List<String> argumentsToUse = new ArrayList<>();
         boolean usingDefaults = false;
 
-
         if (!part.isRequired()) {
             if ((optionalArgumentsToBound <= 0 || argumentsLeft < neededArguments + part.getConsumedArguments()) ||
                             (allNeededArguments == -1 || part.getConsumedArguments() == -1 || hasSubCommand)) {
@@ -296,7 +296,9 @@ public class CommandLineParser {
                         + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
             }
 
-            String argument = nextArgument();
+            String argument = argumentStack.next();
+            argumentsLeft--;
+
             argumentsToUse.add(argument);
 
             /*
@@ -341,7 +343,9 @@ public class CommandLineParser {
             return;
         }
 
-        String argument = nextArgument();
+        String argument = argumentStack.next();
+        argumentsLeft--;
+
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
