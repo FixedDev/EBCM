@@ -16,6 +16,10 @@ public interface ParameterProvider<T> {
         return Collections.emptyList();
     }
 
+    default boolean isInjected() {
+        return false;
+    }
+
     interface Result<T> {
         static <T> Result<T> createResult(T object) {
             return new SimpleResult<>(object);
