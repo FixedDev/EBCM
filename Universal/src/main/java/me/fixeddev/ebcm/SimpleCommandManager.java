@@ -138,12 +138,15 @@ public class SimpleCommandManager implements CommandManager {
             return Collections.emptyList();
         }
 
+        arguments.remove(0);
+
         Command command = optionalCommand.get();
 
         List<CommandPart> parts = command.getParts();
         arguments = parseFlags(arguments, parts);
 
         int argumentsLeft = arguments.size();
+        int lastArgumentsLeft;
 
         CommandPart partToComplete = null;
         String startsWith = "";
@@ -151,15 +154,18 @@ public class SimpleCommandManager implements CommandManager {
         for (CommandPart part : command.getParts()) {
             if (part instanceof ArgumentPart) {
                 ArgumentPart argumentPart = (ArgumentPart) part;
+                lastArgumentsLeft = argumentsLeft;
                 argumentsLeft -= argumentPart.getConsumedArguments();
 
                 if (argumentsLeft <= 0) {
-                    int i = argumentPart.getConsumedArguments() + argumentsLeft;
+                    if(lastArgumentsLeft > 0){
+                        int i = argumentPart.getConsumedArguments() + argumentsLeft;
 
-                    if (i == 0) {
-                        startsWith = arguments.get(arguments.size() - 1);
-                    } else {
-                        startsWith = String.join(" ", arguments.subList(arguments.size() - i, arguments.size()));
+                        if (i == 0) {
+                            startsWith = arguments.get(arguments.size() - 1);
+                        } else {
+                            startsWith = String.join(" ", arguments.subList(arguments.size() - i, arguments.size()));
+                        }
                     }
 
                     partToComplete = part;
@@ -168,6 +174,7 @@ public class SimpleCommandManager implements CommandManager {
             }
 
             if (part instanceof SubCommandPart) {
+                lastArgumentsLeft = argumentsLeft;
                 argumentsLeft--;
 
                 if (argumentsLeft <= 0) {
@@ -225,20 +232,18 @@ public class SimpleCommandManager implements CommandManager {
 
         for (String argument : arguments) {
             if (argument.startsWith("-") && argument.length() == 2 && !ignore) {
-                continue;
+                char flagChar = argument.charAt(1);
+                FlagPart part = flagParts.get(flagChar);
+
+                if (part != null && !ignore) {
+                    continue;
+                }
             }
 
             // Disable the parsing of the next flags
             if ("--".equals(argument)) {
                 ignore = true;
                 break;
-            }
-
-            char flagChar = argument.charAt(1);
-            FlagPart part = flagParts.get(flagChar);
-
-            if (part != null && !ignore) {
-                continue;
             }
 
             newArguments.add(argument);
