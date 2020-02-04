@@ -7,13 +7,22 @@ import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.internal.CommandLineParser;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
+import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
+import me.fixeddev.ebcm.part.ArgumentPart;
+import me.fixeddev.ebcm.part.CommandPart;
+import me.fixeddev.ebcm.part.FlagPart;
+import me.fixeddev.ebcm.part.SubCommandPart;
 import me.fixeddev.ebcm.util.UsageBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SimpleCommandManager implements CommandManager {
     private Map<String, Command> commandMap;
@@ -116,6 +125,130 @@ public class SimpleCommandManager implements CommandManager {
 
         return true;
     }
+
+    @Override
+    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) {
+        if (arguments == null || arguments.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Optional<Command> optionalCommand = getCommand(arguments.get(0));
+
+        if (!optionalCommand.isPresent()) {
+            return Collections.emptyList();
+        }
+
+        Command command = optionalCommand.get();
+
+        List<CommandPart> parts = command.getParts();
+        arguments = parseFlags(arguments, parts);
+
+        int argumentsLeft = arguments.size();
+
+        CommandPart partToComplete = null;
+        String startsWith = "";
+
+        for (CommandPart part : command.getParts()) {
+            if (part instanceof ArgumentPart) {
+                ArgumentPart argumentPart = (ArgumentPart) part;
+                argumentsLeft -= argumentPart.getConsumedArguments();
+
+                if (argumentsLeft <= 0) {
+                    int i = argumentPart.getConsumedArguments() + argumentsLeft;
+
+                    if (i == 0) {
+                        startsWith = arguments.get(arguments.size() - 1);
+                    } else {
+                        startsWith = String.join(" ", arguments.subList(arguments.size() - i, arguments.size()));
+                    }
+
+                    partToComplete = part;
+                    break;
+                }
+            }
+
+            if (part instanceof SubCommandPart) {
+                argumentsLeft--;
+
+                if (argumentsLeft <= 0) {
+                    partToComplete = part;
+                    startsWith = arguments.get(arguments.size() - 1);
+
+                    break;
+                }
+            }
+        }
+
+        if (partToComplete == null) {
+            return Collections.emptyList();
+        }
+
+        if (partToComplete instanceof ArgumentPart) {
+            ArgumentPart part = (ArgumentPart) partToComplete;
+
+            ParameterProvider<?> provider = getProviderRegistry().getParameterProvider(part.getArgumentType());
+
+            if (provider == null) {
+                return Collections.emptyList();
+            }
+
+            return provider.getSuggestions(startsWith);
+        }
+
+        SubCommandPart part = (SubCommandPart) partToComplete;
+
+        return getSubCommands(part, startsWith);
+    }
+
+    private List<String> getSubCommands(SubCommandPart part, String startsWith) {
+        List<String> availableValues = new ArrayList<>();
+
+        for (Command command : part.getCommandsToCall()) {
+            availableValues.add(command.getData().getName());
+
+            for (String value : command.getData().getAliases()) {
+                availableValues.add(value.toLowerCase());
+            }
+        }
+
+        return availableValues;
+    }
+
+    private List<String> parseFlags(List<String> arguments, List<CommandPart> parts) {
+        Map<Character, FlagPart> flagParts = parts.stream()
+                .filter(part -> part instanceof FlagPart)
+                .map(part -> (FlagPart) part).collect(Collectors.toMap(FlagPart::getFlagChar, Function.identity()));
+
+        List<String> newArguments = new ArrayList<>();
+
+        boolean ignore = false;
+
+        for (String argument : arguments) {
+            if (argument.startsWith("-") && argument.length() == 2 && !ignore) {
+                continue;
+            }
+
+            // Disable the parsing of the next flags
+            if ("--".equals(argument)) {
+                ignore = true;
+                break;
+            }
+
+            char flagChar = argument.charAt(1);
+            FlagPart part = flagParts.get(flagChar);
+
+            if (part != null && !ignore) {
+                continue;
+            }
+
+            newArguments.add(argument);
+        }
+
+        parts.removeAll(flagParts.values());
+
+        return newArguments;
+    }
+
 
     @Override
     public ParseResult parse(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandNotFound {
