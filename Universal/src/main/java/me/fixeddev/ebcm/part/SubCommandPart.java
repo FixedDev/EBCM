@@ -22,7 +22,6 @@ public abstract class SubCommandPart implements LineConsumingPart {
     @Override
     @Memoized
     public String getLineRepresentation() {
-
         return (isRequired() ? "<" : "[") +
                 getName() +
                 (isRequired() ? ">" : "]");

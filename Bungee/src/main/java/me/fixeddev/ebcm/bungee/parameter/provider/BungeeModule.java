@@ -1,4 +1,4 @@
-package io.github.yusshu.ebcm.bungee.parameter.provider;
+package me.fixeddev.ebcm.bungee.parameter.provider;
 
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.parameter.provider.ProvidersModule;

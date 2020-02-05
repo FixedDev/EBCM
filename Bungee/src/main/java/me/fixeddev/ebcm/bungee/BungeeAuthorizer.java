@@ -1,4 +1,4 @@
-package io.github.yusshu.ebcm.bungee;
+package me.fixeddev.ebcm.bungee;
 
 import me.fixeddev.ebcm.Authorizer;
 import me.fixeddev.ebcm.NamespaceAccesor;

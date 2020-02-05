@@ -1,4 +1,4 @@
-package io.github.yusshu.ebcm.bungee;
+package me.fixeddev.ebcm.bungee;
 
 import me.fixeddev.ebcm.CommandManager;
 import me.fixeddev.ebcm.exception.CommandException;

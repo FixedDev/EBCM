@@ -1,11 +1,10 @@
-package io.github.yusshu.ebcm.bungee;
+package me.fixeddev.ebcm.bungee;
 
-import io.github.yusshu.ebcm.bungee.parameter.provider.BungeeModule;
+import me.fixeddev.ebcm.bungee.parameter.provider.BungeeModule;
 import me.fixeddev.ebcm.*;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
-import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;

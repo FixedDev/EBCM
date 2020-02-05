@@ -7,7 +7,6 @@ import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.internal.CommandLineParser;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
-import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;

@@ -5,10 +5,10 @@ import me.fixeddev.ebcm.part.CommandPart;
 
 import java.util.List;
 
-public interface InjectedProvider<T>  extends ParameterProvider<T> {
+public interface InjectedProvider<T> extends ParameterProvider<T> {
     @Override
     default Result<T> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part) {
-        if(!arguments.isEmpty()){
+        if (!arguments.isEmpty()) {
             throw new IllegalStateException("An injected provider shouldn't have any arguments!");
         }
 

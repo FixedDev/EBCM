@@ -1,6 +1,6 @@
-package io.github.yusshu.ebcm.bungee.parameter.provider;
+package me.fixeddev.ebcm.bungee.parameter.provider;
 
-import io.github.yusshu.ebcm.bungee.BungeeCommandManager;
+import me.fixeddev.ebcm.bungee.BungeeCommandManager;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
