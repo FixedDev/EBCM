@@ -192,8 +192,7 @@ public class SimpleCommandManager implements CommandManager {
 
         if (partToComplete instanceof ArgumentPart) {
             ArgumentPart part = (ArgumentPart) partToComplete;
-
-            ParameterProvider<?> provider = getProviderRegistry().getParameterProvider(part.getArgumentType());
+            SuggestionProvider provider = part.getSuggestionProvider().orElse(getProviderRegistry().getParameterProvider(part.getArgumentType()));
 
             if (provider == null) {
                 return Collections.emptyList();
