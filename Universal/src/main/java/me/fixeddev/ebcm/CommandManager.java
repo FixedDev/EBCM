@@ -25,7 +25,7 @@ public interface CommandManager {
 
     boolean execute(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandException;
 
-    List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoMoreArgumentsException;
+    List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments);
     
     ParseResult parse(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandNotFound;
 }
