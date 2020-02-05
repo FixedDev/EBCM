@@ -5,6 +5,7 @@ import me.fixeddev.ebcm.*;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
+import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -62,6 +63,11 @@ public class BungeeCommandManager implements CommandManager {
     @Override
     public boolean execute(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandException {
         return parent.execute(accessor, arguments);
+    }
+
+    @Override
+    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoMoreArgumentsException {
+        return parent.getSuggestions(accessor, arguments);
     }
 
     @Override

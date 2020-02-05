@@ -9,12 +9,13 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UnknownFormatConversionException;
 
-public class BungeeCommandWrapper extends Command {
+public class BungeeCommandWrapper extends Command implements TabExecutor {
 
     private CommandManager commandManager;
     private String[] aliases;
@@ -44,8 +45,8 @@ public class BungeeCommandWrapper extends Command {
                     exception.getMessage()
             ).split("\n");
 
-            for(String usage : usageExamples) {
-                sender.sendMessage(new TextComponent(usage));
+            for (String usage : usageExamples) {
+                sender.sendMessage(TextComponent.fromLegacyText(usage));
             }
         } catch (CommandParseException exception) {
             throw new UnknownFormatConversionException("An internal parse exception occurred while executing the command " + getName());
@@ -64,4 +65,13 @@ public class BungeeCommandWrapper extends Command {
         return permission;
     }
 
+    @Override
+    public Iterable<String> onTabComplete(CommandSender commandSender, String[] strings) {
+        List<String> argumentList = Arrays.asList(strings);
+
+        Namespace namespace = new Namespace();
+        namespace.setObject(CommandSender.class, BungeeCommandManager.SENDER_NAMESPACE, commandSender);
+
+        return commandManager.getSuggestions(namespace, argumentList);
+    }
 }
