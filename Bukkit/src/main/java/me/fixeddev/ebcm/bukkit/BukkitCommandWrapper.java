@@ -10,12 +10,13 @@ import me.fixeddev.ebcm.util.UsageBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BukkitCommandWrapper extends Command {
+public class BukkitCommandWrapper extends Command implements TabCompleter {
     private CommandManager commandManager;
 
     public BukkitCommandWrapper(me.fixeddev.ebcm.Command command, CommandManager dispatcher) {
@@ -72,5 +73,18 @@ public class BukkitCommandWrapper extends Command {
         namespace.setObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE, target);
 
         return authorizer.isAuthorized(namespace, getPermission());
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
+        List<String> argumentLine = new ArrayList<>();
+
+        argumentLine.add(s);
+        argumentLine.addAll(Arrays.asList(strings));
+
+        Namespace namespace = new Namespace();
+        namespace.setObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE, commandSender);
+
+        return commandManager.getSuggestions(namespace, argumentLine);
     }
 }

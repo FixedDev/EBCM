@@ -72,6 +72,11 @@ public class BukkitCommandManager implements CommandManager {
         return delegate.execute(accessor, arguments);
     }
 
+    @Override
+    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) {
+        return delegate.getSuggestions(accessor, arguments);
+    }
+
     public ParseResult parse(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandNotFound {
         return delegate.parse(accessor, arguments);
     }
