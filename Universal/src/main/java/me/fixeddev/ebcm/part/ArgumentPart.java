@@ -2,10 +2,12 @@ package me.fixeddev.ebcm.part;
 
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
+import me.fixeddev.ebcm.SuggestionProvider;
 import me.fixeddev.ebcm.util.ListAppender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @AutoValue
 public abstract class ArgumentPart implements ArgumentConsumingPart {
@@ -19,6 +21,8 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
                 .setDescription("")
                 .setDefaultValues(new ArrayList<>());
     }
+
+    public abstract Optional<SuggestionProvider> getSuggestionProvider();
 
     public abstract int getConsumedArguments();
 
@@ -50,6 +54,8 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
         public abstract Builder setDefaultValues(List<String> defaultValues);
 
         public abstract Builder setDescription(String newDescription);
+
+        public abstract Builder setSuggestionProvider(SuggestionProvider suggestionProvider);
 
         public Builder setAllModifiers(List<String> modifiers) {
             this.modifiersAppender.set(modifiers);
