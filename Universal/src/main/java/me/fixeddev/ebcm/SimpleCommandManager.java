@@ -211,10 +211,16 @@ public class SimpleCommandManager implements CommandManager {
         List<String> availableValues = new ArrayList<>();
 
         for (Command command : part.getCommandsToCall()) {
-            availableValues.add(command.getData().getName());
+            String name = command.getData().getName();
 
-            for (String value : command.getData().getAliases()) {
-                availableValues.add(value.toLowerCase());
+            if(name.startsWith(startsWith)){
+                availableValues.add(name.toLowerCase());
+            }
+
+            for (String alias : command.getData().getAliases()) {
+                if(alias.startsWith(startsWith)){
+                    availableValues.add(alias.toLowerCase());
+                }
             }
         }
 
