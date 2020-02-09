@@ -10,6 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OfflinePlayerProvider implements ParameterProvider<OfflinePlayer> {
@@ -34,5 +35,18 @@ public class OfflinePlayerProvider implements ParameterProvider<OfflinePlayer> {
         OfflinePlayer player = Bukkit.getOfflinePlayer(argument);
 
         return Result.createResult(player);
+    }
+
+    @Override
+    public List<String> getSuggestions(String startsWith) {
+        List<String> suggestions = new ArrayList<>();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if(player.getName().startsWith(startsWith)){
+                suggestions.add(player.getName());
+            }
+        }
+
+        return suggestions;
     }
 }

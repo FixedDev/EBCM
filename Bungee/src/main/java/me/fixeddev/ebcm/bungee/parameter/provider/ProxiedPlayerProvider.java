@@ -9,6 +9,7 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProxiedPlayerProvider implements ParameterProvider<ProxiedPlayer> {
@@ -45,4 +46,16 @@ public class ProxiedPlayerProvider implements ParameterProvider<ProxiedPlayer> {
         return Result.createResult(player);
     }
 
+    @Override
+    public List<String> getSuggestions(String startsWith) {
+        List<String> suggestions = new ArrayList<>();
+
+        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            if(player.getName().startsWith(startsWith)){
+                suggestions.add(player.getName());
+            }
+        }
+
+        return suggestions;
+    }
 }
