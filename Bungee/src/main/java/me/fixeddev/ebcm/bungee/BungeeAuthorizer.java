@@ -8,6 +8,10 @@ public class BungeeAuthorizer implements Authorizer {
 
     @Override
     public boolean isAuthorized(NamespaceAccesor namespace, String permission) {
+        if(permission.isEmpty()){
+            return true;
+        }
+
         CommandSender sender = namespace.getObject(CommandSender.class, BungeeCommandManager.SENDER_NAMESPACE);
         return sender.hasPermission(permission);
     }
