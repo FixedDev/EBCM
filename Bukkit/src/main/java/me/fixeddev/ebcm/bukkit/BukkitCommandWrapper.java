@@ -5,15 +5,16 @@ import me.fixeddev.ebcm.CommandManager;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
+import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.internal.namespace.Namespace;
 import me.fixeddev.ebcm.util.UsageBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class BukkitCommandWrapper extends Command {
@@ -72,7 +73,13 @@ public class BukkitCommandWrapper extends Command {
         Namespace namespace = new Namespace();
         namespace.setObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE, sender);
 
-        return commandManager.getSuggestions(namespace, argumentLine);
+        try {
+            return commandManager.getSuggestions(namespace, argumentLine);
+        } catch (NoPermissionException e) {
+            sender.sendMessage(ChatColor.RED + e.getMessage());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
