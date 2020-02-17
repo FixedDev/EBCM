@@ -8,6 +8,7 @@ import me.fixeddev.ebcm.ParseResult;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
+import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -73,7 +74,7 @@ public class BukkitCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) {
+    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoPermissionException {
         return delegate.getSuggestions(accessor, arguments);
     }
 
