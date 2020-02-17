@@ -141,7 +141,7 @@ public class SimpleCommandManager implements CommandManager {
 
         Command command = optionalCommand.get();
 
-        if(!authorizer.isAuthorized(accessor, command.getPermission())){
+        if (!authorizer.isAuthorized(accessor, command.getPermission())) {
             throw new NoPermissionException(command.getPermissionMessage());
         }
 
@@ -161,7 +161,7 @@ public class SimpleCommandManager implements CommandManager {
                 argumentsLeft -= argumentPart.getConsumedArguments();
 
                 if (argumentsLeft <= 0) {
-                    if(lastArgumentsLeft > 0){
+                    if (lastArgumentsLeft > 0) {
                         int i = argumentPart.getConsumedArguments() + argumentsLeft;
 
                         if (i == 0) {
@@ -206,21 +206,25 @@ public class SimpleCommandManager implements CommandManager {
 
         SubCommandPart part = (SubCommandPart) partToComplete;
 
-        return getSubCommands(part, startsWith);
+        return getSubCommands(accessor, part, startsWith);
     }
 
-    private List<String> getSubCommands(SubCommandPart part, String startsWith) {
+    private List<String> getSubCommands(NamespaceAccesor accesor, SubCommandPart part, String startsWith) {
         List<String> availableValues = new ArrayList<>();
 
         for (Command command : part.getCommandsToCall()) {
+            if (!authorizer.isAuthorized(accesor, command.getPermission())) {
+                continue;
+            }
+
             String name = command.getData().getName();
 
-            if(name.startsWith(startsWith)){
+            if (name.startsWith(startsWith)) {
                 availableValues.add(name.toLowerCase());
             }
 
             for (String alias : command.getData().getAliases()) {
-                if(alias.startsWith(startsWith)){
+                if (alias.startsWith(startsWith)) {
                     availableValues.add(alias.toLowerCase());
                 }
             }
