@@ -126,7 +126,7 @@ public class SimpleCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) {
+    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoPermissionException {
         if (arguments == null || arguments.isEmpty()) {
             return Collections.emptyList();
         }
@@ -140,6 +140,10 @@ public class SimpleCommandManager implements CommandManager {
         arguments.remove(0);
 
         Command command = optionalCommand.get();
+
+        if(!authorizer.isAuthorized(accessor, command.getPermission())){
+            throw new NoPermissionException(command.getPermissionMessage());
+        }
 
         List<CommandPart> parts = command.getParts();
         arguments = parseFlags(arguments, parts);

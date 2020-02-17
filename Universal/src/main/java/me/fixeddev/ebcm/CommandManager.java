@@ -3,7 +3,7 @@ package me.fixeddev.ebcm;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
-import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
+import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public interface CommandManager {
 
     boolean execute(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandException;
 
-    List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments);
+    List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoPermissionException;
     
     ParseResult parse(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandNotFound;
 }
