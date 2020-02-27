@@ -12,6 +12,7 @@ import me.fixeddev.ebcm.parametric.annotation.Flag;
 import me.fixeddev.ebcm.parametric.annotation.Injected;
 import me.fixeddev.ebcm.parametric.annotation.ModifierAnnotation;
 import me.fixeddev.ebcm.parametric.annotation.Named;
+import me.fixeddev.ebcm.parametric.annotation.Required;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
@@ -118,8 +119,13 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                         .setCommandParts(command.getParts());
             }
 
+            SubCommandPart.Builder subCommandBuilder = SubCommandPart.builder("subcommand");
 
-            builder.addPart(SubCommandPart.builder("subcommand")
+            if(clazz.isAnnotationPresent(Required.class)){
+                subCommandBuilder.setRequired(true);
+            }
+
+            builder.addPart(subCommandBuilder
                     .setCommands(commandList)
                     .build());
 
