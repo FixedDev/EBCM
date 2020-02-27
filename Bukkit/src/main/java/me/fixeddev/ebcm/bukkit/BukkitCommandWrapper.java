@@ -54,7 +54,7 @@ public class BukkitCommandWrapper extends Command {
                     .split("\n");
 
             for (String s : usage) {
-                commandSender.sendMessage(s);
+                commandSender.sendMessage(ChatColor.RED +s);
             }
         } catch (CommandParseException e) {
             throw new org.bukkit.command.CommandException("An internal parse exception occurred while executing the command " + label, e);
