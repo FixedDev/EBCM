@@ -165,13 +165,20 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 useUpperClass = false;
             }
 
+            boolean accessible = constructor.isAccessible();
+
             constructor.setAccessible(true);
 
+            CommandClass instance;
+
             if (useUpperClass) {
-                return (CommandClass) constructor.newInstance(upperCommand);
+                instance = (CommandClass) constructor.newInstance(upperCommand);
             } else {
-                return (CommandClass) constructor.newInstance();
+                instance = (CommandClass) constructor.newInstance();
             }
+            constructor.setAccessible(accessible);
+
+            return instance;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
