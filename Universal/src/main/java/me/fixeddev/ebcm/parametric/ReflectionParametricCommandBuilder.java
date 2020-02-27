@@ -21,6 +21,7 @@ import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -122,27 +123,27 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
             SubCommandPart.Builder subCommandBuilder = SubCommandPart.builder("subcommand");
 
-            if(clazz.isAnnotationPresent(Required.class)){
+            if (clazz.isAnnotationPresent(Required.class)) {
                 subCommandBuilder.setRequired(true);
             }
-            
+
             SubCommandClasses classesAnnotation = clazz.getAnnotation(SubCommandClasses.class);
 
-            if(classesAnnotation != null){
+            if (classesAnnotation != null) {
                 for (Class<? extends CommandClass> subCommandClass : classesAnnotation.value()) {
-                    if(subCommandClass == clazz) {
+                    if (subCommandClass == clazz) {
                         continue;
                     }
 
                     try {
-                        List<Command> subCommands = fromClass(subCommandClass.newInstance());
+                        List<Command> subCommands = fromClass(createSubCommandInstance(subCommandClass, clazz, commandClass));
                         commandList.addAll(subCommands);
-                    } catch (InstantiationException | IllegalAccessException e) {
+                    } catch (RuntimeException e) {
                         continue;
                     }
                 }
             }
-            
+
             builder.addPart(subCommandBuilder
                     .setCommands(commandList)
                     .build());
@@ -151,6 +152,29 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         }
 
         return commandList;
+    }
+
+    private CommandClass createSubCommandInstance(Class<?> clazz, Class<?> upperCommandClass, CommandClass upperCommand) {
+        try {
+            Constructor constructor;
+            boolean useUpperClass = true;
+            try {
+                constructor = clazz.getConstructor(upperCommandClass);
+            } catch (NoSuchMethodException e) {
+                constructor = clazz.getConstructor();
+                useUpperClass = false;
+            }
+
+            constructor.setAccessible(true);
+
+            if (useUpperClass) {
+                return (CommandClass) constructor.newInstance(upperCommand);
+            } else {
+                return (CommandClass) constructor.newInstance();
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private CommandPart fromParameter(Parameter parameter) {
