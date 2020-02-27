@@ -13,6 +13,7 @@ import me.fixeddev.ebcm.parametric.annotation.Injected;
 import me.fixeddev.ebcm.parametric.annotation.ModifierAnnotation;
 import me.fixeddev.ebcm.parametric.annotation.Named;
 import me.fixeddev.ebcm.parametric.annotation.Required;
+import me.fixeddev.ebcm.parametric.annotation.SubCommandClasses;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
@@ -124,7 +125,24 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
             if(clazz.isAnnotationPresent(Required.class)){
                 subCommandBuilder.setRequired(true);
             }
+            
+            SubCommandClasses classesAnnotation = clazz.getAnnotation(SubCommandClasses.class);
 
+            if(classesAnnotation != null){
+                for (Class<? extends CommandClass> subCommandClass : classesAnnotation.value()) {
+                    if(subCommandClass == clazz) {
+                        continue;
+                    }
+
+                    try {
+                        List<Command> subCommands = fromClass(subCommandClass.newInstance());
+                        commandList.addAll(subCommands);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        continue;
+                    }
+                }
+            }
+            
             builder.addPart(subCommandBuilder
                     .setCommands(commandList)
                     .build());
