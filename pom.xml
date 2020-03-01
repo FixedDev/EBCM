@@ -6,7 +6,7 @@
 
     <groupId>me.fixeddev</groupId>
     <artifactId>ebcm</artifactId>
-    <version>1.4</version>
+    <version>1.6</version>
     <modules>
         <module>Universal</module>
         <module>Bukkit</module>
@@ -27,9 +27,9 @@
     </repositories>
 
     <properties>
-        <universal-version>1.5.2</universal-version>
-        <bukkit-version>1.5.1</bukkit-version>
-        <bungee-version>1.5.0</bungee-version>
+        <universal-version>1.6.0</universal-version>
+        <bukkit-version>1.6.0</bukkit-version>
+        <bungee-version>1.6.0</bungee-version>
         <parent-version>${project.version}</parent-version>
     </properties>
 
