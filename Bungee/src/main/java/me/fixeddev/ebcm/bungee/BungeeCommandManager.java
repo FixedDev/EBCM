@@ -56,6 +56,11 @@ public class BungeeCommandManager implements CommandManager {
     }
 
     @Override
+    public Messager getMessager() {
+        return parent.getMessager();
+    }
+
+    @Override
     public Optional<Command> getCommand(String commandName) {
         return parent.getCommand(commandName);
     }

@@ -3,6 +3,7 @@ package me.fixeddev.ebcm.bukkit;
 import me.fixeddev.ebcm.Authorizer;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandManager;
+import me.fixeddev.ebcm.Messager;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
 import me.fixeddev.ebcm.exception.CommandException;
@@ -63,6 +64,11 @@ public class BukkitCommandManager implements CommandManager {
     @Override
     public Authorizer getAuthorizer() {
         return delegate.getAuthorizer();
+    }
+
+    @Override
+    public Messager getMessager() {
+        return delegate.getMessager();
     }
 
     public Optional<Command> getCommand(String commandName) {
