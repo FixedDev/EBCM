@@ -3,8 +3,6 @@ package me.fixeddev.ebcm;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
-import me.fixeddev.ebcm.exception.CommandUsageException;
-import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.internal.CommandLineParser;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
@@ -40,7 +38,9 @@ public class SimpleCommandManager implements CommandManager {
     }
 
     public SimpleCommandManager(ParameterProviderRegistry registry) {
-        this((namespace, permission) -> true, (namespaceAccesor, message) -> {System.out.println(message);}, registry);
+        this((namespace, permission) -> true, (namespaceAccesor, message) -> {
+            System.out.println(message);
+        }, registry);
     }
 
     public SimpleCommandManager() {
@@ -109,7 +109,9 @@ public class SimpleCommandManager implements CommandManager {
         Command toExecute = result.getCommandToExecute();
 
         if (!authorizer.isAuthorized(accessor, toExecute.getPermission())) {
-            throw new NoPermissionException(toExecute.getPermissionMessage());
+            messager.sendMessage(accessor, toExecute.getPermissionMessage());
+
+            return true;
         }
 
         CommandAction action = toExecute.getAction();
@@ -127,14 +129,14 @@ public class SimpleCommandManager implements CommandManager {
         }
 
         if (usage) {
-            throw new CommandUsageException(UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
+            messager.sendMessage(accessor, "Usage: " + UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
         }
 
         return true;
     }
 
     @Override
-    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoPermissionException {
+    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) {
         if (arguments == null || arguments.isEmpty()) {
             return Collections.emptyList();
         }
@@ -150,7 +152,7 @@ public class SimpleCommandManager implements CommandManager {
         Command command = optionalCommand.get();
 
         if (!authorizer.isAuthorized(accessor, command.getPermission())) {
-            throw new NoPermissionException(command.getPermissionMessage());
+            return Collections.emptyList();
         }
 
         List<CommandPart> parts = command.getParts();
