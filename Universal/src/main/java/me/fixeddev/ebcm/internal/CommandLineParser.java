@@ -307,8 +307,10 @@ public class CommandLineParser {
 
         for (int i = 0; i < part.getConsumedArguments(); i++) {
             if (!hasNextArgument()) {
-                throw new CommandUsageException("Missing arguments for required part " + part.getName()
+                commandManager.getMessager().sendMessage(namespaceAccesor, "Missing arguments for required part " + part.getName()
                         + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+
+                return new ArrayList<>();
             }
 
             String argument = argumentStack.next();
@@ -351,8 +353,10 @@ public class CommandLineParser {
 
         if (!hasNextArgument()) {
             if (partToBind.isRequired()) {
-                throw new CommandUsageException("Missing argument for required part " + partToBind.getName()
+                commandManager.getMessager().sendMessage(namespaceAccesor,"Missing argument for required part " + partToBind.getName()
                         + ", available values: " + availableValuesString + "\n " + usage);
+
+                return;
             }
 
             return;
