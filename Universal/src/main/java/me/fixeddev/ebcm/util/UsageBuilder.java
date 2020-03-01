@@ -28,7 +28,7 @@ public class UsageBuilder {
                 .collect(Collectors.joining(" "))
                 .replace("<command>", label);
 
-        if (parentUsage != null) {
+        if (parentUsage != null && !parentUsage.isEmpty()) {
             return parentUsage + " " + usage;
         }
 

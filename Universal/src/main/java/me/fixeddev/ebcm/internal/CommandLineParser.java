@@ -217,7 +217,7 @@ public class CommandLineParser {
 
         }
 
-        return new ParseResultData(commandLabel, argumentStack.getBacking(), rootCommand, currentCommand, bindings, valueBindings);
+        return new ParseResultData(commandLabel.trim(), argumentStack.getBacking(), rootCommand, currentCommand, bindings, valueBindings);
     }
 
     private void parseInjectedPart(CommandPart partToBind) throws CommandParseException {
