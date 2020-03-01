@@ -27,17 +27,20 @@ public class SimpleCommandManager implements CommandManager {
     private Map<String, Command> commandMap;
 
     private Authorizer authorizer;
+    private Messager messager;
     private ParameterProviderRegistry registry;
 
-    public SimpleCommandManager(Authorizer authorizer, ParameterProviderRegistry registry) {
+    public SimpleCommandManager(Authorizer authorizer, Messager messager, ParameterProviderRegistry registry) {
         this.authorizer = authorizer;
+        this.messager = messager;
         this.registry = registry;
+
 
         commandMap = new HashMap<>();
     }
 
     public SimpleCommandManager(ParameterProviderRegistry registry) {
-        this((namespace, permission) -> true, registry);
+        this((namespace, permission) -> true, (namespaceAccesor, message) -> {System.out.println(message);}, registry);
     }
 
     public SimpleCommandManager() {
@@ -79,6 +82,11 @@ public class SimpleCommandManager implements CommandManager {
     @Override
     public Authorizer getAuthorizer() {
         return authorizer;
+    }
+
+    @Override
+    public Messager getMessager() {
+        return messager;
     }
 
     @Override

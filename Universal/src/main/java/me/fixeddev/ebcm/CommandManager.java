@@ -21,6 +21,8 @@ public interface CommandManager {
 
     Authorizer getAuthorizer();
 
+    Messager getMessager();
+
     Optional<Command> getCommand(String commandName);
 
     boolean execute(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandException;
