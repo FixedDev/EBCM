@@ -306,7 +306,7 @@ public class CommandLineParser {
                 commandManager.getMessager().sendMessage(namespaceAccesor, "Missing arguments for required part " + part.getName()
                         + " minimum arguments required: " + neededArguments);
 
-                return new ArrayList<>();
+                throw new CommandUsageException();
             }
 
             String argument = argumentStack.next();
@@ -351,7 +351,7 @@ public class CommandLineParser {
                 commandManager.getMessager().sendMessage(namespaceAccesor, "Missing argument for required part " + partToBind.getName()
                         + ", available values: " + availableValuesString);
 
-                return;
+                throw new CommandUsageException();
             }
 
             return;
