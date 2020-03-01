@@ -1,5 +1,5 @@
 package me.fixeddev.ebcm;
 
 public interface Messager {
-    void sendMessage(String message);
+    void sendMessage(NamespaceAccesor namespaceAccesor, String message);
 }
