@@ -16,7 +16,6 @@ import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
-import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -291,10 +290,7 @@ public class CommandLineParser {
                 throw new CommandParseException("An exception occurred while parsing the part " + part.getName() + " argument!", lastError.get());
             }
 
-            if (message.isPresent()) {
-                // TODO: Create a better exception to send messages to the command sender
-                throw new CommandUsageException(message.get());
-            }
+            message.ifPresent(s -> commandManager.getMessager().sendMessage(namespaceAccesor, s));
 
             return Optional.empty();
         }
@@ -308,7 +304,7 @@ public class CommandLineParser {
         for (int i = 0; i < part.getConsumedArguments(); i++) {
             if (!hasNextArgument()) {
                 commandManager.getMessager().sendMessage(namespaceAccesor, "Missing arguments for required part " + part.getName()
-                        + " minimum arguments required: " + neededArguments + "\n " + UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+                        + " minimum arguments required: " + neededArguments);
 
                 return new ArrayList<>();
             }
@@ -349,12 +345,11 @@ public class CommandLineParser {
         }
 
         String availableValuesString = String.join(", ", availableValues.keySet());
-        String usage = UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel);
 
         if (!hasNextArgument()) {
             if (partToBind.isRequired()) {
-                commandManager.getMessager().sendMessage(namespaceAccesor,"Missing argument for required part " + partToBind.getName()
-                        + ", available values: " + availableValuesString + "\n " + usage);
+                commandManager.getMessager().sendMessage(namespaceAccesor, "Missing argument for required part " + partToBind.getName()
+                        + ", available values: " + availableValuesString);
 
                 return;
             }
@@ -368,7 +363,7 @@ public class CommandLineParser {
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
-            throw new CommandUsageException("Invalid sub-command, valid values: " + availableValuesString + "\n " + usage);
+            throw new CommandUsageException("Invalid sub-command, valid values: " + availableValuesString);
         }
 
         useCommand(command);
