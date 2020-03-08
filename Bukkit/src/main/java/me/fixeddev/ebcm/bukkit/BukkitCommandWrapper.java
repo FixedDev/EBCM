@@ -50,7 +50,7 @@ public class BukkitCommandWrapper extends Command {
                 return true;
             }
         } catch (CommandUsageException ex) {
-            String[] usage = ChatColor.translateAlternateColorCodes('&', ex.getMessage())
+            String[] usage = ChatColor.translateAlternateColorCodes('&', ex.getMessage()).replace("<command>", label)
                     .split("\n");
 
             for (String s : usage) {
