@@ -22,7 +22,7 @@ public class UsageBuilder {
         }
 
         String usage = command.getParts().stream()
-                .filter(part -> part instanceof LineConsumingPart && (parent == null || !(part instanceof SubCommandPart)))
+                .filter(part -> part instanceof LineConsumingPart)
                 .map(part -> (LineConsumingPart) part)
                 .map(LineConsumingPart::getLineRepresentation)
                 .collect(Collectors.joining(" "))
