@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -164,7 +165,12 @@ public class SimpleCommandManager implements CommandManager {
         CommandPart partToComplete = null;
         String startsWith = "";
 
-        for (CommandPart part : command.getParts()) {
+        List<CommandPart> commandParts = command.getParts();
+
+        ListIterator<CommandPart> partsIterator = commandParts.listIterator();
+        while (partsIterator.hasNext()) {
+            CommandPart part = partsIterator.next();
+
             if (part instanceof ArgumentPart) {
                 ArgumentPart argumentPart = (ArgumentPart) part;
                 lastArgumentsLeft = argumentsLeft;
@@ -195,6 +201,29 @@ public class SimpleCommandManager implements CommandManager {
                     startsWith = arguments.get(arguments.size() - 1);
 
                     break;
+                }
+
+                if (!partsIterator.hasNext()) {
+                    Map<String, Command> availableValues = new HashMap<>();
+
+                    for (Command subCommand : ((SubCommandPart) part).getCommandsToCall()) {
+                        availableValues.put(subCommand.getData().getName(), subCommand);
+
+                        for (String value : command.getData().getAliases()) {
+                            availableValues.put(value.toLowerCase(), subCommand);
+                        }
+                    }
+
+                    String lastArgument = arguments.get(arguments.size() - argumentsLeft -1);
+
+                    Command subCommand = availableValues.get(lastArgument.toLowerCase());
+
+                    if (subCommand == null) {
+                        continue;
+                    }
+
+                    parts = subCommand.getParts();
+                    partsIterator = parts.listIterator();
                 }
             }
         }
