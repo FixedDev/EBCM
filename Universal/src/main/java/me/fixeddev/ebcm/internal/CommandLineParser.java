@@ -16,6 +16,7 @@ import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
+import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -306,7 +307,7 @@ public class CommandLineParser {
                 commandManager.getMessager().sendMessage(namespaceAccesor, "Missing arguments for required part " + part.getName()
                         + " minimum arguments required: " + neededArguments);
 
-                throw new CommandUsageException();
+                throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
             }
 
             String argument = argumentStack.next();
@@ -351,7 +352,7 @@ public class CommandLineParser {
                 commandManager.getMessager().sendMessage(namespaceAccesor, "Missing argument for required part " + partToBind.getName()
                         + ", available values: " + availableValuesString);
 
-                throw new CommandUsageException();
+                throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
             }
 
             return;
@@ -363,7 +364,10 @@ public class CommandLineParser {
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
-            throw new CommandUsageException("Invalid sub-command, valid values: " + availableValuesString);
+            commandManager.getMessager().sendMessage(namespaceAccesor, "Invalid sub-command, valid values: " + availableValuesString);
+
+
+            throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
         }
 
         useCommand(command);
