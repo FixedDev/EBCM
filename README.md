@@ -96,4 +96,4 @@ commandManager.registerCommands(commands);
 ```
 Also, you see that ugly `@Named` annotation? Well, using java8 `-parameters` compiler flag you can get rid of it!
 ### Finally
-There are lots of things that you can do, since the CommandManager was created to be really flexible and it will be updated to be better. At the moment it doesn't has a wiki but, soon a wiki will be created, to make the experience of using it easier
+There are lots of things that you can do, since the CommandManager was created to be really flexible and it will be updated to be better. At the moment it doesn't has a wiki but, soon it will be created, to make the experience of using it easier
