@@ -239,7 +239,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
     private CommandAction actionOfMethod(CommandClass commandClass, Method method) {
         return (parameters -> {
-            List<CommandPart> commandParts = parameters.getCommand().getParts();
+            List<CommandPart> commandParts = parameters.getBoundParts();
 
             List<Object> params = new ArrayList<>();
 
