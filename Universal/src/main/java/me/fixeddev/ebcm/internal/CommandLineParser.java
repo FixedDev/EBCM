@@ -131,7 +131,7 @@ public class CommandLineParser {
         partsIterator = currentCommandParts.listIterator();
         partsLeft = currentCommandParts.size();
 
-        List<String> newArguments = argumentStack.getBacking().subList(argumentStack.getPosition(), argumentStack.getSize());
+        List<String> newArguments = argumentStack.getBacking().subList(0, argumentStack.getPosition() + 1);
         // We have the arguments already used, now, use them to create a new list
         newArguments = new ArrayList<>(newArguments);
 
