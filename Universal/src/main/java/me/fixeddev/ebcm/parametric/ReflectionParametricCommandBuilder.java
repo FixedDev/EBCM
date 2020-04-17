@@ -1,7 +1,9 @@
 package me.fixeddev.ebcm.parametric;
 
+import com.sun.istack.internal.Nullable;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandAction;
+import me.fixeddev.ebcm.CommandContext;
 import me.fixeddev.ebcm.CommandData;
 import me.fixeddev.ebcm.ImmutableCommand;
 import me.fixeddev.ebcm.exception.CommandException;
@@ -12,6 +14,7 @@ import me.fixeddev.ebcm.parametric.annotation.Flag;
 import me.fixeddev.ebcm.parametric.annotation.Injected;
 import me.fixeddev.ebcm.parametric.annotation.ModifierAnnotation;
 import me.fixeddev.ebcm.parametric.annotation.Named;
+import me.fixeddev.ebcm.parametric.annotation.ParentArg;
 import me.fixeddev.ebcm.parametric.annotation.Required;
 import me.fixeddev.ebcm.parametric.annotation.SubCommandClasses;
 import me.fixeddev.ebcm.part.ArgumentPart;
@@ -64,7 +67,13 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 .setPermissionMessage(commandAnnotation.permissionMessage());
 
         for (Parameter parameter : method.getParameters()) {
-            commandBuilder.addPart(fromParameter(parameter));
+            CommandPart part = fromParameter(parameter);
+
+            if (part == null) {
+                continue;
+            }
+
+            commandBuilder.addPart(part);
         }
 
         commandBuilder.setAction(actionOfMethod(commandClass, method));
@@ -184,7 +193,12 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         }
     }
 
+    @Nullable
     private CommandPart fromParameter(Parameter parameter) {
+        if (parameter.isAnnotationPresent(ParentArg.class)) {
+            return null;
+        }
+
         Class<?> type = parameter.getType();
         String name = getName(parameter);
         int consumedArgs = getConsumedArgs(parameter);
@@ -238,28 +252,57 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
     }
 
     private CommandAction actionOfMethod(CommandClass commandClass, Method method) {
-        return (parameters -> {
-            List<CommandPart> commandParts = parameters.getBoundParts();
+        class ParametricCommandAction implements CommandAction {
 
-            List<Object> params = new ArrayList<>();
+            List<CommandPart> commandParts = new ArrayList<>();
 
-            for (CommandPart part : commandParts) {
-                if (part instanceof FlagPart || part instanceof ArgumentPart || part instanceof InjectedValuePart)
-                    params.add(parameters.getValue(part).get());
+            @Override
+            public boolean execute(CommandContext parameters) throws CommandException {
+                if (commandParts.isEmpty()) {
+                    computeParts(parameters);
+                }
+
+                List<Object> params = new ArrayList<>();
+
+                for (CommandPart part : commandParts) {
+                    if (part instanceof FlagPart || part instanceof ArgumentPart || part instanceof InjectedValuePart) {
+                        Optional<Object> optionalParameter = parameters.getValue(part);
+                        params.add(optionalParameter.get());
+
+                    }
+                }
+
+                boolean accessible = method.isAccessible();
+
+                try {
+                    method.setAccessible(true);
+
+                    boolean result = (boolean) method.invoke(commandClass, params.toArray());
+                    method.setAccessible(accessible);
+
+                    return result;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new CommandException("An exception occurred while executing the command", e);
+                }
             }
 
-            boolean accessible = method.isAccessible();
+            private void computeParts(CommandContext parameters) {
+                for (Parameter parameter : method.getParameters()) {
+                    String name = getName(parameter);
+                    int indexOf = 0;
 
-            try {
-                method.setAccessible(true);
-                boolean result = (boolean) method.invoke(commandClass, params.toArray());
-                method.setAccessible(accessible);
+                    ParentArg parentArg = parameter.getAnnotation(ParentArg.class);
+                    if (parentArg != null) {
+                        indexOf = parentArg.value();
+                    }
 
-                return result;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new CommandException("An exception occurred while executing the command", e);
+                    commandParts.add(parameters.getParts(name).get(indexOf));
+                }
             }
-        });
+
+        }
+
+        return new ParametricCommandAction();
     }
 
     private String getName(Parameter parameter) {
