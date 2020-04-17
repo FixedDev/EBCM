@@ -27,8 +27,8 @@
     </repositories>
 
     <properties>
-        <universal-version>1.6.2-SNAPSHOT.2</universal-version>
-        <bukkit-version>1.6.1-SNAPSHOT.1</bukkit-version>
+        <universal-version>1.6.2</universal-version>
+        <bukkit-version>1.6.1</bukkit-version>
         <bungee-version>1.6.0</bungee-version>
         <parent-version>${project.version}</parent-version>
     </properties>
