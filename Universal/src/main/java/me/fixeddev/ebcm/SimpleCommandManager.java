@@ -4,6 +4,7 @@ import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.internal.CommandLineParser;
+import me.fixeddev.ebcm.internal.Messages;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.part.ArgumentPart;
@@ -39,8 +40,8 @@ public class SimpleCommandManager implements CommandManager {
     }
 
     public SimpleCommandManager(ParameterProviderRegistry registry) {
-        this((namespace, permission) -> true, (namespaceAccesor, message) -> {
-            System.out.println(message);
+        this((namespace, permission) -> true, (namespaceAccesor, messageId, message, parameters) -> {
+            System.out.println(String.format(message, (Object[]) parameters));
         }, registry);
     }
 
@@ -110,7 +111,7 @@ public class SimpleCommandManager implements CommandManager {
         Command toExecute = result.getCommandToExecute();
 
         if (!authorizer.isAuthorized(accessor, toExecute.getPermission())) {
-            messager.sendMessage(accessor, toExecute.getPermissionMessage());
+            messager.sendMessage(accessor, Messages.COMMAND_NO_PERMISSIONS.getId(), toExecute.getPermissionMessage());
 
             return true;
         }
@@ -130,7 +131,7 @@ public class SimpleCommandManager implements CommandManager {
         }
 
         if (usage) {
-            messager.sendMessage(accessor, "Usage: " + UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
+            messager.sendMessage(accessor, Messages.COMMAND_USAGE.getId(), "Usage: %1$s", UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
         }
 
         return true;
@@ -214,7 +215,7 @@ public class SimpleCommandManager implements CommandManager {
                         }
                     }
 
-                    String lastArgument = arguments.get(arguments.size() - argumentsLeft -1);
+                    String lastArgument = arguments.get(arguments.size() - argumentsLeft - 1);
 
                     Command subCommand = availableValues.get(lastArgument.toLowerCase());
 

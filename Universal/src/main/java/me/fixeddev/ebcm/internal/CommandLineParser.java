@@ -304,8 +304,8 @@ public class CommandLineParser {
 
         for (int i = 0; i < part.getConsumedArguments(); i++) {
             if (!hasNextArgument()) {
-                commandManager.getMessager().sendMessage(namespaceAccesor, "Missing arguments for required part " + part.getName()
-                        + " minimum arguments required: " + neededArguments);
+                commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_ARGUMENT.getId(),
+                        "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
 
                 throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
             }
@@ -349,8 +349,8 @@ public class CommandLineParser {
 
         if (!hasNextArgument()) {
             if (partToBind.isRequired()) {
-                commandManager.getMessager().sendMessage(namespaceAccesor, "Missing argument for required part " + partToBind.getName()
-                        + ", available values: " + availableValuesString);
+                commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_SUBCOMMAND.getId(),
+                        "Missing argument for required part %s, available values: %s", partToBind.getName(), availableValuesString);
 
                 throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
             }
@@ -364,7 +364,8 @@ public class CommandLineParser {
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
-            commandManager.getMessager().sendMessage(namespaceAccesor, "Invalid sub-command, valid values: " + availableValuesString);
+            commandManager.getMessager().sendMessage(namespaceAccesor, Messages.INVALID_SUBCOMMAND.getId(),
+                    "Invalid sub-command, valid values: %s", availableValuesString);
 
 
             throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
