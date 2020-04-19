@@ -8,7 +8,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class BungeeMessager implements Messager {
     @Override
-    public void sendMessage(NamespaceAccesor namespace, String message) {
+    public void sendMessage(NamespaceAccesor namespace, String messageId, String message) {
         CommandSender sender = namespace.getObject(CommandSender.class, BungeeCommandManager.SENDER_NAMESPACE);
 
         message = ChatColor.translateAlternateColorCodes('&',message);
