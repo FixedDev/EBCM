@@ -5,5 +5,5 @@ public interface Messager {
         sendMessage(namespaceAccesor, "UNKNOWN", message);
     }
 
-    void sendMessage(NamespaceAccesor namespaceAccesor, String messageId, String message);
+    void sendMessage(NamespaceAccesor namespaceAccesor, String messageId, String message, String... parameters);
 }
