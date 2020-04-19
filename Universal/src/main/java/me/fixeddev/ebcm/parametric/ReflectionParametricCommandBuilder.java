@@ -1,6 +1,5 @@
 package me.fixeddev.ebcm.parametric;
 
-import com.sun.istack.internal.Nullable;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandAction;
 import me.fixeddev.ebcm.CommandContext;
@@ -193,7 +192,6 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         }
     }
 
-    @Nullable
     private CommandPart fromParameter(Parameter parameter) {
         if (parameter.isAnnotationPresent(ParentArg.class)) {
             return null;
