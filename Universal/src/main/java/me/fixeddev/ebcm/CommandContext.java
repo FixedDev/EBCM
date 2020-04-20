@@ -30,4 +30,17 @@ public interface CommandContext extends NamespaceAccesor {
     List<CommandPart> getBoundParts();
 
     <V> Optional<V> getValue(CommandPart part);
+
+    /**
+     * The difference between this and the {@link CommandContext#getValue(CommandPart)} method is that this method allows null values(being valid) to be returned
+     * In certain cases it can be useful, since the provider can return a null, but still be a valid value
+     *
+     * @param part The part to retrieve the value from
+     * @param <V> The returned object type
+     * @return The nullable object associated as the value for the specified part
+     * @throws IllegalArgumentException If the specified part doesn't has a value associated with
+     */
+    <V> V getRawValue(CommandPart part);
+
+    boolean hasValue(CommandPart part);
 }

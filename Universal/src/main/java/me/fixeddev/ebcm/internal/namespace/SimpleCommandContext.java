@@ -92,4 +92,18 @@ public class SimpleCommandContext extends NamespaceAccessorDelegate implements C
     public <V> Optional<V> getValue(CommandPart part) {
         return (Optional<V>) Optional.ofNullable(valueBindings.get(part));
     }
+
+    @Override
+    public <V> V getRawValue(CommandPart part) {
+        if(hasValue(part)){
+            throw new IllegalArgumentException("The specified part doesn't has a value associated with!");
+        }
+
+        return (V) valueBindings.get(part);
+    }
+
+    @Override
+    public boolean hasValue(CommandPart part) {
+        return valueBindings.containsKey(part);
+    }
 }
