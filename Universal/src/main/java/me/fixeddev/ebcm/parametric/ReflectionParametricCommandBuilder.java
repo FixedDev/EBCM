@@ -264,9 +264,14 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
                 for (CommandPart part : commandParts) {
                     if (part instanceof FlagPart || part instanceof ArgumentPart || part instanceof InjectedValuePart) {
-                        Optional<Object> optionalParameter = parameters.getValue(part);
-                        params.add(optionalParameter.get());
-
+                        if (parameters.hasValue(part)) {
+                            params.add(parameters.getRawValue(part));
+                        } else {
+                            if (part.isRequired()){
+                                throw new CommandException("The value for the required part" + part.getName() + " is missing!");
+                            }
+                            params.add(null);
+                        }
                     }
                 }
 
