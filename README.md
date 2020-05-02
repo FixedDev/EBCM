@@ -12,7 +12,7 @@ While the command manager is working, it's not complete yet, there are a lot of 
 * [x] Develop the parametric commands
 * [x] Allow subcommands in the parametric commands
 * [x] Allow more than 1 depth of subcommands in the parametric commands 
-* [ ] Allow parent commands parameters to be used on the subcommands 
+* [x] Allow parent commands parameters to be used on the subcommands 
 * [x] Modify the parser so it's more maintainable and has better performance
 * [ ] Refactor some things(command structure, implementations of interfaces) to make the above task easier to complete
 * [x] Allow optional subcommands
