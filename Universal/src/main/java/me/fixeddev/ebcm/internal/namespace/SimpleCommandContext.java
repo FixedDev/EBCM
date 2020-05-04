@@ -95,8 +95,8 @@ public class SimpleCommandContext extends NamespaceAccessorDelegate implements C
 
     @Override
     public <V> V getRawValue(CommandPart part) {
-        if(hasValue(part)){
-            throw new IllegalArgumentException("The specified part doesn't has a value associated with!");
+        if(!hasValue(part)){
+            throw new IllegalArgumentException("The part " + part.getName() + " doesn't has a value associated with!");
         }
 
         return (V) valueBindings.get(part);
