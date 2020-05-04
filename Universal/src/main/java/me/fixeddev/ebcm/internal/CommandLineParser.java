@@ -9,6 +9,7 @@ import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
+import me.fixeddev.ebcm.parameter.provider.Key;
 import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.part.ArgumentPart;
@@ -224,7 +225,12 @@ public class CommandLineParser {
     private void parseInjectedPart(CommandPart partToBind) throws CommandParseException {
         InjectedValuePart part = (InjectedValuePart) partToBind;
 
-        ParameterProvider<?> provider = providerRegistry.getParameterProvider(part.getType());
+        String modifier = part.getModifiers().isEmpty() ? null : part.getModifiers().get(0);
+        ParameterProvider<?> provider = providerRegistry.getParameterProvider(new Key<>(modifier, part.getType()));
+
+        if (provider == null) {
+            provider = providerRegistry.getParameterProvider(part.getType());
+        }
 
         if (provider == null || !provider.isInjected()) {
             throw new CommandParseException("Failed to get a provider for the part " + part.getName());
@@ -247,7 +253,12 @@ public class CommandLineParser {
     private void parseArgument(CommandPart partToBind) throws CommandParseException {
         ArgumentPart part = (ArgumentPart) partToBind;
 
-        ParameterProvider<?> provider = providerRegistry.getParameterProvider(part.getArgumentType());
+        String modifier = part.getModifiers().isEmpty() ? null : part.getModifiers().get(0);
+        ParameterProvider<?> provider = providerRegistry.getParameterProvider(new Key<>(modifier, part.getArgumentType()));
+
+        if (provider == null) {
+            provider = providerRegistry.getParameterProvider(part.getArgumentType());
+        }
 
         if (provider == null || provider.isInjected()) {
             throw new CommandParseException("Failed to get a provider for the part " + part.getName());
