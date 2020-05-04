@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class ParameterProviderRegistryImpl implements ParameterProviderRegistry {
-    private Map<Class<?>, ParameterProvider<?>> parameterProviders;
+    private Map<Key<?>, ParameterProvider<?>> parameterProviders;
 
     ParameterProviderRegistryImpl() {
         parameterProviders = new HashMap<>();
@@ -15,26 +15,27 @@ class ParameterProviderRegistryImpl implements ParameterProviderRegistry {
     }
 
     @Override
-    public <T> void registerParameterProvider(Class<T> clazz, ParameterProvider<T> parameterProvider) {
-        if (hasRegisteredProvider(clazz)) {
-            throw new IllegalStateException("Failed to register parameter provider for class " + clazz.getName() + ", there's already a registered parameter provider for that class!");
-        }
-        parameterProviders.put(clazz, parameterProvider);
+    public <T> boolean hasRegisteredProvider(Key<T> key) {
+        return parameterProviders.containsKey(key);
     }
 
     @Override
-    public <T> boolean hasRegisteredProvider(Class<T> clazz) {
-        return parameterProviders.containsKey(clazz);
-    }
-
-    @Override
-    public Map<Class<?>, ParameterProvider<?>> getRegisteredProviders() {
+    public Map<Key<?>, ParameterProvider<?>> getRegisteredProviders() {
         return parameterProviders;
     }
 
     @Override
+    public <T> void registerParameterProvider(Key<T> key, ParameterProvider<T> parameterProvider) {
+        if (hasRegisteredProvider(key)) {
+            throw new IllegalStateException("Failed to register parameter provider for key " + key.toString() + ", there's already a registered parameter provider for that class!");
+        }
+
+        parameterProviders.put(key, parameterProvider);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public <T> ParameterProvider<T> getParameterProvider(Class<T> clazz) {
-        return (ParameterProvider<T>) parameterProviders.get(clazz);
+    public <T> ParameterProvider<T> getParameterProvider(Key<T> key) {
+        return (ParameterProvider<T>) parameterProviders.get(key);
     }
 }

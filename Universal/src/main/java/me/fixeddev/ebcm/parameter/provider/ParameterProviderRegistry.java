@@ -7,13 +7,25 @@ public interface ParameterProviderRegistry {
         return new ParameterProviderRegistryImpl();
     }
 
-    Map<Class<?>, ParameterProvider<?>> getRegisteredProviders();
+    Map<Key<?>, ParameterProvider<?>> getRegisteredProviders();
 
-    <T> void registerParameterProvider(Class<T> clazz, ParameterProvider<T> parameterProvider);
+    <T> void registerParameterProvider(Key<T> key, ParameterProvider<T> parameterProvider);
 
-    <T> ParameterProvider<T> getParameterProvider(Class<T> clazz);
+    default <T> void registerParameterProvider(Class<T> clazz, ParameterProvider<T> parameterProvider) {
+        registerParameterProvider(new Key<>(clazz), parameterProvider);
+    }
 
-    <T> boolean hasRegisteredProvider(Class<T> clazz);
+    default <T> ParameterProvider<T> getParameterProvider(Class<T> clazz) {
+        return getParameterProvider(new Key<>(clazz));
+    }
+
+    <T> ParameterProvider<T> getParameterProvider(Key<T> key);
+
+    default <T> boolean hasRegisteredProvider(Class<T> clazz){
+        return hasRegisteredProvider(new Key<>(clazz));
+    }
+
+    <T> boolean hasRegisteredProvider(Key<T> key);
 
     default void installModule(ProvidersModule module) {
         module.configure(this);
