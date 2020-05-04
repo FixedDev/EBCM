@@ -1,5 +1,6 @@
 package me.fixeddev.ebcm.bukkit.parameter.provider;
 
+import me.fixeddev.ebcm.parameter.provider.Key;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.parameter.provider.ProvidersModule;
 import org.bukkit.OfflinePlayer;
@@ -12,5 +13,7 @@ public class BukkitModule implements ProvidersModule {
         registry.registerParameterProvider(CommandSender.class, new CommandSenderProvider());
         registry.registerParameterProvider(OfflinePlayer.class, new OfflinePlayerProvider());
         registry.registerParameterProvider(Player.class, new PlayerProvider());
+        registry.registerParameterProvider(new Key<>(PlayerSenderProvider.SENDER_MODIFIER, Player.class), new PlayerSenderProvider());
+
     }
 }
