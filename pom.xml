@@ -6,7 +6,7 @@
 
     <groupId>me.fixeddev</groupId>
     <artifactId>ebcm</artifactId>
-    <version>1.6</version>
+    <version>1.9</version>
     <modules>
         <module>Universal</module>
         <module>Bukkit</module>
