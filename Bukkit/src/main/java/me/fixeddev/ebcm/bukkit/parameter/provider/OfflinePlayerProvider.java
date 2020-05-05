@@ -18,7 +18,7 @@ public class OfflinePlayerProvider implements ParameterProvider<OfflinePlayer> {
     public Result<OfflinePlayer> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part) {
         CommandSender sender = namespaceAccesor.getObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE);
 
-        if (part.getModifiers().contains(PlayerProvider.SENDER_MODIFIER)) {
+        if (part.getModifiers().contains(PlayerSenderProvider.SENDER_MODIFIER)) {
             if (sender == null) {
                 return Result.createResult("Failed to get command sender!", new CommandException("Failed to get CommandSender, maybe the namespace wasn't provided with the command sender when executing the command?"));
             }
