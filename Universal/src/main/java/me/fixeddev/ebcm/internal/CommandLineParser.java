@@ -395,7 +395,7 @@ public class CommandLineParser {
 
 
     private void checkForInvalidInfiniteParts() throws CommandParseException {
-        boolean requiredPartFound = false;
+        boolean infinitePartFound = false;
 
         for (CommandPart part : currentCommandParts) {
             if (!(part instanceof ArgumentPart)) {
@@ -404,12 +404,12 @@ public class CommandLineParser {
 
             ArgumentPart argumentPart = (ArgumentPart) part;
 
-            if (argumentPart.isRequired()) {
-                requiredPartFound = true;
+            if (argumentPart.getConsumedArguments() == -1) {
+                infinitePartFound = true;
                 continue;
             }
 
-            if (argumentPart.getConsumedArguments() == -1 && requiredPartFound) {
+            if (argumentPart.isRequired() && infinitePartFound) {
                 throw new CommandParseException("A required part was found after an infinite part!");
             }
         }
