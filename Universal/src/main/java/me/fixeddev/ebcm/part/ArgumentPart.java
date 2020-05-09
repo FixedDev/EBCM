@@ -82,10 +82,6 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
         protected abstract ArgumentPart autoBuild();
 
         public ArgumentPart build() {
-            if (isRequired() && getConsumedArguments() == -1) {
-                throw new IllegalArgumentException("A part can't be required and infinite!");
-            }
-
             setModifiers(modifiersAppender.toList());
 
             return autoBuild();
