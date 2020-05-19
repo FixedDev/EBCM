@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 public class CommandLineParser {
 
-    private Command rootCommand;
+    private List<Command> commandExecutionPath;
     private String commandLabel;
 
     // Per command fields start
@@ -70,6 +70,7 @@ public class CommandLineParser {
         this.commandManager = commandManager;
         this.namespaceAccesor = namespaceAccesor;
         providerRegistry = commandManager.getProviderRegistry();
+        commandExecutionPath = new ArrayList<>();
     }
 
     public String nextArgument() throws CommandParseException {
@@ -102,20 +103,22 @@ public class CommandLineParser {
     public Command currentAsRootCommand() throws CommandNotFound, CommandParseException {
         String currentArgument = argumentStack.current();
 
-        if (rootCommand != null) {
+        if (!commandExecutionPath.isEmpty()) {
             throw new CommandParseException("The command was already found, no need to execute this method again!");
         }
 
-        rootCommand = commandManager.getCommand(currentArgument)
+        currentCommand = commandManager.getCommand(currentArgument)
                 .orElseThrow(() -> new CommandNotFound("The current argument(" + currentArgument + ") can't be found as command!"));
 
-        useCommand(rootCommand);
+        useCommand(currentCommand);
 
-        return rootCommand;
+        return currentCommand;
     }
 
     public void useCommand(Command command) {
         currentCommand = command;
+
+        commandExecutionPath.add(command);
 
         commandLabel += " " + argumentStack.current();
         currentCommandParts = new ArrayList<>(command.getParts());
@@ -199,7 +202,7 @@ public class CommandLineParser {
         optionalArgumentsToBound = argumentsLeft - neededArguments;
 
         if (partsLeft <= 0) {
-            return new ParseResultData(commandLabel, argumentStack.getBacking(), currentCommand, currentCommand, bindings, valueBindings);
+            return new ParseResultData(commandLabel, argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
         }
 
         checkForInvalidInfiniteParts();
@@ -219,7 +222,7 @@ public class CommandLineParser {
 
         }
 
-        return new ParseResultData(commandLabel.trim(), argumentStack.getBacking(), rootCommand, currentCommand, bindings, valueBindings);
+        return new ParseResultData(commandLabel.trim(), argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
     }
 
     private void parseInjectedPart(CommandPart partToBind) throws CommandParseException {
@@ -318,7 +321,7 @@ public class CommandLineParser {
                 commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_ARGUMENT.getId(),
                         "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
 
-                throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+                throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
             }
 
             String argument = argumentStack.next();
@@ -363,7 +366,7 @@ public class CommandLineParser {
                 commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_SUBCOMMAND.getId(),
                         "Missing argument for required part %s, available values: %s", partToBind.getName(), availableValuesString);
 
-                throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+                throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
             }
 
             return;
@@ -379,7 +382,7 @@ public class CommandLineParser {
                     "Invalid sub-command, valid values: %s", availableValuesString);
 
 
-            throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+            throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
         }
 
         useCommand(command);
@@ -487,21 +490,18 @@ public class CommandLineParser {
 
         private String label;
         private List<String> commandLine;
-        private Command command;
-        private Command commandToExecute;
+        private List<Command> executionPath;
         private List<ParameterBinding> parameterBindings;
         private Map<CommandPart, Object> valueBindings;
 
         public ParseResultData(String label,
                                List<String> commandLine,
-                               Command command,
-                               Command commandToExecute,
+                               List<Command> executionPath,
                                List<ParameterBinding> parameterBindings,
                                Map<CommandPart, Object> valueBindings) {
             this.label = label;
             this.commandLine = commandLine;
-            this.command = command;
-            this.commandToExecute = commandToExecute;
+            this.executionPath = executionPath;
             this.parameterBindings = parameterBindings;
             this.valueBindings = valueBindings;
         }
@@ -517,13 +517,18 @@ public class CommandLineParser {
         }
 
         @Override
+        public List<Command> getCommandExecutionPath() {
+            return executionPath;
+        }
+
+        @Override
         public Command getMainCommand() {
-            return command;
+            return executionPath.get(0);
         }
 
         @Override
         public Command getCommandToExecute() {
-            return commandToExecute;
+            return executionPath.get(executionPath.size() - 1);
         }
 
         public List<ParameterBinding> getBindings() {

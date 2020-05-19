@@ -10,6 +10,8 @@ public interface ParseResult {
 
     List<String> getCommandLine();
 
+    List<Command> getCommandExecutionPath();
+
     Command getMainCommand();
 
     Command getCommandToExecute();
