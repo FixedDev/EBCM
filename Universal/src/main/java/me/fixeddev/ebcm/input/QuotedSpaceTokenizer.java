@@ -26,12 +26,19 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
                 continue;
             }
 
+            escaped = false;
+
             if (charAt == ' ' && !quoted) {
-                inputTokens.add(token.toString());
+                String tokenStr = token.toString();
+
+                if(!tokenStr.trim().isEmpty()){
+                    inputTokens.add(tokenStr);
+                }
+
+                continue;
             }
 
             token.append(charAt);
-            escaped = false;
         }
 
         return inputTokens;
