@@ -17,6 +17,7 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
 
             if (charAt == '\\') {
                 escaped = true;
+                continue;
             }
 
             if ((charAt == '"' || charAt == '\'') && !escaped) {
