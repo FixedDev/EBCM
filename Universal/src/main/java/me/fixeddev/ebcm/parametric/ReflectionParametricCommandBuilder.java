@@ -16,6 +16,7 @@ import me.fixeddev.ebcm.parametric.annotation.Named;
 import me.fixeddev.ebcm.parametric.annotation.ParentArg;
 import me.fixeddev.ebcm.parametric.annotation.Required;
 import me.fixeddev.ebcm.parametric.annotation.SubCommandClasses;
+import me.fixeddev.ebcm.parametric.annotation.Usage;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
@@ -76,6 +77,14 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         }
 
         commandBuilder.setAction(actionOfMethod(commandClass, method));
+
+        Usage usage = method.getAnnotation(Usage.class);
+        if(usage != null){
+            if(!usage.usage()[0].equals("_!!_NOT_OVERRIDE_!!_")){
+                commandBuilder.setUsage(String.join("\n", usage.usage()));
+            }
+        }
+
 
         return commandBuilder.build();
     }
