@@ -21,6 +21,7 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
 
             if ((charAt == '"' || charAt == '\'') && !escaped) {
                 quoted = !quoted;
+                escaped = false;
                 continue;
             }
 
@@ -29,6 +30,7 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
             }
 
             token.append(charAt);
+            escaped = false;
         }
 
         return inputTokens;
