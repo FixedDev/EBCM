@@ -134,7 +134,8 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 commands.remove("");
                 commandList.remove(command);
 
-                builder.setAction(command.getAction())
+                builder.setUsage(command.getUsage())
+                        .setAction(command.getAction())
                         .setCommandParts(command.getParts());
             }
 
