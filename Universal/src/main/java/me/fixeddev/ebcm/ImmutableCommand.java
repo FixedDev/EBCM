@@ -13,6 +13,7 @@ public abstract class ImmutableCommand implements Command {
         return new AutoValue_ImmutableCommand.Builder()
                 .withData(dataBuilder)
                 .setPermission("")
+                .setUsage("_!!_NOT_OVERRIDE_!!_")
                 .setPermissionMessage("No permission.")
                 .setAction(params -> false);
     }
@@ -31,6 +32,8 @@ public abstract class ImmutableCommand implements Command {
         public abstract Builder setPermission(String permission);
 
         public abstract Builder setPermissionMessage(String message);
+
+        public abstract Builder setUsage(String usage);
 
         public abstract Builder setAction(CommandAction newAction);
 

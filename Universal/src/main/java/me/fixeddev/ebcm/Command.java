@@ -12,6 +12,8 @@ public interface Command {
 
     String getPermissionMessage();
 
+    String getUsage();
+
     CommandAction getAction();
 
     List<CommandPart> getParts();
