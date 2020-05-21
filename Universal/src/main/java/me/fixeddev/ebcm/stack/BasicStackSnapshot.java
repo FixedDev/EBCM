@@ -3,6 +3,7 @@ package me.fixeddev.ebcm.stack;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BasicStackSnapshot implements StackSnapshot {
@@ -11,7 +12,7 @@ public class BasicStackSnapshot implements StackSnapshot {
     private int position;
 
     public BasicStackSnapshot(ArgumentStack stack, int position) {
-        this.backing = stack.getBacking();
+        this.backing = new ArrayList<>(stack.getBacking());
         this.position = position;
     }
 
