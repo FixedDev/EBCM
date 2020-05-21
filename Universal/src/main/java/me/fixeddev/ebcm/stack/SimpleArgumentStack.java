@@ -138,9 +138,12 @@ public class SimpleArgumentStack implements ArgumentStack {
     }
 
     @Override
-    public void applySnapshot(StackSnapshot snapshot) {
-        this.originalArguments = snapshot.backing;
+    public void applySnapshot(StackSnapshot snapshot, boolean changeArgs) {
         this.position = snapshot.position;
+
+        if (changeArgs) {
+            this.originalArguments = snapshot.backing;
+        }
     }
 
     @Override

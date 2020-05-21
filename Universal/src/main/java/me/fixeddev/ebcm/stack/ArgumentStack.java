@@ -28,7 +28,7 @@ public interface ArgumentStack {
 
     byte nextByte() throws CommandParseException;
 
-    boolean nextBoolean() throws  CommandParseException;
+    boolean nextBoolean() throws CommandParseException;
 
     void markAsConsumed();
 
@@ -36,19 +36,24 @@ public interface ArgumentStack {
 
     StackSlice getSlice(int start, int end);
 
-    default StackSlice getSliceFrom(int start){
+    default StackSlice getSliceFrom(int start) {
         return getSlice(start, getSize());
     }
 
-    default StackSlice getSliceTo(int end){
+    default StackSlice getSliceTo(int end) {
         return getSlice(getPosition(), end);
     }
 
-    default StackSnapshot getSnapshot(){
+    default StackSnapshot getSnapshot() {
         return getSnapshot(true);
     }
 
     StackSnapshot getSnapshot(boolean useCurrentPos);
 
-    void applySnapshot(StackSnapshot snapshot);
+    default void applySnapshot(StackSnapshot snapshot) {
+        applySnapshot(snapshot, true);
+    }
+
+    void applySnapshot(StackSnapshot snapshot, boolean changeArgs);
+
 }
