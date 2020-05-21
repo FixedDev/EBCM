@@ -25,7 +25,6 @@ import me.fixeddev.ebcm.stack.StackSnapshot;
 import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,8 +50,6 @@ public class CommandLineParser {
 
     private ArgumentStack argumentStack;
 
-    private int argumentsLeft;
-
     private List<ParseResult.ParameterBinding> bindings;
     private Map<CommandPart, Object> valueBindings;
 
@@ -67,8 +64,6 @@ public class CommandLineParser {
 
         argumentStack = new SimpleArgumentStack(argumentsLine);
 
-        argumentsLeft = argumentsLine.size();
-
         bindings = new ArrayList<>();
         valueBindings = new LinkedHashMap<>();
 
@@ -79,7 +74,6 @@ public class CommandLineParser {
     }
 
     public String nextArgument() throws CommandParseException {
-        argumentsLeft--;
         return argumentStack.next();
     }
 
@@ -159,7 +153,6 @@ public class CommandLineParser {
 
             // Disable the parsing of the next flags
             if ("--".equals(argument)) {
-                argumentsLeft--;
                 break;
             }
 
@@ -179,8 +172,6 @@ public class CommandLineParser {
             flagParts.remove(flagChar);
             argumentStack.remove();
             removedArg = true;
-
-            argumentsLeft--;
         }
 
         argumentStack.applySnapshot(snapshot, false);
@@ -203,7 +194,7 @@ public class CommandLineParser {
         hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
         neededArguments = calculateNeededArgs();
         allNeededArguments = calculateAllNeededArgs();
-        optionalArgumentsToBound = argumentsLeft - neededArguments;
+        optionalArgumentsToBound = argumentStack.getArgumentsLeft() - neededArguments;
 
         if (partsLeft <= 0) {
             return new ParseResultData(commandLabel, argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
@@ -275,7 +266,7 @@ public class CommandLineParser {
         boolean usingDefaults = false;
 
         if (!part.isRequired()) {
-            if ((optionalArgumentsToBound <= 0 || argumentsLeft < neededArguments + part.getConsumedArguments()) ||
+            if ((optionalArgumentsToBound <= 0 || argumentStack.getArgumentsLeft() < neededArguments + part.getConsumedArguments()) ||
                     (allNeededArguments == -1 || part.getConsumedArguments() == -1 || hasSubCommand)) {
                 if (part.getDefaultValues().isEmpty()) {
                     return;
@@ -288,16 +279,29 @@ public class CommandLineParser {
             }
         }
 
+        int oldArgumentsLeft = argumentStack.getArgumentsLeft();
+
         if (!usingDefaults) {
-            //argumentsToUse = getArgumentsToConsume(part);
-            argumentsToUse = argumentStack.getSliceTo(argumentStack.getPosition() + part.getConsumedArguments());
+            argumentsToUse = argumentStack.getSliceTo( argumentStack.getPosition() + part.getConsumedArguments());
 
             bindPart(part, new ArrayList<>(argumentsToUse.getBacking()));
         }
 
         ParameterProvider.Result<?> object = provider.transform(argumentsToUse, namespaceAccesor, part);
 
+        int usedArguments = oldArgumentsLeft - argumentStack.getArgumentsLeft();
+        decrementArguments(part, usedArguments);
+
         valueBindings.put(part, unwrapObject(object, part).orElse(null));
+    }
+
+    private void decrementArguments(CommandPart part, int usedArguments) {
+        if (part.isRequired()) {
+            neededArguments -= usedArguments;
+        } else {
+            optionalArgumentsToBound -= usedArguments;
+        }
+        allNeededArguments -= usedArguments;
     }
 
 
@@ -317,36 +321,6 @@ public class CommandLineParser {
         }
 
         return providedObject;
-    }
-
-    private List<String> getArgumentsToConsume(ArgumentPart part) throws CommandParseException {
-        List<String> argumentsToUse = new ArrayList<>();
-
-        for (int i = 0; i < part.getConsumedArguments(); i++) {
-            if (!hasNextArgument()) {
-                commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_ARGUMENT.getId(),
-                        "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
-
-                throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
-            }
-
-            String argument = argumentStack.next();
-            argumentsLeft--;
-
-            argumentsToUse.add(argument);
-
-            /*
-             * Don't subtract an argument from needed arguments if this part is not required, because it's not counted there
-             */
-            if (part.isRequired()) {
-                neededArguments--;
-            } else {
-                optionalArgumentsToBound--;
-            }
-            allNeededArguments--;
-        }
-
-        return argumentsToUse;
     }
 
     private void parseSubCommand(CommandPart partToBind) throws CommandParseException {
@@ -379,7 +353,6 @@ public class CommandLineParser {
         }
 
         String argument = argumentStack.next();
-        argumentsLeft--;
 
         Command command = availableValues.get(argument.toLowerCase());
 
