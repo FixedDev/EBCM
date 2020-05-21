@@ -2,7 +2,9 @@ package me.fixeddev.ebcm.parameter.provider;
 
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.SuggestionProvider;
+import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
 import me.fixeddev.ebcm.part.CommandPart;
+import me.fixeddev.ebcm.stack.StackSlice;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +13,7 @@ import java.util.Optional;
 
 public interface ParameterProvider<T> extends SuggestionProvider {
 
-    Result<T> transform(List<String> arguments, NamespaceAccesor namespaceAccesor, CommandPart part);
+    Result<T> transform(StackSlice slice, NamespaceAccesor namespaceAccesor, CommandPart part) throws NoMoreArgumentsException;
 
     default List<String> getSuggestions(String startsWith) {
         return Collections.emptyList();

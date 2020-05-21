@@ -17,7 +17,10 @@ import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
 import me.fixeddev.ebcm.stack.ArgumentStack;
+import me.fixeddev.ebcm.stack.BasicStackSlice;
+import me.fixeddev.ebcm.stack.NoOpStackSlice;
 import me.fixeddev.ebcm.stack.SimpleArgumentStack;
+import me.fixeddev.ebcm.stack.StackSlice;
 import me.fixeddev.ebcm.stack.StackSnapshot;
 import me.fixeddev.ebcm.util.UsageBuilder;
 
@@ -143,8 +146,8 @@ public class CommandLineParser {
         while (argumentStack.hasNext()) {
             String argument;
 
-            if(!removedArg){
-                 argument = argumentStack.next();
+            if (!removedArg) {
+                argument = argumentStack.next();
             } else {
                 argument = argumentStack.current();
                 removedArg = false;
@@ -240,7 +243,7 @@ public class CommandLineParser {
             throw new CommandParseException("Failed to get a provider for the part " + part.getName());
         }
 
-        ParameterProvider.Result<?> result = provider.transform(Collections.emptyList(), namespaceAccesor, part);
+        ParameterProvider.Result<?> result = provider.transform(new NoOpStackSlice(), namespaceAccesor, part);
 
         Optional<?> optionalObject = unwrapObject(result, part);
 
@@ -268,7 +271,7 @@ public class CommandLineParser {
             throw new CommandParseException("Failed to get a provider for the part " + part.getName());
         }
 
-        List<String> argumentsToUse = new ArrayList<>();
+        StackSlice argumentsToUse = null;
         boolean usingDefaults = false;
 
         if (!part.isRequired()) {
@@ -277,17 +280,19 @@ public class CommandLineParser {
                 if (part.getDefaultValues().isEmpty()) {
                     return;
                 }
+                List<String> defaults = part.getDefaultValues();
 
                 usingDefaults = true;
-                argumentsToUse = part.getDefaultValues();
+                argumentsToUse = new BasicStackSlice(0, defaults.size(), -1, new SimpleArgumentStack(defaults));
                 allNeededArguments = allNeededArguments - part.getConsumedArguments();
             }
         }
 
         if (!usingDefaults) {
-            argumentsToUse = getArgumentsToConsume(part);
+            //argumentsToUse = getArgumentsToConsume(part);
+            argumentsToUse = argumentStack.getSliceTo(argumentStack.getPosition() + part.getConsumedArguments());
 
-            bindPart(part, argumentsToUse);
+            bindPart(part, new ArrayList<>(argumentsToUse.getBacking()));
         }
 
         ParameterProvider.Result<?> object = provider.transform(argumentsToUse, namespaceAccesor, part);
