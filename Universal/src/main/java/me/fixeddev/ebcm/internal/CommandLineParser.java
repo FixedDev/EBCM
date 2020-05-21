@@ -1,6 +1,5 @@
 package me.fixeddev.ebcm.internal;
 
-import me.fixeddev.ebcm.ArgumentStack;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandManager;
 import me.fixeddev.ebcm.NamespaceAccesor;
@@ -17,6 +16,9 @@ import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
+import me.fixeddev.ebcm.stack.ArgumentStack;
+import me.fixeddev.ebcm.stack.SimpleArgumentStack;
+import me.fixeddev.ebcm.stack.StackSnapshot;
 import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ public class CommandLineParser {
     public CommandLineParser(List<String> argumentsLine, NamespaceAccesor namespaceAccesor, CommandManager commandManager) {
         commandLabel = "";
 
-        argumentStack = new ArgumentStack(argumentsLine);
+        argumentStack = new SimpleArgumentStack(argumentsLine);
 
         argumentsLeft = argumentsLine.size();
 
@@ -135,15 +137,20 @@ public class CommandLineParser {
         partsIterator = currentCommandParts.listIterator();
         partsLeft = currentCommandParts.size();
 
-        List<String> newArguments = argumentStack.getBacking().subList(0, argumentStack.getPosition() + 1);
-        // We have the arguments already used, now, use them to create a new list
-        newArguments = new ArrayList<>(newArguments);
+        StackSnapshot snapshot = argumentStack.getSnapshot();
 
+        boolean removedArg = false;
         while (argumentStack.hasNext()) {
-            String argument = argumentStack.next();
+            String argument;
+
+            if(!removedArg){
+                 argument = argumentStack.next();
+            } else {
+                argument = argumentStack.current();
+                removedArg = false;
+            }
 
             if (!argument.startsWith("-") || argument.length() != 2) {
-                newArguments.add(argument);
                 continue;
             }
 
@@ -158,7 +165,6 @@ public class CommandLineParser {
 
             // The flag is valid, but it doesn't has a part to be bound
             if (part == null) {
-                newArguments.add(argument);
                 continue;
             }
 
@@ -168,19 +174,14 @@ public class CommandLineParser {
             // We remove the part, at the end create a value binding for every flag that wasn't
             // in the command line with value false
             flagParts.remove(flagChar);
+            argumentStack.remove();
+            removedArg = true;
 
             argumentsLeft--;
         }
 
-        this.argumentStack = new ArgumentStack(newArguments);
+        argumentStack.applySnapshot(snapshot, false);
         flagParts.values().forEach(part -> valueBindings.put(part, false));
-
-        int newSize = argumentStack.getSize() - argumentsLeft;
-
-        for (int i = 0; i < newSize; i++) {
-            // Move the cursor to the last position, to prevent that an argument that was already used being used again
-            argumentStack.next();
-        }
     }
 
     private boolean hasSubCommand;
