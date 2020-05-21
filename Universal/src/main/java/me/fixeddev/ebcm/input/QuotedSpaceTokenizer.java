@@ -11,6 +11,7 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
         StringBuilder token = new StringBuilder();
 
         boolean quoted = false;
+        char quoteType = ' ';
         boolean escaped = false;
         for (int i = 0; i < line.length(); i++) {
             char charAt = line.charAt(i);
@@ -21,6 +22,11 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
             }
 
             if ((charAt == '"' || charAt == '\'') && !escaped) {
+                if (quoted && quoteType != charAt) {
+                    continue;
+                }
+
+                quoteType = charAt;
                 quoted = !quoted;
                 escaped = false;
                 continue;
@@ -31,7 +37,7 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
             if (charAt == ' ' && !quoted) {
                 String tokenStr = token.toString();
 
-                if(!tokenStr.trim().isEmpty()){
+                if (!tokenStr.trim().isEmpty()) {
                     inputTokens.add(tokenStr);
                 }
 
