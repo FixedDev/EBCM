@@ -1,6 +1,4 @@
-package me.fixeddev.ebcm.internal.namespace;
-
-import me.fixeddev.ebcm.NamespaceAccesor;
+package me.fixeddev.ebcm;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
