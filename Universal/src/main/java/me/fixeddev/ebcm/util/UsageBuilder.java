@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 public class UsageBuilder {
 
     public static String getUsageForCommand(Command parent, Command command, String label) {
+        if(!command.getUsage().equals("_!!_NOT_OVERRIDE_!!_")){
+            return command.getUsage();
+        }
+
         String parentUsage = null;
 
         if (command.equals(parent)) {

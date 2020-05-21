@@ -9,13 +9,15 @@ import java.util.Objects;
 public class MutableCommand implements Command {
 
     private final CommandData data;
+    private String usage;
     private String permission;
     private String permissionMessage;
     private CommandAction action;
     private List<CommandPart> parts;
 
-    private MutableCommand(CommandData data, String permission, String permissionMessage, CommandAction action, List<CommandPart> parts) {
+    private MutableCommand(CommandData data, String usage, String permission, String permissionMessage, CommandAction action, List<CommandPart> parts) {
         this.data = data;
+        this.usage = usage;
         this.permission = permission;
         this.permissionMessage = permissionMessage;
         this.action = action;
@@ -48,6 +50,11 @@ public class MutableCommand implements Command {
         return permissionMessage;
     }
 
+    @Override
+    public String getUsage() {
+        return usage;
+    }
+
     public void setPermissionMessage(String permissionMessage) {
         this.permissionMessage = permissionMessage;
     }
@@ -72,6 +79,7 @@ public class MutableCommand implements Command {
 
     public static class Builder {
         private CommandData data;
+        private String usage;
         private String permission;
         private String permissionMessage;
         private CommandAction action;
@@ -95,6 +103,11 @@ public class MutableCommand implements Command {
             Objects.requireNonNull(permissionMessage);
 
             this.permissionMessage = permissionMessage;
+            return this;
+        }
+
+        public Builder setUsage(String usage) {
+            this.usage = usage;
             return this;
         }
 
@@ -138,6 +151,7 @@ public class MutableCommand implements Command {
             }
             return new MutableCommand(
                     this.data,
+                    this.usage,
                     this.permission,
                     this.permissionMessage,
                     this.action,

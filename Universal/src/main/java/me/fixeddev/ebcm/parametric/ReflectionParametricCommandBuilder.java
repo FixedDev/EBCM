@@ -16,6 +16,7 @@ import me.fixeddev.ebcm.parametric.annotation.Named;
 import me.fixeddev.ebcm.parametric.annotation.ParentArg;
 import me.fixeddev.ebcm.parametric.annotation.Required;
 import me.fixeddev.ebcm.parametric.annotation.SubCommandClasses;
+import me.fixeddev.ebcm.parametric.annotation.Usage;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
@@ -77,6 +78,14 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
         commandBuilder.setAction(actionOfMethod(commandClass, method));
 
+        Usage usage = method.getAnnotation(Usage.class);
+        if (usage != null) {
+            if (!usage.usage()[0].equals("_!!_NOT_OVERRIDE_!!_")) {
+                commandBuilder.setUsage(String.join("\n", usage.usage()));
+            }
+        }
+
+
         return commandBuilder.build();
     }
 
@@ -125,7 +134,8 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 commands.remove("");
                 commandList.remove(command);
 
-                builder.setAction(command.getAction())
+                builder.setUsage(command.getUsage())
+                        .setAction(command.getAction())
                         .setCommandParts(command.getParts());
             }
 
@@ -149,6 +159,13 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                     } catch (RuntimeException e) {
                         continue;
                     }
+                }
+            }
+
+            Usage usage = clazz.getAnnotation(Usage.class);
+            if (usage != null) {
+                if (!usage.usage()[0].equals("_!!_NOT_OVERRIDE_!!_")) {
+                    builder.setUsage(String.join("\n", usage.usage()));
                 }
             }
 
@@ -267,7 +284,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                         if (parameters.hasValue(part)) {
                             params.add(parameters.getRawValue(part));
                         } else {
-                            if (part.isRequired()){
+                            if (part.isRequired()) {
                                 throw new CommandException("The value for the required part" + part.getName() + " is missing!");
                             }
                             params.add(null);
