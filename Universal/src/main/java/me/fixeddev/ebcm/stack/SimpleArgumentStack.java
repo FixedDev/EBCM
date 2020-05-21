@@ -58,6 +58,10 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     @Override
     public String remove() {
+        if (position == -1) {
+            throw new IllegalStateException("You must advance the stack at least once before using the remove() method!");
+        }
+
         String toRemove = current();
         getBacking().remove(current());
 
