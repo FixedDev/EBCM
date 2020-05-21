@@ -14,6 +14,8 @@ public interface StackSlice {
 
     String current();
 
+    String remove();
+
     int getPosition();
 
     int getSize();
