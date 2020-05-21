@@ -24,7 +24,12 @@ public class NoOpStackSlice implements StackSlice {
 
     @Override
     public String current() {
-        throw new IllegalStateException("You must advance the stack at least once before using the current() method!");
+        throw new IllegalStateException("You must advance the slice at least once before using the current() method!");
+    }
+
+    @Override
+    public String remove() {
+        throw new IllegalStateException("You must advance the slice at least once before using the current() method!");
     }
 
     @Override
