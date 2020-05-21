@@ -20,6 +20,8 @@ public interface ArgumentStack {
 
     int getSize();
 
+    int getArgumentsLeft();
+
     int nextInt() throws CommandParseException;
 
     float nextFloat() throws CommandParseException;

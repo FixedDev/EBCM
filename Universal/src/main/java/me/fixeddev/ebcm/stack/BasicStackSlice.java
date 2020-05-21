@@ -87,6 +87,11 @@ public class BasicStackSlice implements StackSlice {
     }
 
     @Override
+    public int getArgumentsLeft() {
+        return (getSize() - 1) - getPosition();
+    }
+
+    @Override
     public int nextInt() throws CommandParseException {
         String next = next();
         try {

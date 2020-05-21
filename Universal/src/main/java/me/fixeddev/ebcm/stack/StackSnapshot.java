@@ -63,10 +63,14 @@ public class StackSnapshot {
         return position;
     }
 
-
     public int getSize() {
         return backing.size();
     }
+
+    public int getArgumentsLeft() {
+        return (getSize() - 1) - getPosition();
+    }
+
 
     public int nextInt() throws CommandParseException {
         String next = next();

@@ -43,6 +43,11 @@ public class NoOpStackSlice implements StackSlice {
     }
 
     @Override
+    public int getArgumentsLeft() {
+        return 0;
+    }
+
+    @Override
     public int nextInt() throws CommandParseException {
         throw new NoMoreArgumentsException(getSize(), -1);
     }

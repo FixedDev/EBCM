@@ -20,6 +20,8 @@ public interface StackSlice {
 
     int getSize();
 
+    int getArgumentsLeft();
+
     int nextInt() throws CommandParseException;
 
     float nextFloat() throws CommandParseException;

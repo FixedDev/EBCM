@@ -79,6 +79,11 @@ public class SimpleArgumentStack implements ArgumentStack {
     }
 
     @Override
+    public int getArgumentsLeft() {
+        return (getSize() - 1) - getPosition();
+    }
+
+    @Override
     public int nextInt() throws CommandParseException {
         String next = next();
         try {
