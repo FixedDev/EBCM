@@ -10,7 +10,7 @@ public class UsageBuilder {
 
     public static String getUsageForCommand(Command parent, Command command, String label) {
         if(!command.getUsage().equals("_!!_NOT_OVERRIDE_!!_")){
-            return command.getUsage();
+            return command.getUsage().replace("<command>", label);
         }
 
         String parentUsage = null;
