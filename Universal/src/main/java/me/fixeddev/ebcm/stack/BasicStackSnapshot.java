@@ -52,6 +52,17 @@ public class BasicStackSnapshot implements StackSnapshot {
     }
 
     @Override
+    public String remove() {
+        if (position == -1) {
+            throw new IllegalStateException("You must advance the stack at least once before using the remove() method!");
+        }
+
+        String toRemove = current();
+        backing.remove(current());
+
+        return toRemove;
+    }
+    @Override
     public int getPosition() {
         return position;
     }

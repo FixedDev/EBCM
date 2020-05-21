@@ -12,6 +12,8 @@ public interface StackSnapshot {
 
     String current();
 
+    String remove();
+
     int getPosition();
 
     int getSize();
