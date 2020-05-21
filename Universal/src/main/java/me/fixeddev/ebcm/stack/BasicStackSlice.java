@@ -10,6 +10,7 @@ public class BasicStackSlice implements StackSlice {
     private int start;
     private int end;
 
+    private int size;
     private int position;
 
     private ArgumentStack backing;
@@ -17,7 +18,9 @@ public class BasicStackSlice implements StackSlice {
     public BasicStackSlice(int start, int end, int position, ArgumentStack backing) {
         this.start = start;
         this.end = end;
-        this.position = position;
+        this.size = end - start;
+        this.position = -1;
+
         this.backing = backing;
 
         if (position + 1 < start) {
@@ -36,7 +39,7 @@ public class BasicStackSlice implements StackSlice {
 
     @Override
     public boolean hasNext() {
-        return (end - 1) > position;
+        return (size - 1) > position;
     }
 
     @Override
@@ -78,12 +81,12 @@ public class BasicStackSlice implements StackSlice {
 
     @Override
     public int getPosition() {
-        return position - start;
+        return position;
     }
 
     @Override
     public int getSize() {
-        return end - start + 1;
+        return size;
     }
 
     @Override
@@ -152,6 +155,6 @@ public class BasicStackSlice implements StackSlice {
 
 
     private boolean hasAdvanced() {
-        return position >= start;
+        return position > -1;
     }
 }
