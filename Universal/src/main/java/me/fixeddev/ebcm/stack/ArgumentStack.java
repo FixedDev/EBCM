@@ -50,4 +50,5 @@ public interface ArgumentStack {
 
     StackSnapshot getSnapshot(boolean useCurrentPos);
 
+    void applySnapshot(StackSnapshot snapshot);
 }

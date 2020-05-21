@@ -138,6 +138,12 @@ public class SimpleArgumentStack implements ArgumentStack {
     }
 
     @Override
+    public void applySnapshot(StackSnapshot snapshot) {
+        this.originalArguments = snapshot.backing;
+        this.position = snapshot.position;
+    }
+
+    @Override
     public List<String> getBacking() {
         return originalArguments;
     }
@@ -149,6 +155,6 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     @Override
     public StackSnapshot getSnapshot(boolean useCurrentPos) {
-        return new BasicStackSnapshot(this, useCurrentPos ? position : -1);
+        return new StackSnapshot(this, useCurrentPos ? position : -1);
     }
 }
