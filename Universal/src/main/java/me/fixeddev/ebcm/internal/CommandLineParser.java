@@ -282,17 +282,34 @@ public class CommandLineParser {
         int oldArgumentsLeft = argumentStack.getArgumentsLeft();
 
         if (!usingDefaults) {
-            argumentsToUse = argumentStack.getSliceTo( argumentStack.getPosition() + part.getConsumedArguments());
-
-            bindPart(part, new ArrayList<>(argumentsToUse.getBacking()));
+            if (part.getConsumedArguments() == -1) {
+                argumentsToUse = argumentStack.getSliceFrom(argumentStack.getPosition());
+            } else {
+                argumentsToUse = argumentStack.getSliceTo(argumentStack.getPosition() + part.getConsumedArguments());
+            }
         }
+
+        StackSnapshot start = argumentStack.getSnapshot();
 
         ParameterProvider.Result<?> object = provider.transform(argumentsToUse, namespaceAccesor, part);
 
         int usedArguments = oldArgumentsLeft - argumentStack.getArgumentsLeft();
+
         decrementArguments(part, usedArguments);
+        bindPart(part, getUsedArguments(start, usedArguments));
 
         valueBindings.put(part, unwrapObject(object, part).orElse(null));
+    }
+
+    private List<String> getUsedArguments(StackSnapshot snapshot, int usedArguments) throws NoMoreArgumentsException {
+        List<String> arguments = new ArrayList<>();
+
+        while (snapshot.hasNext() && usedArguments > 0) {
+            arguments.add(snapshot.next());
+            usedArguments--;
+        }
+
+        return arguments;
     }
 
     private void decrementArguments(CommandPart part, int usedArguments) {
@@ -303,7 +320,6 @@ public class CommandLineParser {
         }
         allNeededArguments -= usedArguments;
     }
-
 
     private Optional<?> unwrapObject(ParameterProvider.Result<?> result, CommandPart part) throws CommandParseException {
         Optional<?> providedObject = result.getResultObject();
