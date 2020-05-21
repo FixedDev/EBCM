@@ -20,11 +20,11 @@ public class BasicStackSlice implements StackSlice {
         this.position = position;
         this.backing = backing;
 
-        if (position < start - 2) {
+        if (position + 1 < start) {
             throw new IllegalArgumentException("The position should be after the start of the slice!");
         }
 
-        if (position > end) {
+        if (position >= end) {
             throw new IllegalArgumentException("The position should be before the end of the slice!");
         }
 
@@ -61,11 +61,18 @@ public class BasicStackSlice implements StackSlice {
 
     @Override
     public String current() {
+        if (!hasAdvanced()) {
+            throw new IllegalStateException("You must advance the slice at least once before using the current() method!");
+        }
+
         return backing.current();
     }
 
     @Override
     public String remove() {
+        if (!hasAdvanced()) {
+            throw new IllegalStateException("You must advance the slice at least once before using the remove() method!");
+        }
         return backing.remove();
     }
 
@@ -136,5 +143,10 @@ public class BasicStackSlice implements StackSlice {
     @Override
     public List<String> getBacking() {
         return backing.getBacking().subList(start, end);
+    }
+
+
+    private boolean hasAdvanced() {
+        return position >= start;
     }
 }
