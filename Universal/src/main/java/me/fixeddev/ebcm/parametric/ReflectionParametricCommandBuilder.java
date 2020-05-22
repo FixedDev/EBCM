@@ -8,7 +8,7 @@ import me.fixeddev.ebcm.ImmutableCommand;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.parametric.annotation.ACommand;
 import me.fixeddev.ebcm.parametric.annotation.ConsumedArgs;
-import me.fixeddev.ebcm.parametric.annotation.Optional;
+import me.fixeddev.ebcm.parametric.annotation.Default;
 import me.fixeddev.ebcm.parametric.annotation.Flag;
 import me.fixeddev.ebcm.parametric.annotation.Injected;
 import me.fixeddev.ebcm.parametric.annotation.ModifierAnnotation;
@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ReflectionParametricCommandBuilder implements ParametricCommandBuilder {
 
@@ -216,7 +217,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         Class<?> type = parameter.getType();
         String name = getName(parameter);
         int consumedArgs = getConsumedArgs(parameter);
-        java.util.Optional defaultValues = getDefault(parameter);
+        Optional<String[]> defaultValues = getDefault(parameter);
 
         Flag flag = parameter.getAnnotation(Flag.class);
         Injected injected = parameter.getAnnotation(Injected.class);
@@ -336,9 +337,9 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         return consumedArgs != null ? consumedArgs.value() : 1;
     }
 
-    private java.util.Optional getDefault(Parameter parameter) {
-        Optional defaultA = parameter.getAnnotation(Optional.class);
+    private Optional<String[]> getDefault(Parameter parameter) {
+        Default defaultA = parameter.getAnnotation(Default.class);
 
-        return defaultA == null ? java.util.Optional.empty() : java.util.Optional.of(defaultA.value());
+        return defaultA == null ? Optional.empty() : Optional.of(defaultA.value());
     }
 }
