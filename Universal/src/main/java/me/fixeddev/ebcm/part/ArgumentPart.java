@@ -71,11 +71,7 @@ public abstract class ArgumentPart implements ArgumentConsumingPart {
 
         protected abstract Builder setModifiers(List<String> modifiers);
 
-        protected abstract boolean isRequired();
-
         public abstract Builder setRequired(boolean newRequired);
-
-        protected abstract int getConsumedArguments();
 
         public abstract Builder setConsumedArguments(int consumedArguments);
 
