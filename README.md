@@ -22,7 +22,7 @@ While the command manager is working, it's not complete yet, there are a lot of 
 ## Usage
 The command manager actually has 2 types of commands.
 The basic commands and the parametric commands, the basic commands are commands created using a CommandBuilder in which you build every argument and later you specify an action for that command. The Parametric Commands are created by annotations on methods which specify certain needed things.
-## Repository
+### Repository
 At the moment I don't have my own repository, so I'm using jitpack.
 
 Add this to your repository list
