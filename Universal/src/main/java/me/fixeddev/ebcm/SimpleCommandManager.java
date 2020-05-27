@@ -57,10 +57,10 @@ public class SimpleCommandManager implements CommandManager {
             throw new IllegalArgumentException("A command with the name " + data.getName() + " is already registered!");
         }
 
-        commandMap.put(data.getName(), command);
+        commandMap.put(data.getName().toLowerCase(), command);
 
         data.getAliases().forEach(alias -> {
-            commandMap.putIfAbsent(alias, command);
+            commandMap.putIfAbsent(alias.toLowerCase(), command);
         });
     }
 
@@ -93,7 +93,7 @@ public class SimpleCommandManager implements CommandManager {
 
     @Override
     public Optional<Command> getCommand(String commandName) {
-        return Optional.ofNullable(commandMap.get(commandName));
+        return Optional.ofNullable(commandMap.get(commandName.toLowerCase()));
     }
 
     @Override
