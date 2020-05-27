@@ -8,11 +8,11 @@ import me.fixeddev.ebcm.ImmutableCommand;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.parametric.annotation.ACommand;
 import me.fixeddev.ebcm.parametric.annotation.ConsumedArgs;
-import me.fixeddev.ebcm.parametric.annotation.Optional;
 import me.fixeddev.ebcm.parametric.annotation.Flag;
 import me.fixeddev.ebcm.parametric.annotation.Injected;
 import me.fixeddev.ebcm.parametric.annotation.ModifierAnnotation;
 import me.fixeddev.ebcm.parametric.annotation.Named;
+import me.fixeddev.ebcm.parametric.annotation.Optional;
 import me.fixeddev.ebcm.parametric.annotation.ParentArg;
 import me.fixeddev.ebcm.parametric.annotation.Required;
 import me.fixeddev.ebcm.parametric.annotation.SubCommandClasses;
@@ -136,6 +136,13 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 builder.setUsage(command.getUsage())
                         .setAction(command.getAction())
                         .setCommandParts(command.getParts());
+
+                if(!command.getData().getAliases().isEmpty()){
+                    Command newCommand = cloneCommand(command).build();
+
+                    commands.put(newCommand.getData().getName(), newCommand);
+                    commandList.add(newCommand);
+                }
             }
 
             SubCommandPart.Builder subCommandBuilder = SubCommandPart.builder("subcommand");
@@ -176,6 +183,42 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         }
 
         return commandList;
+    }
+
+    private CommandData.Builder cloneCommandData(CommandData commandData) {
+        CommandData.Builder dataBuilder = CommandData.builder(commandData.getName());
+
+        boolean aliasSet = false;
+
+        if (commandData.getName().equals("") && !commandData.getAliases().isEmpty()) {
+            dataBuilder = CommandData.builder(commandData.getAliases().get(0));
+
+            if (commandData.getAliases().size() > 1) {
+                dataBuilder.setAliases(new ArrayList<>(commandData.getAliases().subList(1, commandData.getAliases().size())));
+            }
+
+            aliasSet = true;
+        }
+
+        if (!aliasSet) {
+            dataBuilder.setAliases(commandData.getAliases());
+        }
+
+        dataBuilder.setDescription(commandData.getDescription());
+
+        return dataBuilder;
+    }
+
+    private ImmutableCommand.Builder cloneCommand(Command command) {
+        ImmutableCommand.Builder builder = ImmutableCommand.builder(cloneCommandData(command.getData()));
+
+        builder.setUsage(command.getUsage())
+                .setAction(command.getAction())
+                .setCommandParts(command.getParts())
+                .setPermission(command.getPermission())
+                .setPermissionMessage(command.getPermissionMessage());
+
+        return builder;
     }
 
     private CommandClass createSubCommandInstance(Class<?> clazz, Class<?> upperCommandClass, CommandClass upperCommand) {
