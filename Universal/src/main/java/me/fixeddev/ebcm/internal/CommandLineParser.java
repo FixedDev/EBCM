@@ -59,6 +59,14 @@ public class CommandLineParser {
 
     private ParameterProviderRegistry providerRegistry;
 
+    private boolean hasSubCommand;
+    private int neededArguments;
+    private int allNeededArguments;
+    // Ok, the name of this is not clear
+    // But, this variable it's supposed to mean the quantity of optional parts
+    // that can be bound before only the required parts can be bound
+    private int optionalArgumentsToBound;
+
     public CommandLineParser(List<String> argumentsLine, NamespaceAccesor namespaceAccesor, CommandManager commandManager) {
         commandLabel = "";
 
@@ -71,14 +79,6 @@ public class CommandLineParser {
         this.namespaceAccesor = namespaceAccesor;
         providerRegistry = commandManager.getProviderRegistry();
         commandExecutionPath = new ArrayList<>();
-    }
-
-    public String nextArgument() throws CommandParseException {
-        return argumentStack.next();
-    }
-
-    public boolean hasNextArgument() {
-        return argumentStack.hasNext();
     }
 
     public CommandPart nextUnboundPart() throws CommandParseException {
@@ -99,19 +99,11 @@ public class CommandLineParser {
         bindings.add(binding);
     }
 
-    public Command currentAsRootCommand() throws CommandNotFound, CommandParseException {
-        String currentArgument = argumentStack.current();
+    public Command nextAsCommand() throws CommandNotFound, CommandParseException {
+        String currentArgument = argumentStack.next();
 
-        if (!commandExecutionPath.isEmpty()) {
-            throw new CommandParseException("The command was already found, no need to execute this method again!");
-        }
-
-        currentCommand = commandManager.getCommand(currentArgument)
+        return commandManager.getCommand(currentArgument)
                 .orElseThrow(() -> new CommandNotFound("The current argument(" + currentArgument + ") can't be found as command!"));
-
-        useCommand(currentCommand);
-
-        return currentCommand;
     }
 
     public void useCommand(Command command) {
@@ -125,18 +117,11 @@ public class CommandLineParser {
         partsLeft = currentCommandParts.size();
     }
 
-    private boolean hasSubCommand;
-    private int neededArguments;
-    private int allNeededArguments;
-    // Ok, the name of this is not clear
-    // But, this variable it's supposed to mean the quantity of optional parts
-    // that can be bound before only the required parts can be bound
-    private int optionalArgumentsToBound;
-
     public ParseResult parse() throws CommandParseException, CommandNotFound {
-        nextArgument();
-        currentAsRootCommand();
         parseFlags();
+
+        Command command = nextAsCommand();
+        useCommand(command);
 
         hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
         neededArguments = calculateNeededArgs();
@@ -417,7 +402,7 @@ public class CommandLineParser {
 
         String availableValuesString = String.join(", ", availableValues.keySet());
 
-        if (!hasNextArgument()) {
+        if (!argumentStack.hasNext()) {
             if (partToBind.isRequired()) {
                 commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_SUBCOMMAND.getId(),
                         "Missing argument for required part %s, available values: %s", partToBind.getName(), availableValuesString);
