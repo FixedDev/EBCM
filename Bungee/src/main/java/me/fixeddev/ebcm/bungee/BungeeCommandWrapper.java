@@ -8,6 +8,7 @@ import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.internal.namespace.Namespace;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
@@ -15,7 +16,6 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UnknownFormatConversionException;
 
 public class BungeeCommandWrapper extends Command implements TabExecutor {
 
@@ -51,8 +51,11 @@ public class BungeeCommandWrapper extends Command implements TabExecutor {
                 sender.sendMessage(TextComponent.fromLegacyText(usage));
             }
         } catch (CommandParseException exception) {
-            throw new UnknownFormatConversionException("An internal parse exception occurred while executing the command " + getName());
+            sender.sendMessage(new ComponentBuilder("An internal parse exception occurred while executing the command.").color(ChatColor.RED).create());
+
+            throw new RuntimeException("An internal parse exception occurred while executing the command " + getName(), exception);
         } catch (CommandException exception) {
+            sender.sendMessage(new ComponentBuilder("An unexpected exception occurred while executing the command.").color(ChatColor.RED).create());
             throw new RuntimeException("An unexpected exception occurred while executing the command " + getName(), exception);
         }
     }
