@@ -13,6 +13,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,8 @@ public class BungeeCommandWrapper extends Command implements TabExecutor {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        List<String> argumentList = Arrays.asList(args);
+        List<String> argumentList = new ArrayList<>(Arrays.asList(args));
+        argumentList.add(0, getName());
 
         Namespace namespace = new Namespace();
         namespace.setObject(CommandSender.class, BungeeCommandManager.SENDER_NAMESPACE, sender);
