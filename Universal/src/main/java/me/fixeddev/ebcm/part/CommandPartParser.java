@@ -1,8 +1,7 @@
 package me.fixeddev.ebcm.part;
 
-import me.fixeddev.ebcm.internal.CommandLineParser;
-import me.fixeddev.ebcm.stack.ArgumentStack;
+import me.fixeddev.ebcm.ParsingContext;
 
 public interface CommandPartParser {
-    void parse(ArgumentStack stack, CommandLineParser parser, CommandPart part);
+    void parse(CommandPart part, ParsingContext context);
 }

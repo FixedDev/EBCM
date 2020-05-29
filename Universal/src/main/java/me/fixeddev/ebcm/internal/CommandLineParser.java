@@ -4,6 +4,7 @@ import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandManager;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
+import me.fixeddev.ebcm.ParsingContext;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
@@ -146,7 +147,8 @@ public class CommandLineParser {
                 parseInjectedPart(partToBind);
             }  else if(partToBind instanceof CommandPartParser) {
                 CommandPartParser partParser = (CommandPartParser) partToBind;
-                partParser.parse(argumentStack, this, partToBind);
+
+                partParser.parse(partToBind, new ParsingContextData(this));
             } else{
                 throw new CommandParseException("Invalid part type provided! Type: " + partToBind.getClass().getSimpleName());
             }
@@ -458,6 +460,45 @@ public class CommandLineParser {
             if (argumentPart.isRequired() && infinitePartFound) {
                 throw new CommandParseException("A required part was found after an infinite part!");
             }
+        }
+    }
+
+    static class ParsingContextData implements ParsingContext {
+
+        private CommandLineParser parser;
+
+        public ParsingContextData(CommandLineParser parser) {
+            this.parser = parser;
+        }
+
+        @Override
+        public CommandLineParser getParser() {
+            return parser;
+        }
+
+        @Override
+        public ArgumentStack getStack() {
+            return parser.argumentStack;
+        }
+
+        @Override
+        public NamespaceAccesor getNamespace() {
+            return parser.namespaceAccesor;
+        }
+
+        @Override
+        public Command getCurrentCommand() {
+            return parser.currentCommand;
+        }
+
+        @Override
+        public ParameterProviderRegistry getRegistry() {
+            return parser.providerRegistry;
+        }
+
+        @Override
+        public CommandManager getCommandManager() {
+            return parser.commandManager;
         }
     }
 
