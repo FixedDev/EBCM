@@ -6,7 +6,7 @@ import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
-import me.fixeddev.ebcm.internal.namespace.Namespace;
+import me.fixeddev.ebcm.Namespace;
 import me.fixeddev.ebcm.util.UsageBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
