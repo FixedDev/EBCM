@@ -6,6 +6,7 @@ import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
+import me.fixeddev.ebcm.input.InputTokenizer;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -56,8 +57,28 @@ public class BungeeCommandManager implements CommandManager {
     }
 
     @Override
+    public void setAuthorizer(Authorizer authorizer) {
+        parent.setAuthorizer(authorizer);
+    }
+
+    @Override
     public Messager getMessager() {
         return parent.getMessager();
+    }
+
+    @Override
+    public void setMessager(Messager messager) {
+        parent.setMessager(messager);
+    }
+
+    @Override
+    public InputTokenizer getInputTokenizer() {
+        return parent.getInputTokenizer();
+    }
+
+    @Override
+    public void setInputTokenizer(InputTokenizer tokenizer) {
+        parent.setInputTokenizer(tokenizer);
     }
 
     @Override
@@ -71,13 +92,28 @@ public class BungeeCommandManager implements CommandManager {
     }
 
     @Override
+    public boolean execute(NamespaceAccesor accessor, String line) throws CommandParseException, CommandException {
+        return parent.execute(accessor, line);
+    }
+
+    @Override
     public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoPermissionException {
         return parent.getSuggestions(accessor, arguments);
     }
 
     @Override
+    public List<String> getSuggestions(NamespaceAccesor accessor, String line) throws NoPermissionException {
+        return parent.getSuggestions(accessor, line);
+    }
+
+    @Override
     public ParseResult parse(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandNotFound {
         return parent.parse(accessor, arguments);
+    }
+
+    @Override
+    public ParseResult parse(NamespaceAccesor accessor, String line) throws CommandParseException, CommandNotFound {
+        return parent.parse(accessor, line);
     }
 
 }

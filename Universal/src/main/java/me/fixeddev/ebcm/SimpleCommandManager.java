@@ -3,6 +3,8 @@ package me.fixeddev.ebcm;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
+import me.fixeddev.ebcm.exception.NoPermissionException;
+import me.fixeddev.ebcm.input.InputTokenizer;
 import me.fixeddev.ebcm.internal.CommandLineParser;
 import me.fixeddev.ebcm.internal.Messages;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
@@ -29,6 +31,7 @@ public class SimpleCommandManager implements CommandManager {
     private Authorizer authorizer;
     private Messager messager;
     private ParameterProviderRegistry registry;
+    private InputTokenizer tokenizer;
 
     public SimpleCommandManager(Authorizer authorizer, Messager messager, ParameterProviderRegistry registry) {
         this.authorizer = authorizer;
@@ -87,8 +90,40 @@ public class SimpleCommandManager implements CommandManager {
     }
 
     @Override
+    public void setAuthorizer(Authorizer authorizer) {
+        if(authorizer == null){
+            throw new IllegalArgumentException("Trying to set a null authorizer!");
+        }
+
+        this.authorizer = authorizer;
+    }
+
+    @Override
     public Messager getMessager() {
         return messager;
+    }
+
+    @Override
+    public void setMessager(Messager messager) {
+        if(messager == null){
+            throw new IllegalArgumentException("Trying to set a null messenger!");
+        }
+
+        this.messager = messager;
+    }
+
+    @Override
+    public InputTokenizer getInputTokenizer() {
+        return tokenizer;
+    }
+
+    @Override
+    public void setInputTokenizer(InputTokenizer tokenizer) {
+        if(tokenizer == null){
+            throw new IllegalArgumentException("Trying to set a null input tokenizer!");
+        }
+
+        this.tokenizer = tokenizer;
     }
 
     @Override
@@ -135,6 +170,11 @@ public class SimpleCommandManager implements CommandManager {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean execute(NamespaceAccesor accessor, String line) throws CommandParseException, CommandException {
+        return execute(accessor, tokenizer.tokenize(line));
     }
 
     @Override
@@ -249,6 +289,11 @@ public class SimpleCommandManager implements CommandManager {
         return getSubCommands(accessor, part, startsWith);
     }
 
+    @Override
+    public List<String> getSuggestions(NamespaceAccesor accessor, String line) throws NoPermissionException {
+        return getSuggestions(accessor, tokenizer.tokenize(line));
+    }
+
     private List<String> getSubCommands(NamespaceAccesor accesor, SubCommandPart part, String startsWith) {
         List<String> availableValues = new ArrayList<>();
 
@@ -312,5 +357,10 @@ public class SimpleCommandManager implements CommandManager {
         CommandLineParser parser = new CommandLineParser(arguments, accessor, this);
 
         return parser.parse();
+    }
+
+    @Override
+    public ParseResult parse(NamespaceAccesor accessor, String line) throws CommandParseException, CommandNotFound {
+        return parse(accessor, tokenizer.tokenize(line));
     }
 }

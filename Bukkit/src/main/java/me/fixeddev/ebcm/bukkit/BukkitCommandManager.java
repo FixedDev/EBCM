@@ -10,6 +10,7 @@ import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
+import me.fixeddev.ebcm.input.InputTokenizer;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -53,10 +54,12 @@ public class BukkitCommandManager implements CommandManager {
         }
     }
 
+    @Override
     public boolean exists(String commandName) {
         return delegate.exists(commandName);
     }
 
+    @Override
     public ParameterProviderRegistry getProviderRegistry() {
         return delegate.getProviderRegistry();
     }
@@ -67,16 +70,43 @@ public class BukkitCommandManager implements CommandManager {
     }
 
     @Override
+    public void setAuthorizer(Authorizer authorizer) {
+        delegate.setAuthorizer(authorizer);
+    }
+
+    @Override
     public Messager getMessager() {
         return delegate.getMessager();
     }
 
+    @Override
+    public void setMessager(Messager messager) {
+        delegate.setMessager(messager);
+    }
+
+    @Override
+    public InputTokenizer getInputTokenizer() {
+        return delegate.getInputTokenizer();
+    }
+
+    @Override
+    public void setInputTokenizer(InputTokenizer tokenizer) {
+        delegate.setInputTokenizer(tokenizer);
+    }
+
+    @Override
     public Optional<Command> getCommand(String commandName) {
         return delegate.getCommand(commandName);
     }
 
+    @Override
     public boolean execute(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandException {
         return delegate.execute(accessor, arguments);
+    }
+
+    @Override
+    public boolean execute(NamespaceAccesor accessor, String line) throws CommandParseException, CommandException {
+        return delegate.execute(accessor, line);
     }
 
     @Override
@@ -84,8 +114,20 @@ public class BukkitCommandManager implements CommandManager {
         return delegate.getSuggestions(accessor, arguments);
     }
 
+    @Override
+    public List<String> getSuggestions(NamespaceAccesor accessor, String line) throws NoPermissionException {
+        return delegate.getSuggestions(accessor, line);
+    }
+
+    @Override
     public ParseResult parse(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandNotFound {
         return delegate.parse(accessor, arguments);
     }
+
+    @Override
+    public ParseResult parse(NamespaceAccesor accessor, String line) throws CommandParseException, CommandNotFound {
+        return delegate.parse(accessor, line);
+    }
+
 
 }
