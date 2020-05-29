@@ -39,6 +39,7 @@ public class QuotedSpaceTokenizer implements InputTokenizer {
 
                 if (!tokenStr.trim().isEmpty()) {
                     inputTokens.add(tokenStr);
+                    token = new StringBuilder();
                 }
 
                 continue;
