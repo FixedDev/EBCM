@@ -13,6 +13,7 @@ import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
+import me.fixeddev.ebcm.part.CommandPartParser;
 import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
@@ -143,7 +144,10 @@ public class CommandLineParser {
                 parseArgument(partToBind);
             } else if (partToBind instanceof InjectedValuePart) {
                 parseInjectedPart(partToBind);
-            } else {
+            }  else if(partToBind instanceof CommandPartParser) {
+                CommandPartParser partParser = (CommandPartParser) partToBind;
+                partParser.parse(argumentStack, this, partToBind);
+            } else{
                 throw new CommandParseException("Invalid part type provided! Type: " + partToBind.getClass().getSimpleName());
             }
 
