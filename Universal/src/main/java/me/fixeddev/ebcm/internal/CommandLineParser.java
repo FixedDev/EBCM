@@ -125,6 +125,128 @@ public class CommandLineParser {
         partsLeft = currentCommandParts.size();
     }
 
+    private boolean hasSubCommand;
+    private int neededArguments;
+    private int allNeededArguments;
+    // Ok, the name of this is not clear
+    // But, this variable it's supposed to mean the quantity of optional parts
+    // that can be bound before only the required parts can be bound
+    private int optionalArgumentsToBound;
+
+    public ParseResult parse() throws CommandParseException, CommandNotFound {
+        nextArgument();
+        currentAsRootCommand();
+        parseFlags();
+
+        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
+        neededArguments = calculateNeededArgs();
+        allNeededArguments = calculateAllNeededArgs();
+        optionalArgumentsToBound = argumentStack.getArgumentsLeft() - neededArguments;
+
+        if (partsLeft <= 0) {
+            return new ParseResultData(commandLabel, argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
+        }
+
+        checkForInvalidInfiniteParts();
+
+        while (hasNextUnboundPart()) {
+            CommandPart partToBind = nextUnboundPart();
+
+            if (partToBind instanceof SubCommandPart) {
+                parseSubCommand(partToBind);
+            } else if (partToBind instanceof ArgumentPart) {
+                parseArgument(partToBind);
+            } else if (partToBind instanceof InjectedValuePart) {
+                parseInjectedPart(partToBind);
+            } else {
+                throw new CommandParseException("Invalid part type provided! Type: " + partToBind.getClass().getSimpleName());
+            }
+
+        }
+
+        return new ParseResultData(commandLabel.trim(), argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
+    }
+
+    public List<String> getUsedArguments(StackSnapshot snapshot, int usedArguments) throws NoMoreArgumentsException {
+        List<String> arguments = new ArrayList<>();
+
+        while (snapshot.hasNext() && usedArguments > 0) {
+            arguments.add(snapshot.next());
+            usedArguments--;
+        }
+
+        return arguments;
+    }
+
+    public int calculateNeededArgs() {
+        int sum = 0;
+
+        for (CommandPart part : currentCommandParts) {
+            if (!(part instanceof ArgumentPart) || !part.isRequired()) {
+                continue;
+            }
+
+            int consumedArgs = ((ArgumentPart) part).getConsumedArguments();
+
+            if (consumedArgs == -1) {
+                consumedArgs = 1;
+            }
+
+            sum += consumedArgs;
+        }
+
+        return sum;
+    }
+
+    public int calculateAllNeededArgs() {
+        int sum = 0;
+
+        for (CommandPart part : currentCommandParts) {
+            if (!(part instanceof ArgumentPart)) {
+                continue;
+            }
+
+            int consumedArgs = ((ArgumentPart) part).getConsumedArguments();
+
+            if (consumedArgs == -1) {
+                return -1;
+            }
+
+            sum += consumedArgs;
+        }
+
+        return sum;
+    }
+
+    public int calculateOptionalArgumentsToBound() {
+        return argumentStack.getArgumentsLeft() - neededArguments;
+    }
+
+    public void decrementArguments(CommandPart part, int usedArguments) {
+        if (part.isRequired()) {
+            neededArguments -= usedArguments;
+        } else {
+            optionalArgumentsToBound -= usedArguments;
+        }
+        allNeededArguments -= usedArguments;
+    }
+
+    public boolean hasSubCommand() {
+        return hasSubCommand;
+    }
+
+    public int getNeededArguments() {
+        return neededArguments;
+    }
+
+    public int getAllNeededArguments() {
+        return allNeededArguments;
+    }
+
+    public int getOptionalArgumentsToBound() {
+        return optionalArgumentsToBound;
+    }
+
     private void parseFlags() throws NoMoreArgumentsException {
         Map<Character, FlagPart> flagParts = currentCommandParts.stream()
                 .filter(part -> part instanceof FlagPart)
@@ -176,48 +298,6 @@ public class CommandLineParser {
 
         argumentStack.applySnapshot(snapshot, false);
         flagParts.values().forEach(part -> valueBindings.put(part, false));
-    }
-
-    private boolean hasSubCommand;
-    private int neededArguments;
-    private int allNeededArguments;
-    // Ok, the name of this is not clear
-    // But, this variable it's supposed to mean the quantity of optional parts
-    // that can be bound before only the required parts can be bound
-    private int optionalArgumentsToBound;
-
-    public ParseResult parse() throws CommandParseException, CommandNotFound {
-        nextArgument();
-        currentAsRootCommand();
-        parseFlags();
-
-        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
-        neededArguments = calculateNeededArgs();
-        allNeededArguments = calculateAllNeededArgs();
-        optionalArgumentsToBound = argumentStack.getArgumentsLeft() - neededArguments;
-
-        if (partsLeft <= 0) {
-            return new ParseResultData(commandLabel, argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
-        }
-
-        checkForInvalidInfiniteParts();
-
-        while (hasNextUnboundPart()) {
-            CommandPart partToBind = nextUnboundPart();
-
-            if (partToBind instanceof SubCommandPart) {
-                parseSubCommand(partToBind);
-            } else if (partToBind instanceof ArgumentPart) {
-                parseArgument(partToBind);
-            } else if (partToBind instanceof InjectedValuePart) {
-                parseInjectedPart(partToBind);
-            } else {
-                throw new CommandParseException("Invalid part type provided! Type: " + partToBind.getClass().getSimpleName());
-            }
-
-        }
-
-        return new ParseResultData(commandLabel.trim(), argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
     }
 
     private void parseInjectedPart(CommandPart partToBind) throws CommandParseException {
@@ -301,26 +381,6 @@ public class CommandLineParser {
         valueBindings.put(part, unwrapObject(object, part).orElse(null));
     }
 
-    private List<String> getUsedArguments(StackSnapshot snapshot, int usedArguments) throws NoMoreArgumentsException {
-        List<String> arguments = new ArrayList<>();
-
-        while (snapshot.hasNext() && usedArguments > 0) {
-            arguments.add(snapshot.next());
-            usedArguments--;
-        }
-
-        return arguments;
-    }
-
-    private void decrementArguments(CommandPart part, int usedArguments) {
-        if (part.isRequired()) {
-            neededArguments -= usedArguments;
-        } else {
-            optionalArgumentsToBound -= usedArguments;
-        }
-        allNeededArguments -= usedArguments;
-    }
-
     private Optional<?> unwrapObject(ParameterProvider.Result<?> result, CommandPart part) throws CommandParseException {
         Optional<?> providedObject = result.getResultObject();
         Optional<String> message = result.getMessage();
@@ -391,7 +451,6 @@ public class CommandLineParser {
         bindings.add(parameterBinding);
     }
 
-
     private void checkForInvalidInfiniteParts() throws CommandParseException {
         boolean infinitePartFound = false;
 
@@ -411,46 +470,6 @@ public class CommandLineParser {
                 throw new CommandParseException("A required part was found after an infinite part!");
             }
         }
-    }
-
-    private int calculateNeededArgs() {
-        int sum = 0;
-
-        for (CommandPart part : currentCommandParts) {
-            if (!(part instanceof ArgumentPart) || !part.isRequired()) {
-                continue;
-            }
-
-            int consumedArgs = ((ArgumentPart) part).getConsumedArguments();
-
-            if (consumedArgs == -1) {
-                consumedArgs = 1;
-            }
-
-            sum += consumedArgs;
-        }
-
-        return sum;
-    }
-
-    private int calculateAllNeededArgs() {
-        int sum = 0;
-
-        for (CommandPart part : currentCommandParts) {
-            if (!(part instanceof ArgumentPart)) {
-                continue;
-            }
-
-            int consumedArgs = ((ArgumentPart) part).getConsumedArguments();
-
-            if (consumedArgs == -1) {
-                return -1;
-            }
-
-            sum += consumedArgs;
-        }
-
-        return sum;
     }
 
     static class ParameterBindingData implements ParseResult.ParameterBinding {
