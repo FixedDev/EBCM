@@ -313,12 +313,18 @@ public class CommandLineParser {
     private List<String> getArgumentsToConsume(ArgumentPart part) throws CommandParseException {
         List<String> argumentsToUse = new ArrayList<>();
 
-        for (int i = 0; i < part.getConsumedArguments(); i++) {
-            if (!hasNextArgument()) {
-                commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_ARGUMENT.getId(),
-                        "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
+        int i = 0;
 
-                throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+        while (i != part.getConsumedArguments()) {
+            if (!hasNextArgument()) {
+                if (part.getConsumedArguments() != -1) {
+                    commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_ARGUMENT.getId(),
+                            "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
+
+                    throw new CommandUsageException(UsageBuilder.getUsageForCommand(rootCommand, currentCommand, commandLabel));
+                }
+
+                break;
             }
 
             String argument = argumentStack.next();
@@ -335,6 +341,8 @@ public class CommandLineParser {
                 optionalArgumentsToBound--;
             }
             allNeededArguments--;
+
+            i++;
         }
 
         return argumentsToUse;
