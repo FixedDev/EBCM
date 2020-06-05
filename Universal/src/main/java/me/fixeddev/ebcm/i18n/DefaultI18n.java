@@ -40,4 +40,8 @@ public class DefaultI18n implements I18n {
 
         return messageMap.get(messageId);
     }
+
+    public void setMessage(String messageId, String message) {
+        messageMap.put(messageId, message);
+    }
 }
