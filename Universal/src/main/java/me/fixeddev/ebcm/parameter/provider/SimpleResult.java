@@ -21,33 +21,33 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
     }
 
     SimpleResult(String message, List<Object> parameters) {
-        this.message = message;
+        setMessage(message);
         errors = Collections.emptyList();
         this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
     SimpleResult(String message, List<Object> parameters, List<Exception> errors) {
-        this.message = message;
+        setMessage(message);
         this.errors = errors;
         this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
     SimpleResult(T object, String message, List<Object> parameters, List<Exception> errors) {
         this.object = object;
-        this.message = message;
+        setMessage(message);
         this.errors = errors;
         this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
-    private void setMessage(String message){
-        if(!message.startsWith("%") || !message.endsWith("%")){
+    private void setMessage(String message) {
+        if (!message.startsWith("%") || !message.endsWith("%")) {
             this.message = message;
             i18n = false;
 
             return;
         }
 
-        this.message = message;
+        this.message = message.substring(1, message.length() - 1);
         this.i18n = true;
     }
 
