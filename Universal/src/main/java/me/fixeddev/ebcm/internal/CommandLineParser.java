@@ -383,8 +383,13 @@ public class CommandLineParser {
             object = provider.transform(argumentsToUse, namespaceAccesor, part);
         } catch (NoMoreArgumentsException ex) {
             if (part.isRequired()) {
-                commandManager.getMessenger().sendMessage(namespaceAccesor, Message.MISSING_ARGUMENT.getId(),
-                        "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
+                String message = commandManager.getI18n().getMessage(Message.MISSING_ARGUMENT, commandExecutionPath, namespaceAccesor);
+
+                if (message == null) {
+                    message = "Missing arguments for required part %s minimum arguments required: %s";
+                }
+
+                commandManager.getMessenger().sendMessage(namespaceAccesor, message,  part.getName(), neededArguments + "");
 
                 throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
             }
@@ -443,8 +448,13 @@ public class CommandLineParser {
 
         if (!argumentStack.hasNext()) {
             if (partToBind.isRequired()) {
-                commandManager.getMessenger().sendMessage(namespaceAccesor, Message.MISSING_SUBCOMMAND.getId(),
-                        "Missing argument for required part %s, available values: %s", partToBind.getName(), availableValuesString);
+                String message = commandManager.getI18n().getMessage(Message.MISSING_SUBCOMMAND, commandExecutionPath, namespaceAccesor);
+
+                if (message == null) {
+                    message = "Missing argument for required part %s, available values: %s";
+                }
+
+                commandManager.getMessenger().sendMessage(namespaceAccesor, message, partToBind.getName(), availableValuesString);
 
                 throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
             }
@@ -457,9 +467,13 @@ public class CommandLineParser {
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
-            commandManager.getMessenger().sendMessage(namespaceAccesor, Message.INVALID_SUBCOMMAND.getId(),
-                    "Invalid sub-command, valid values: %s", availableValuesString);
+            String message = commandManager.getI18n().getMessage(Message.INVALID_SUBCOMMAND, commandExecutionPath, namespaceAccesor);
 
+            if (message == null) {
+                message = "Invalid sub-command, valid values: %s";
+            }
+
+            commandManager.getMessenger().sendMessage(namespaceAccesor, message, availableValuesString);
 
             throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
         }
