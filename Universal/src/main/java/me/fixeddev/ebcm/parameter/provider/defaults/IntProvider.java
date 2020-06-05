@@ -10,7 +10,7 @@ public class IntProvider implements SingleArgumentProvider<Integer> {
         try {
             return Result.createResult(Integer.parseInt(argument));
         } catch (NumberFormatException ex) {
-            return Result.createResultOfMessage("The argument " + argument + " is not a valid number!");
+            return Result.createResultOfMessage("%provider.invalid.int%", argument);
         }
     }
 }

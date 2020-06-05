@@ -16,6 +16,10 @@ public class DefaultI18n implements I18n {
         messageMap.put(Message.INVALID_SUBCOMMAND.getId(), "Invalid sub-command, valid values: %s");
         messageMap.put(Message.MISSING_ARGUMENT.getId(), "Missing arguments for required part %s minimum arguments required: %s");
         messageMap.put(Message.MISSING_SUBCOMMAND.getId(), "Missing argument for required part %s, available values: %s");
+        messageMap.put("provider.invalid.boolean", "The provided argument(%s) is not a valid boolean!");
+        messageMap.put("provider.invalid.double", "The argument %s is not a valid number!");
+        messageMap.put("provider.invalid.int", "The argument %s is not a valid number!");
+
     }
 
     @Override

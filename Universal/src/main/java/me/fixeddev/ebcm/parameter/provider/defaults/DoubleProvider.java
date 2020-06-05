@@ -10,7 +10,7 @@ public class DoubleProvider implements SingleArgumentProvider<Double> {
         try {
             return Result.createResult(Double.parseDouble(argument));
         } catch (NumberFormatException ex) {
-            return Result.createResultOfMessage("The argument " + argument + " is not a valid number!");
+            return Result.createResultOfMessage("%provider.invalid.double%", argument);
         }
     }
 }

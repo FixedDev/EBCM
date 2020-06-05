@@ -10,6 +10,8 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
     private List<Exception> errors;
     private List<Object> parameters;
 
+    private boolean i18n;
+
     private Exception lastError;
 
     SimpleResult(T object) {
@@ -37,6 +39,18 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
         this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
+    private void setMessage(String message){
+        if(!message.startsWith("%") || !message.endsWith("%")){
+            this.message = message;
+            i18n = false;
+
+            return;
+        }
+
+        this.message = message;
+        this.i18n = true;
+    }
+
     @Override
     public Optional<T> getResultObject() {
         return Optional.ofNullable(object);
@@ -49,7 +63,12 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
 
     @Override
     public Optional<String> getMessage() {
-        return getRawMessage().map(s -> String.format(s, getMessageParameters()));
+        return getRawMessage().map(s -> !i18n ? String.format(s, getMessageParameters()) : message);
+    }
+
+    @Override
+    public boolean isI18nPath() {
+        return i18n;
     }
 
     @Override

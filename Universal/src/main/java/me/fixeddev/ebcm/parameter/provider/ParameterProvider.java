@@ -48,7 +48,13 @@ public interface ParameterProvider<T> extends SuggestionProvider {
 
         Optional<String> getRawMessage();
 
+        /**
+         * Formats the raw message if the message is not an i18n translate path
+         * @return An optional formatted message or i18n path
+         */
         Optional<String> getMessage();
+
+        boolean isI18nPath();
 
         List<Object> getMessageParameters();
 

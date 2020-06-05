@@ -14,7 +14,7 @@ public class BooleanProvider implements SingleArgumentProvider<Boolean> {
     @Override
     public Result<Boolean> transform(String argument, NamespaceAccesor namespaceAccesor, CommandPart part) {
         if (!argument.equalsIgnoreCase("true") && !argument.equalsIgnoreCase("false")) {
-            return Result.createResultOfMessage("The provided argument(" + argument + ") is not a valid boolean!");
+            return Result.createResultOfMessage("%provider.invalid.boolean%", argument);
         }
 
         return Result.createResult(Boolean.parseBoolean(argument));
