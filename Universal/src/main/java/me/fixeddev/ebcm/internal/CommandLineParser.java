@@ -123,10 +123,10 @@ public class CommandLineParser {
     }
 
     public ParseResult parse() throws CommandParseException, CommandNotFound {
-        parseFlags();
-
         Command command = nextAsCommand();
         useCommand(command);
+
+        parseFlags();
 
         hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
         neededArguments = calculateNeededArgs();
@@ -389,7 +389,7 @@ public class CommandLineParser {
                     message = "Missing arguments for required part %s minimum arguments required: %s";
                 }
 
-                commandManager.getMessenger().sendMessage(namespaceAccesor, message,  part.getName(), neededArguments + "");
+                commandManager.getMessenger().sendMessage(namespaceAccesor, message, part.getName(), neededArguments + "");
 
                 throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
             }
@@ -419,7 +419,15 @@ public class CommandLineParser {
                 throw new CommandParseException("An exception occurred while parsing the part " + part.getName() + " argument!", lastError.get());
             }
 
-            message.ifPresent(s -> commandManager.getMessenger().sendMessage(namespaceAccesor, s));
+            message.map(s -> {
+                if (result.isI18nPath()) {
+                    return commandManager.getI18n().getMessage(s, namespaceAccesor);
+                }
+
+                return s;
+            }).ifPresent(s -> {
+                commandManager.getMessenger().sendMessage(namespaceAccesor, s, result.getMessageParameters().toArray());
+            });
             stopParse();
 
             return Optional.empty();
