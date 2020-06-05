@@ -9,7 +9,7 @@ import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
-import me.fixeddev.ebcm.i18n.Messages;
+import me.fixeddev.ebcm.i18n.Message;
 import me.fixeddev.ebcm.parameter.provider.Key;
 import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
@@ -383,7 +383,7 @@ public class CommandLineParser {
             object = provider.transform(argumentsToUse, namespaceAccesor, part);
         } catch (NoMoreArgumentsException ex) {
             if (part.isRequired()) {
-                commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_ARGUMENT.getId(),
+                commandManager.getMessager().sendMessage(namespaceAccesor, Message.MISSING_ARGUMENT.getId(),
                         "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
 
                 throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
@@ -443,7 +443,7 @@ public class CommandLineParser {
 
         if (!argumentStack.hasNext()) {
             if (partToBind.isRequired()) {
-                commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_SUBCOMMAND.getId(),
+                commandManager.getMessager().sendMessage(namespaceAccesor, Message.MISSING_SUBCOMMAND.getId(),
                         "Missing argument for required part %s, available values: %s", partToBind.getName(), availableValuesString);
 
                 throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
@@ -457,7 +457,7 @@ public class CommandLineParser {
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
-            commandManager.getMessager().sendMessage(namespaceAccesor, Messages.INVALID_SUBCOMMAND.getId(),
+            commandManager.getMessager().sendMessage(namespaceAccesor, Message.INVALID_SUBCOMMAND.getId(),
                     "Invalid sub-command, valid values: %s", availableValuesString);
 
 
