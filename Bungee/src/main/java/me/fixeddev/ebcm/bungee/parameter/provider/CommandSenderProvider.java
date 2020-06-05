@@ -15,7 +15,7 @@ public class CommandSenderProvider implements InjectedProvider<CommandSender> {
 
         if(sender == null) {
             return Result.createResult(
-                    "Failed to get command sender!",
+                    "%bungee.invalid.commandsender%",
                     new CommandException("Failed to get CommandSender, maybe the namespace wasn't " +
                             "provided with the command sender when executing the command?")
             );

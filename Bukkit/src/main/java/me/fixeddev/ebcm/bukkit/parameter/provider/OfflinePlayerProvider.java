@@ -22,11 +22,11 @@ public class OfflinePlayerProvider implements ParameterProvider<OfflinePlayer> {
 
         if (part.getModifiers().contains(PlayerSenderProvider.SENDER_MODIFIER)) {
             if (sender == null) {
-                return Result.createResult("Failed to get command sender!", new CommandException("Failed to get CommandSender, maybe the namespace wasn't provided with the command sender when executing the command?"));
+                return Result.createResult("%bukkit.invalid.commandsender%", new CommandException("Failed to get CommandSender, maybe the namespace wasn't provided with the command sender when executing the command?"));
             }
 
             if (!(sender instanceof Player)) {
-                return Result.createResultOfMessage("Only players can execute this command!");
+                return Result.createResultOfMessage("%bukkit.only.players%");
             }
 
             return Result.createResult((Player) sender);

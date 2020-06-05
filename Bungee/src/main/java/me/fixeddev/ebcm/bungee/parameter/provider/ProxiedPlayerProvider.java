@@ -19,7 +19,7 @@ public class ProxiedPlayerProvider implements ParameterProvider<ProxiedPlayer> {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerName);
 
         if (player == null) {
-            return Result.createResultOfMessage("The player " + playerName + " is not online!");
+            return Result.createResultOfMessage("%bungee.player.not.online%", playerName);
         }
 
         return Result.createResult(player);

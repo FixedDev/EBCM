@@ -40,6 +40,7 @@ public class BungeeCommandManager implements CommandManager {
         setMessenger(new BungeeMessenger());
 
         getProviderRegistry().installModule(new BungeeModule());
+        setI18n(new BungeeDefaultI18n());
     }
 
     @Override
