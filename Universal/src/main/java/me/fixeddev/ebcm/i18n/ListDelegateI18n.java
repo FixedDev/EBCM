@@ -35,7 +35,7 @@ public class ListDelegateI18n implements I18n {
             return;
         }
 
-        delegates.add(i18n);
+        delegates.add(0, i18n);
     }
 
     public void removeDelegate(I18n i18n) {
