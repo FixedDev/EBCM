@@ -1,8 +1,11 @@
-package me.fixeddev.ebcm.internal;
+package me.fixeddev.ebcm.i18n;
 
+import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 
-public enum Messages {
+public enum Message {
+
     COMMAND_USAGE("command.usage") {
         @Override
         public String getId(String... commandName) {
@@ -33,13 +36,18 @@ public enum Messages {
     MISSING_SUBCOMMAND("missing.subcommand"),
     INVALID_SUBCOMMAND("invalid.subcommand");
 
+    private static final Map<String, Message> messages = new ConcurrentHashMap<>();
+
     private String id;
 
-    Messages(String id) {
+    Message(String id) {
         this.id = id;
+        getId();
     }
 
     public String getId() {
+        messages.put(id, this);
+
         return id;
     }
 
@@ -50,5 +58,36 @@ public enum Messages {
     @Override
     public String toString() {
         return getId();
+    }
+
+    public static Message findMessage(String id) {
+        Message firstFound = messages.get(id);
+
+        if (firstFound != null) {
+            return firstFound;
+        }
+
+        StringBuilder messagePath = new StringBuilder();
+
+        boolean first = true;
+        for (String part : id.split(".")) {
+            if (first) {
+                messagePath.append(part);
+
+                first = false;
+            } else {
+                messagePath.append(".").append(part);
+            }
+
+            Message message = messages.get(messagePath.toString());
+
+            if (message != null) {
+                messages.put(id, message);
+
+                return message;
+            }
+        }
+
+        return null;
     }
 }
