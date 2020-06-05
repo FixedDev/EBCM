@@ -113,6 +113,22 @@ public class CommandLineParser {
 
     public void useCommand(Command command) {
         currentCommand = command;
+        commandExecutionPath.add(command);
+
+        if (!commandManager.getAuthorizer().isAuthorized(namespaceAccesor, command.getPermission())) {
+            String message = commandManager.getI18n().getMessage(Message.COMMAND_NO_PERMISSIONS, commandExecutionPath, namespaceAccesor);
+
+            if (message == null) {
+                message = command.getPermissionMessage();
+            }
+
+            commandManager.getMessenger().sendMessage(namespaceAccesor, message);
+
+            stopParse();
+            return;
+        }
+
+        currentCommand = command;
 
         commandExecutionPath.add(command);
 
@@ -125,6 +141,10 @@ public class CommandLineParser {
     public ParseResult parse() throws CommandParseException, CommandNotFound {
         Command command = nextAsCommand();
         useCommand(command);
+
+        if (stopParse) {
+            throw new CommandParseException("STOPPED_PARSING");
+        }
 
         parseFlags();
 

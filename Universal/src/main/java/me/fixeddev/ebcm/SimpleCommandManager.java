@@ -167,19 +167,6 @@ public class SimpleCommandManager implements CommandManager {
         CommandContext context = new SimpleCommandContext(accessor, result);
 
         Command toExecute = result.getCommandToExecute();
-
-        if (!authorizer.isAuthorized(accessor, toExecute.getPermission())) {
-            String message = i18n.getMessage(Message.COMMAND_NO_PERMISSIONS, result.getCommandExecutionPath(), accessor);
-
-            if (message == null) {
-                message = toExecute.getPermissionMessage();
-            }
-
-            messenger.sendMessage(accessor, message);
-
-            return true;
-        }
-
         CommandAction action = toExecute.getAction();
 
         boolean usage = false;
