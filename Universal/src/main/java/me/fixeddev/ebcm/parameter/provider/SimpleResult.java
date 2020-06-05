@@ -8,28 +8,33 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
     private T object;
     private String message;
     private List<Exception> errors;
+    private List<Object> parameters;
 
     private Exception lastError;
 
     SimpleResult(T object) {
         this.object = object;
         errors = Collections.emptyList();
+        parameters = Collections.emptyList();
     }
 
-    SimpleResult(String message) {
+    SimpleResult(String message, List<Object> parameters) {
         this.message = message;
         errors = Collections.emptyList();
+        this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
-    SimpleResult(String message, List<Exception> errors) {
+    SimpleResult(String message, List<Object> parameters, List<Exception> errors) {
         this.message = message;
         this.errors = errors;
+        this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
-    SimpleResult(T object, String message, List<Exception> errors) {
+    SimpleResult(T object, String message, List<Object> parameters, List<Exception> errors) {
         this.object = object;
         this.message = message;
         this.errors = errors;
+        this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
     @Override
@@ -38,8 +43,18 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
     }
 
     @Override
-    public Optional<String> getMessage() {
+    public Optional<String> getRawMessage() {
         return Optional.ofNullable(message);
+    }
+
+    @Override
+    public Optional<String> getMessage() {
+        return getRawMessage().map(s -> String.format(s, getMessageParameters()));
+    }
+
+    @Override
+    public List<Object> getMessageParameters() {
+        return parameters;
     }
 
     @Override

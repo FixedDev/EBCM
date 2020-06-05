@@ -28,25 +28,29 @@ public interface ParameterProvider<T> extends SuggestionProvider {
             return new SimpleResult<>(object);
         }
 
-        static <T> Result<T> createResultOfMessage(String message) {
-            return new SimpleResult<>(message);
+        static <T> Result<T> createResultOfMessage(String message, String... messageParameters) {
+            return new SimpleResult<>(message, Arrays.asList(messageParameters));
         }
 
-        static <T> Result<T> createResult(String message, List<Exception> errors) {
-            return new SimpleResult<>(message, errors);
+        static <T> Result<T> createResult(String message, List<Exception> errors, String... messageParameters) {
+            return new SimpleResult<>(message, Arrays.asList(messageParameters), errors);
         }
 
-        static <T> Result<T> createResult(String message, Exception... errors) {
-            return new SimpleResult<>(message, Arrays.asList(errors));
+        static <T> Result<T> createResult(String message, String[] messageParameters, Exception... errors) {
+            return new SimpleResult<>(message, Arrays.asList(messageParameters), Arrays.asList(errors));
         }
 
-        static <T> Result<T> createResult(T object, String message, List<Exception> errors) {
-            return new SimpleResult<>(object, message, errors);
+        static <T> Result<T> createResult(T object, String message, List<Exception> errors, String... messageParameters) {
+            return new SimpleResult<>(object, message, Arrays.asList(messageParameters), errors);
         }
 
         Optional<T> getResultObject();
 
+        Optional<String> getRawMessage();
+
         Optional<String> getMessage();
+
+        List<Object> getMessageParameters();
 
         List<Exception> getErrors();
 
