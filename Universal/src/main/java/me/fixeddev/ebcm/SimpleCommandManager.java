@@ -91,7 +91,7 @@ public class SimpleCommandManager implements CommandManager {
 
     @Override
     public void setAuthorizer(Authorizer authorizer) {
-        if(authorizer == null){
+        if (authorizer == null) {
             throw new IllegalArgumentException("Trying to set a null authorizer!");
         }
 
@@ -105,7 +105,7 @@ public class SimpleCommandManager implements CommandManager {
 
     @Override
     public void setMessager(Messager messager) {
-        if(messager == null){
+        if (messager == null) {
             throw new IllegalArgumentException("Trying to set a null messenger!");
         }
 
@@ -119,7 +119,7 @@ public class SimpleCommandManager implements CommandManager {
 
     @Override
     public void setInputTokenizer(InputTokenizer tokenizer) {
-        if(tokenizer == null){
+        if (tokenizer == null) {
             throw new IllegalArgumentException("Trying to set a null input tokenizer!");
         }
 
@@ -137,6 +137,12 @@ public class SimpleCommandManager implements CommandManager {
 
         try {
             result = parse(accessor, arguments);
+        } catch (CommandParseException e) {
+            if(e.getMessage().equals("STOPPED_PARSING")){
+                return false;
+            }
+
+            throw e;
         } catch (CommandNotFound ex) {
             return false;
         }
