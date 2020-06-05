@@ -2,14 +2,14 @@ package me.fixeddev.ebcm.i18n;
 
 import me.fixeddev.ebcm.NamespaceAccesor;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultI18n implements I18n {
     private final Map<String, String> messageMap;
 
     public DefaultI18n() {
-        messageMap = new ConcurrentHashMap<>();
+        messageMap = new HashMap<>();
 
         messageMap.put(Message.COMMAND_NO_PERMISSIONS.getId(), null);
         messageMap.put(Message.COMMAND_USAGE.getId(), null);
