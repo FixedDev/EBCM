@@ -6,6 +6,8 @@ import me.fixeddev.ebcm.CommandManager;
 import me.fixeddev.ebcm.Messenger;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
+import me.fixeddev.ebcm.SimpleCommandManager;
+import me.fixeddev.ebcm.bukkit.parameter.provider.BukkitModule;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
@@ -40,6 +42,14 @@ public class BukkitCommandManager implements CommandManager {
         } catch (NoSuchFieldException | IllegalAccessException ex) {
             Bukkit.getLogger().log(Level.SEVERE, "Failed to get command map: ", ex);
         }
+    }
+
+    public BukkitCommandManager(String fallbackPrefix) {
+        this(new SimpleCommandManager(), fallbackPrefix);
+
+        setAuthorizer(new BukkitAuthorizer());
+        setMessenger(new BukkitMessenger());
+        getProviderRegistry().installModule(new BukkitModule());
     }
 
     public void registerCommand(Command command) {

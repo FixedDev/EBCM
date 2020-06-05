@@ -6,6 +6,7 @@ import me.fixeddev.ebcm.CommandManager;
 import me.fixeddev.ebcm.Messenger;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
+import me.fixeddev.ebcm.SimpleCommandManager;
 import me.fixeddev.ebcm.bungee.parameter.provider.BungeeModule;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
@@ -29,8 +30,16 @@ public class BungeeCommandManager implements CommandManager {
     public BungeeCommandManager(CommandManager parent, Plugin plugin) {
         this.parent = parent;
         this.plugin = plugin;
+    }
 
-        parent.getProviderRegistry().installModule(new BungeeModule());
+    public BungeeCommandManager(Plugin plugin){
+        this.plugin = plugin;
+        parent = new SimpleCommandManager();
+
+        setAuthorizer(new BungeeAuthorizer());
+        setMessenger(new BungeeMessenger());
+
+        getProviderRegistry().installModule(new BungeeModule());
     }
 
     @Override
