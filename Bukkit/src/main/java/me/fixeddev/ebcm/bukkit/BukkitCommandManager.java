@@ -3,13 +3,14 @@ package me.fixeddev.ebcm.bukkit;
 import me.fixeddev.ebcm.Authorizer;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandManager;
-import me.fixeddev.ebcm.Messager;
+import me.fixeddev.ebcm.Messenger;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
+import me.fixeddev.ebcm.i18n.I18n;
 import me.fixeddev.ebcm.input.InputTokenizer;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import org.bukkit.Bukkit;
@@ -75,13 +76,13 @@ public class BukkitCommandManager implements CommandManager {
     }
 
     @Override
-    public Messager getMessager() {
-        return delegate.getMessager();
+    public Messenger getMessenger() {
+        return delegate.getMessenger();
     }
 
     @Override
-    public void setMessager(Messager messager) {
-        delegate.setMessager(messager);
+    public void setMessenger(Messenger messenger) {
+        delegate.setMessenger(messenger);
     }
 
     @Override
@@ -93,6 +94,17 @@ public class BukkitCommandManager implements CommandManager {
     public void setInputTokenizer(InputTokenizer tokenizer) {
         delegate.setInputTokenizer(tokenizer);
     }
+
+    @Override
+    public I18n getI18n() {
+        return delegate.getI18n();
+    }
+
+    @Override
+    public void setI18n(I18n i18n) {
+        delegate.setI18n(i18n);
+    }
+
 
     @Override
     public Optional<Command> getCommand(String commandName) {
