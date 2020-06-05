@@ -69,6 +69,8 @@ public class CommandLineParser {
     // that can be bound before only the required parts can be bound
     private int optionalArgumentsToBound;
 
+    private boolean stopParse;
+
     public CommandLineParser(List<String> argumentsLine, NamespaceAccesor namespaceAccesor, CommandManager commandManager) {
         commandLabel = "";
 
@@ -137,6 +139,10 @@ public class CommandLineParser {
         checkForInvalidInfiniteParts();
 
         while (hasNextUnboundPart()) {
+            if (stopParse) {
+                throw new CommandParseException("STOPPED_PARSING");
+            }
+
             CommandPart partToBind = nextUnboundPart();
 
             if (partToBind instanceof SubCommandPart) {
@@ -145,17 +151,21 @@ public class CommandLineParser {
                 parseArgument(partToBind);
             } else if (partToBind instanceof InjectedValuePart) {
                 parseInjectedPart(partToBind);
-            }  else if(partToBind instanceof CommandPartParser) {
+            } else if (partToBind instanceof CommandPartParser) {
                 CommandPartParser partParser = (CommandPartParser) partToBind;
 
                 partParser.parse(partToBind, new ParsingContextData(this));
-            } else{
+            } else {
                 throw new CommandParseException("Invalid part type provided! Type: " + partToBind.getClass().getSimpleName());
             }
 
         }
 
         return new ParseResultData(commandLabel.trim(), argumentStack.getBacking(), commandExecutionPath, bindings, valueBindings);
+    }
+
+    public void stopParse() {
+        this.stopParse = true;
     }
 
     public List<String> getUsedArguments(StackSnapshot snapshot, int usedArguments) throws NoMoreArgumentsException {
@@ -309,6 +319,10 @@ public class CommandLineParser {
 
         Optional<?> optionalObject = unwrapObject(result, part);
 
+        if (stopParse) {
+            return;
+        }
+
         if (!optionalObject.isPresent() && part.isRequired()) {
             throw new CommandParseException("Failed to get the injected value for the part with name " + part.getName() +
                     "\n injected name: " + part.getInjectedName() +
@@ -383,6 +397,7 @@ public class CommandLineParser {
             }
 
             message.ifPresent(s -> commandManager.getMessager().sendMessage(namespaceAccesor, s));
+            stopParse();
 
             return Optional.empty();
         }
