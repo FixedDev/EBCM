@@ -10,7 +10,7 @@ public interface SingleArgumentProvider<T> extends ParameterProvider<T> {
     default Result<T> transform(StackSlice arguments, NamespaceAccesor namespaceAccesor, CommandPart part) throws NoMoreArgumentsException {
         if (arguments.getArgumentsLeft() != 1) {
             return Result.createResult("Internal error!",
-                    new IllegalArgumentException("A single argument provider should receive only one argument!"));
+                   new IllegalArgumentException("A single argument provider should receive only one argument!"));
         }
 
         return transform(arguments.next(), namespaceAccesor, part);

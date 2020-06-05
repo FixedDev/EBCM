@@ -36,6 +36,10 @@ public interface ParameterProvider<T> extends SuggestionProvider {
             return new SimpleResult<>(message, Arrays.asList(messageParameters), errors);
         }
 
+        static <T> Result<T> createResult(String message, Exception... errors) {
+            return createResult(message, new String[0], errors);
+        }
+
         static <T> Result<T> createResult(String message, String[] messageParameters, Exception... errors) {
             return new SimpleResult<>(message, Arrays.asList(messageParameters), Arrays.asList(errors));
         }
