@@ -4,9 +4,11 @@ import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
+import me.fixeddev.ebcm.i18n.DefaultI18n;
+import me.fixeddev.ebcm.i18n.I18n;
+import me.fixeddev.ebcm.i18n.Message;
 import me.fixeddev.ebcm.input.InputTokenizer;
 import me.fixeddev.ebcm.internal.CommandLineParser;
-import me.fixeddev.ebcm.internal.Messages;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import me.fixeddev.ebcm.part.ArgumentPart;
@@ -32,19 +34,20 @@ public class SimpleCommandManager implements CommandManager {
     private Messager messager;
     private ParameterProviderRegistry registry;
     private InputTokenizer tokenizer;
+    private I18n i18n;
 
     public SimpleCommandManager(Authorizer authorizer, Messager messager, ParameterProviderRegistry registry) {
         this.authorizer = authorizer;
         this.messager = messager;
         this.registry = registry;
-
+        this.i18n = new DefaultI18n();
 
         commandMap = new HashMap<>();
     }
 
     public SimpleCommandManager(ParameterProviderRegistry registry) {
-        this((namespace, permission) -> true, (namespaceAccesor, messageId, message, parameters) -> {
-            System.out.println(String.format(message, (Object[]) parameters));
+        this((namespace, permission) -> true, (namespaceAccessor, message, parameters) -> {
+            System.out.println(String.format(message, parameters));
         }, registry);
     }
 
@@ -127,6 +130,20 @@ public class SimpleCommandManager implements CommandManager {
     }
 
     @Override
+    public I18n getI18n() {
+        return i18n;
+    }
+
+    @Override
+    public void setI18n(I18n i18n) {
+        if (i18n == null) {
+            throw new IllegalArgumentException("Trying to set a null i18n instance!");
+        }
+
+        this.i18n = i18n;
+    }
+
+    @Override
     public Optional<Command> getCommand(String commandName) {
         return Optional.ofNullable(commandMap.get(commandName.toLowerCase()));
     }
@@ -138,7 +155,7 @@ public class SimpleCommandManager implements CommandManager {
         try {
             result = parse(accessor, arguments);
         } catch (CommandParseException e) {
-            if(e.getMessage().equals("STOPPED_PARSING")){
+            if (e.getMessage().equals("STOPPED_PARSING")) {
                 return false;
             }
 
@@ -152,7 +169,13 @@ public class SimpleCommandManager implements CommandManager {
         Command toExecute = result.getCommandToExecute();
 
         if (!authorizer.isAuthorized(accessor, toExecute.getPermission())) {
-            messager.sendMessage(accessor, Messages.COMMAND_NO_PERMISSIONS.getId(), toExecute.getPermissionMessage());
+            String message = i18n.getMessage(Message.COMMAND_NO_PERMISSIONS, result.getCommandExecutionPath(), accessor);
+
+            if (message == null) {
+                message = toExecute.getPermissionMessage();
+            }
+
+            messager.sendMessage(accessor, message);
 
             return true;
         }
@@ -172,7 +195,13 @@ public class SimpleCommandManager implements CommandManager {
         }
 
         if (usage) {
-            messager.sendMessage(accessor, Messages.COMMAND_USAGE.getId(), "Usage: %1$s", UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
+            String message = i18n.getMessage(Message.COMMAND_USAGE, result.getCommandExecutionPath(), accessor);
+
+            if (message == null) {
+                message = "Usage: %1$s";
+            }
+
+            messager.sendMessage(accessor, message,  UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
         }
 
         return true;
@@ -334,6 +363,12 @@ public class SimpleCommandManager implements CommandManager {
         boolean ignore = false;
 
         for (String argument : arguments) {
+            // Disable the parsing of the next flags
+            if ("--".equals(argument)) {
+                ignore = true;
+                break;
+            }
+
             if (argument.startsWith("-") && argument.length() == 2 && !ignore) {
                 char flagChar = argument.charAt(1);
                 FlagPart part = flagParts.get(flagChar);
@@ -341,12 +376,6 @@ public class SimpleCommandManager implements CommandManager {
                 if (part != null && !ignore) {
                     continue;
                 }
-            }
-
-            // Disable the parsing of the next flags
-            if ("--".equals(argument)) {
-                ignore = true;
-                break;
             }
 
             newArguments.add(argument);
