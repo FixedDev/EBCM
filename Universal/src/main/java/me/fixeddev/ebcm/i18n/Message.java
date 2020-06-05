@@ -36,13 +36,20 @@ public enum Message {
     MISSING_SUBCOMMAND("missing.subcommand"),
     INVALID_SUBCOMMAND("invalid.subcommand");
 
-    private static final Map<String, Message> messages = new ConcurrentHashMap<>();
+    private static final Map<String, Message> messages;
+
+    static {
+        messages = new ConcurrentHashMap<>();
+
+        for (Message value : values()) {
+            value.getId();
+        }
+    }
 
     private String id;
 
     Message(String id) {
         this.id = id;
-        getId();
     }
 
     public String getId() {
