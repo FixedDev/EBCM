@@ -25,9 +25,9 @@ public interface CommandManager {
 
     void setAuthorizer(Authorizer authorizer);
 
-    Messager getMessager();
+    Messenger getMessenger();
 
-    void setMessager(Messager messager);
+    void setMessenger(Messenger messenger);
 
     InputTokenizer getInputTokenizer();
 

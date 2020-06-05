@@ -31,14 +31,14 @@ public class SimpleCommandManager implements CommandManager {
     private Map<String, Command> commandMap;
 
     private Authorizer authorizer;
-    private Messager messager;
+    private Messenger messenger;
     private ParameterProviderRegistry registry;
     private InputTokenizer tokenizer;
     private I18n i18n;
 
-    public SimpleCommandManager(Authorizer authorizer, Messager messager, ParameterProviderRegistry registry) {
+    public SimpleCommandManager(Authorizer authorizer, Messenger messenger, ParameterProviderRegistry registry) {
         this.authorizer = authorizer;
-        this.messager = messager;
+        this.messenger = messenger;
         this.registry = registry;
         this.i18n = new DefaultI18n();
 
@@ -102,17 +102,17 @@ public class SimpleCommandManager implements CommandManager {
     }
 
     @Override
-    public Messager getMessager() {
-        return messager;
+    public Messenger getMessenger() {
+        return messenger;
     }
 
     @Override
-    public void setMessager(Messager messager) {
-        if (messager == null) {
+    public void setMessenger(Messenger messenger) {
+        if (messenger == null) {
             throw new IllegalArgumentException("Trying to set a null messenger!");
         }
 
-        this.messager = messager;
+        this.messenger = messenger;
     }
 
     @Override
@@ -175,7 +175,7 @@ public class SimpleCommandManager implements CommandManager {
                 message = toExecute.getPermissionMessage();
             }
 
-            messager.sendMessage(accessor, message);
+            messenger.sendMessage(accessor, message);
 
             return true;
         }
@@ -201,7 +201,7 @@ public class SimpleCommandManager implements CommandManager {
                 message = "Usage: %1$s";
             }
 
-            messager.sendMessage(accessor, message,  UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
+            messenger.sendMessage(accessor, message,  UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
         }
 
         return true;
