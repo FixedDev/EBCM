@@ -9,6 +9,7 @@ import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
+import me.fixeddev.ebcm.i18n.Messages;
 import me.fixeddev.ebcm.parameter.provider.Key;
 import me.fixeddev.ebcm.parameter.provider.ParameterProvider;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
@@ -376,7 +377,24 @@ public class CommandLineParser {
 
         StackSnapshot start = argumentStack.getSnapshot();
 
-        ParameterProvider.Result<?> object = provider.transform(argumentsToUse, namespaceAccesor, part);
+        ParameterProvider.Result<?> object;
+
+        try {
+            object = provider.transform(argumentsToUse, namespaceAccesor, part);
+        } catch (NoMoreArgumentsException ex) {
+            if (part.isRequired()) {
+                commandManager.getMessager().sendMessage(namespaceAccesor, Messages.MISSING_ARGUMENT.getId(),
+                        "Missing arguments for required part %s minimum arguments required: %s", part.getName(), neededArguments + "");
+
+                throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
+            }
+
+            if (partsLeft > 0) {
+                argumentStack.applySnapshot(start);
+            }
+
+            return;
+        }
 
         int usedArguments = oldArgumentsLeft - argumentStack.getArgumentsLeft();
 
