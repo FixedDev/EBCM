@@ -11,6 +11,7 @@
         <module>Universal</module>
         <module>Bukkit</module>
         <module>Bungee</module>
+        <module>Guice</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -30,6 +31,7 @@
         <universal-version>2.0.1-SNAPSHOT</universal-version>
         <bukkit-version>2.0.0-SNAPSHOT</bukkit-version>
         <bungee-version>2.0.0-SNAPSHOT</bungee-version>
+        <guice-version>2.0.0-SNAPSHOT</guice-version>
         <parent-version>${project.version}</parent-version>
     </properties>
 
