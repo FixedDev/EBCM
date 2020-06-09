@@ -2,11 +2,11 @@ package me.fixeddev.ebcm.bukkit;
 
 import me.fixeddev.ebcm.Authorizer;
 import me.fixeddev.ebcm.CommandManager;
+import me.fixeddev.ebcm.Namespace;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
-import me.fixeddev.ebcm.Namespace;
 import me.fixeddev.ebcm.util.UsageBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -54,7 +54,7 @@ public class BukkitCommandWrapper extends Command {
                     .split("\n");
 
             for (String s : usage) {
-                commandSender.sendMessage(ChatColor.RED +s);
+                commandSender.sendMessage(ChatColor.RED + s);
             }
         } catch (CommandParseException e) {
             throw new org.bukkit.command.CommandException("An internal parse exception occurred while executing the command " + label, e);

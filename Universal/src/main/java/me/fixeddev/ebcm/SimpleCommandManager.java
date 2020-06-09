@@ -188,7 +188,7 @@ public class SimpleCommandManager implements CommandManager {
                 message = "Usage: %1$s";
             }
 
-            messenger.sendMessage(accessor, message,  UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
+            messenger.sendMessage(accessor, message, UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
         }
 
         return true;

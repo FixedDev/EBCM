@@ -31,7 +31,7 @@ public class PlayerProvider implements ParameterProvider<Player> {
         List<String> suggestions = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if(player.getName().startsWith(startsWith)){
+            if (player.getName().startsWith(startsWith)) {
                 suggestions.add(player.getName());
             }
         }

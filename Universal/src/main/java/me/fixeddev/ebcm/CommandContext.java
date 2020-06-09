@@ -36,7 +36,7 @@ public interface CommandContext extends NamespaceAccesor {
      * In certain cases it can be useful, since the provider can return a null, but still be a valid value
      *
      * @param part The part to retrieve the value from
-     * @param <V> The returned object type
+     * @param <V>  The returned object type
      * @return The nullable object associated as the value for the specified part
      * @throws IllegalArgumentException If the specified part doesn't has a value associated with
      */

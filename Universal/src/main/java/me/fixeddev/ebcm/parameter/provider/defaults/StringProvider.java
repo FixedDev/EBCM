@@ -19,7 +19,7 @@ public class StringProvider implements ParameterProvider<String> {
     public Result<String> transform(StackSlice arguments, NamespaceAccesor namespaceAccesor, CommandPart part) throws NoMoreArgumentsException {
         StringJoiner joiner = new StringJoiner(" ");
 
-        while (arguments.hasNext()){
+        while (arguments.hasNext()) {
             joiner.add(arguments.next());
         }
 

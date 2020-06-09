@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 public class BukkitAuthorizer implements Authorizer {
     @Override
     public boolean isAuthorized(NamespaceAccesor namespace, String permission) {
-        if(permission.isEmpty()){
+        if (permission.isEmpty()) {
             return true;
         }
 

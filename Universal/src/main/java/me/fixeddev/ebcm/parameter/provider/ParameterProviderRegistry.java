@@ -21,7 +21,7 @@ public interface ParameterProviderRegistry {
 
     <T> ParameterProvider<T> getParameterProvider(Key<T> key);
 
-    default <T> boolean hasRegisteredProvider(Class<T> clazz){
+    default <T> boolean hasRegisteredProvider(Class<T> clazz) {
         return hasRegisteredProvider(new Key<>(clazz));
     }
 

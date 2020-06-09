@@ -13,7 +13,7 @@ public class BungeeMessenger implements Messenger {
 
         message = String.format(message, parameters);
 
-        message = ChatColor.translateAlternateColorCodes('&',message);
+        message = ChatColor.translateAlternateColorCodes('&', message);
         sender.sendMessage(TextComponent.fromLegacyText(message));
     }
 }

@@ -25,7 +25,7 @@ public class BooleanProvider implements SingleArgumentProvider<Boolean> {
         List<String> newSuggestions = new ArrayList<>();
 
         for (String suggestion : suggestions) {
-            if(suggestion.startsWith(startsWith)){
+            if (suggestion.startsWith(startsWith)) {
                 newSuggestions.add(suggestion);
             }
         }

@@ -32,7 +32,7 @@ public class BungeeCommandManager implements CommandManager {
         this.plugin = plugin;
     }
 
-    public BungeeCommandManager(Plugin plugin){
+    public BungeeCommandManager(Plugin plugin) {
         this.plugin = plugin;
         parent = new SimpleCommandManager();
 

@@ -20,8 +20,8 @@ public class ProxiedPlayerSenderProvider implements InjectedProvider<ProxiedPlay
     public Result<ProxiedPlayer> transform(NamespaceAccesor namespaceAccesor, CommandPart part) {
         CommandSender sender = namespaceAccesor.getObject(CommandSender.class, BungeeCommandManager.SENDER_NAMESPACE);
 
-        if(part.getModifiers().contains(SENDER_MODIFIER)) {
-            if(sender == null) {
+        if (part.getModifiers().contains(SENDER_MODIFIER)) {
+            if (sender == null) {
                 return Result.createResult(
                         "%bungee.invalid.commandsender%",
                         new CommandException("Failed to get CommandSender, maybe the namespace wasn't " +
@@ -29,7 +29,7 @@ public class ProxiedPlayerSenderProvider implements InjectedProvider<ProxiedPlay
                 );
             }
 
-            if(!(sender instanceof ProxiedPlayer)) {
+            if (!(sender instanceof ProxiedPlayer)) {
                 return Result.createResultOfMessage("%bungee.only.players%");
             }
 
@@ -44,7 +44,7 @@ public class ProxiedPlayerSenderProvider implements InjectedProvider<ProxiedPlay
         List<String> suggestions = new ArrayList<>();
 
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-            if(player.getName().startsWith(startsWith)){
+            if (player.getName().startsWith(startsWith)) {
                 suggestions.add(player.getName());
             }
         }

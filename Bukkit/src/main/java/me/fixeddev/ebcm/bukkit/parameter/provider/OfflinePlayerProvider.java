@@ -44,7 +44,7 @@ public class OfflinePlayerProvider implements ParameterProvider<OfflinePlayer> {
         List<String> suggestions = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if(player.getName().startsWith(startsWith)){
+            if (player.getName().startsWith(startsWith)) {
                 suggestions.add(player.getName());
             }
         }

@@ -39,18 +39,6 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
         this.parameters = parameters == null ? Collections.emptyList() : parameters;
     }
 
-    private void setMessage(String message) {
-        if (!message.startsWith("%") || !message.endsWith("%")) {
-            this.message = message;
-            i18n = false;
-
-            return;
-        }
-
-        this.message = message.substring(1, message.length() - 1);
-        this.i18n = true;
-    }
-
     @Override
     public Optional<T> getResultObject() {
         return Optional.ofNullable(object);
@@ -64,6 +52,18 @@ class SimpleResult<T> implements ParameterProvider.Result<T> {
     @Override
     public Optional<String> getMessage() {
         return getRawMessage().map(s -> !i18n ? String.format(s, getMessageParameters()) : message);
+    }
+
+    private void setMessage(String message) {
+        if (!message.startsWith("%") || !message.endsWith("%")) {
+            this.message = message;
+            i18n = false;
+
+            return;
+        }
+
+        this.message = message.substring(1, message.length() - 1);
+        this.i18n = true;
     }
 
     @Override

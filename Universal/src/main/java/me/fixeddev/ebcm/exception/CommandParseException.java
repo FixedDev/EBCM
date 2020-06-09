@@ -22,7 +22,7 @@ public class CommandParseException extends Exception {
 
     @Override
     public synchronized Throwable fillInStackTrace() {
-        if(!stackTrace){
+        if (!stackTrace) {
             return this;
         }
 

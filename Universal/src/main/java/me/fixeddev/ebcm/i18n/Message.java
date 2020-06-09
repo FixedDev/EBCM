@@ -52,21 +52,6 @@ public enum Message {
         this.id = id;
     }
 
-    public String getId() {
-        messages.put(id, this);
-
-        return id;
-    }
-
-    public String getId(String... commandName) {
-        return id;
-    }
-
-    @Override
-    public String toString() {
-        return getId();
-    }
-
     public static Message findMessage(String id) {
         Message firstFound = messages.get(id);
 
@@ -96,5 +81,20 @@ public enum Message {
         }
 
         return null;
+    }
+
+    public String getId() {
+        messages.put(id, this);
+
+        return id;
+    }
+
+    public String getId(String... commandName) {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return getId();
     }
 }

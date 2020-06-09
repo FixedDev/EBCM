@@ -30,7 +30,7 @@ public interface StackSlice {
 
     byte nextByte() throws CommandParseException;
 
-    boolean nextBoolean() throws  CommandParseException;
+    boolean nextBoolean() throws CommandParseException;
 
     List<String> getBacking();
 }

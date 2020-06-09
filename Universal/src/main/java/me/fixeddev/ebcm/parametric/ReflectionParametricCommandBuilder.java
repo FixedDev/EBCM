@@ -137,7 +137,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                         .setAction(command.getAction())
                         .setCommandParts(command.getParts());
 
-                if(!command.getData().getAliases().isEmpty()){
+                if (!command.getData().getAliases().isEmpty()) {
                     Command newCommand = cloneCommand(command).build();
 
                     commands.put(newCommand.getData().getName(), newCommand);

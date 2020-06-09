@@ -11,5 +11,6 @@ public interface CommandBinder {
     default void bind(Class<? extends CommandClass> clazz) {
         bind(clazz, Scopes.NO_SCOPE);
     }
+
     void bind(Class<? extends CommandClass> clazz, Scope scope);
 }

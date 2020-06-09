@@ -33,9 +33,9 @@ This automatically creates all the needed objects and gives you a ready to work 
 ```java
 Authorizer authorizer = new BukkitAuthorizer();
 ParameterProviderRegistry providerRegistry = ParameterProviderRegistry.createRegistry();
-Messager messager = new BukkitMessager();
+Messager messenger = new BukkitMessager();
 
-CommandManager commandManager = new SimpleCommandManager(authorizer, messager, providerRegistry);
+CommandManager commandManager = new SimpleCommandManager(authorizer, messenger, providerRegistry);
 
 ```
 ### Basic Commands

@@ -22,7 +22,7 @@ public class ListDelegateI18n implements I18n {
         for (I18n delegate : delegates) {
             String message = delegate.getMessage(messageId, namespace);
 
-            if(message != null){
+            if (message != null) {
                 return message;
             }
         }

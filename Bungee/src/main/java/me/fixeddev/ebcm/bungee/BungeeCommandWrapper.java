@@ -1,11 +1,11 @@
 package me.fixeddev.ebcm.bungee;
 
 import me.fixeddev.ebcm.CommandManager;
+import me.fixeddev.ebcm.Namespace;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoPermissionException;
-import me.fixeddev.ebcm.Namespace;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;

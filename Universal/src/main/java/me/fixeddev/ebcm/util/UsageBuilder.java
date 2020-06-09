@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class UsageBuilder {
 
     public static String getUsageForCommand(Command parent, Command command, String label) {
-        if(!command.getUsage().equals("_!!_NOT_OVERRIDE_!!_")){
+        if (!command.getUsage().equals("_!!_NOT_OVERRIDE_!!_")) {
             return command.getUsage().replace("<command>", label);
         }
 
@@ -20,7 +20,7 @@ public class UsageBuilder {
         }
 
         if (parent != null && !parent.getParts().isEmpty()) {
-            if(parent.getParts().size() > 1 || !(parent.getParts().get(0) instanceof SubCommandPart)){
+            if (parent.getParts().size() > 1 || !(parent.getParts().get(0) instanceof SubCommandPart)) {
                 parentUsage = getUsageForCommand(null, parent, label);
             }
         }
