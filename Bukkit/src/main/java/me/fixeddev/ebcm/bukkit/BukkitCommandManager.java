@@ -11,7 +11,6 @@ import me.fixeddev.ebcm.bukkit.parameter.provider.BukkitModule;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
-import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.i18n.I18n;
 import me.fixeddev.ebcm.input.InputTokenizer;
 import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;

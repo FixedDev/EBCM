@@ -371,7 +371,7 @@ public class SimpleCommandManager implements CommandManager {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getSuggestions(NamespaceAccesor accessor, String line) throws NoPermissionException {
+    public List<String> getSuggestions(NamespaceAccesor accessor, String line) {
         return getSuggestions(accessor, tokenizer.tokenize(line));
     }
 
