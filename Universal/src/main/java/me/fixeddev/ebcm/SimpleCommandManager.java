@@ -175,8 +175,6 @@ public class SimpleCommandManager implements CommandManager {
             if (!action.execute(context)) {
                 usage = true;
             }
-        } catch (CommandException ex) {
-            throw ex;
         } catch (Exception ex) {
             throw new CommandException("An exception occurred while executing the command", ex);
         }
@@ -282,6 +280,10 @@ public class SimpleCommandManager implements CommandManager {
                     Command subCommand = availableValues.get(lastArgument.toLowerCase());
 
                     if (subCommand == null) {
+                        continue;
+                    }
+
+                    if(authorizer.isAuthorized(accessor, subCommand.getPermission())){
                         continue;
                     }
 
