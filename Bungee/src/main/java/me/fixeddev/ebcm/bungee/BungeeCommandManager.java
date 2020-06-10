@@ -129,7 +129,7 @@ public class BungeeCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(NamespaceAccesor accessor, String line) throws NoPermissionException {
+    public List<String> getSuggestions(NamespaceAccesor accessor, String line)  {
         return parent.getSuggestions(accessor, line);
     }
 
