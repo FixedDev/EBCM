@@ -5,7 +5,6 @@ import me.fixeddev.ebcm.Namespace;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.CommandUsageException;
-import me.fixeddev.ebcm.exception.NoPermissionException;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -13,7 +12,6 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UnknownFormatConversionException;
 
@@ -74,12 +72,6 @@ public class BungeeCommandWrapper extends Command implements TabExecutor {
         Namespace namespace = new Namespace();
         namespace.setObject(CommandSender.class, BungeeCommandManager.SENDER_NAMESPACE, commandSender);
 
-        try {
-            return commandManager.getSuggestions(namespace, argumentList);
-        } catch (NoPermissionException e) {
-            commandSender.sendMessage(ChatColor.RED + e.getMessage());
-        }
-
-        return Collections.emptyList();
+        return commandManager.getSuggestions(namespace, argumentList);
     }
 }

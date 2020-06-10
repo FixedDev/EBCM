@@ -27,6 +27,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * The default implementation for {@link CommandManager} using a HashMap for the internal commandMap
+ * And delegating the parse calls to the {@link CommandLineParser}
+ *
+ * @implNote This class is not threadsafe, we can't ensure that registering/executing commands on more than 1 thread concurrently works correctly
+ */
 public class SimpleCommandManager implements CommandManager {
     private Map<String, Command> commandMap;
 
@@ -55,6 +61,9 @@ public class SimpleCommandManager implements CommandManager {
         this(ParameterProviderRegistry.createRegistry());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerCommand(Command command) {
         CommandData data = command.getData();
@@ -70,6 +79,9 @@ public class SimpleCommandManager implements CommandManager {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerCommands(List<Command> commandList) {
         for (Command command : commandList) {
@@ -77,21 +89,33 @@ public class SimpleCommandManager implements CommandManager {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean exists(String commandName) {
         return commandMap.containsKey(commandName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ParameterProviderRegistry getProviderRegistry() {
         return registry;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Authorizer getAuthorizer() {
         return authorizer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setAuthorizer(Authorizer authorizer) {
         if (authorizer == null) {
@@ -101,11 +125,17 @@ public class SimpleCommandManager implements CommandManager {
         this.authorizer = authorizer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Messenger getMessenger() {
         return messenger;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setMessenger(Messenger messenger) {
         if (messenger == null) {
@@ -115,11 +145,17 @@ public class SimpleCommandManager implements CommandManager {
         this.messenger = messenger;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputTokenizer getInputTokenizer() {
         return tokenizer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setInputTokenizer(InputTokenizer tokenizer) {
         if (tokenizer == null) {
@@ -129,11 +165,17 @@ public class SimpleCommandManager implements CommandManager {
         this.tokenizer = tokenizer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public I18n getI18n() {
         return i18n;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setI18n(I18n i18n) {
         if (i18n == null) {
@@ -143,11 +185,17 @@ public class SimpleCommandManager implements CommandManager {
         this.i18n = i18n;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Command> getCommand(String commandName) {
         return Optional.ofNullable(commandMap.get(commandName.toLowerCase()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean execute(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandException {
         ParseResult result;
@@ -192,11 +240,17 @@ public class SimpleCommandManager implements CommandManager {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean execute(NamespaceAccesor accessor, String line) throws CommandParseException, CommandException {
         return execute(accessor, tokenizer.tokenize(line));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) {
         if (arguments == null || arguments.isEmpty()) {
@@ -283,7 +337,7 @@ public class SimpleCommandManager implements CommandManager {
                         continue;
                     }
 
-                    if(authorizer.isAuthorized(accessor, subCommand.getPermission())){
+                    if (authorizer.isAuthorized(accessor, subCommand.getPermission())) {
                         continue;
                     }
 
@@ -313,6 +367,9 @@ public class SimpleCommandManager implements CommandManager {
         return getSubCommands(accessor, part, startsWith);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getSuggestions(NamespaceAccesor accessor, String line) throws NoPermissionException {
         return getSuggestions(accessor, tokenizer.tokenize(line));
@@ -375,7 +432,10 @@ public class SimpleCommandManager implements CommandManager {
         return newArguments;
     }
 
-
+    /**
+     * Delegates the parse phase to the {@link CommandLineParser} class
+     * {@inheritDoc}
+     */
     @Override
     public ParseResult parse(NamespaceAccesor accessor, List<String> arguments) throws CommandParseException, CommandNotFound {
         CommandLineParser parser = new CommandLineParser(arguments, accessor, this);
@@ -383,6 +443,9 @@ public class SimpleCommandManager implements CommandManager {
         return parser.parse();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ParseResult parse(NamespaceAccesor accessor, String line) throws CommandParseException, CommandNotFound {
         return parse(accessor, tokenizer.tokenize(line));

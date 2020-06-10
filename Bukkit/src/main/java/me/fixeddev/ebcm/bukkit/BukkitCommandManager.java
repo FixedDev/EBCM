@@ -133,7 +133,7 @@ public class BukkitCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) throws NoPermissionException {
+    public List<String> getSuggestions(NamespaceAccesor accessor, List<String> arguments) {
         return delegate.getSuggestions(accessor, arguments);
     }
 
