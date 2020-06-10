@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * The default implementation for {@link CommandManager} using a HashMap for the internal commandMap
  * And delegating the parse calls to the {@link CommandLineParser}
  *
- * @implNote This class is not threadsafe, we can't ensure that registering/executing commands on more than 1 thread concurrently works correctly
+ * This class is not threadsafe, we can't ensure that registering/executing commands on more than 1 thread concurrently works correctly
  */
 public class SimpleCommandManager implements CommandManager {
     private Map<String, Command> commandMap;
