@@ -16,7 +16,6 @@ import java.util.Optional;
  * In that way is a CommandRegistry and a CommandDispatcher at the same time, it also manages the parsing phase of the execution of the command
  * And manages the suggestions for the commands, used on Tab Completing on things like CLI applications or Bukkit
  *
- * @implSpec
  */
 public interface CommandManager {
 
@@ -183,7 +182,7 @@ public interface CommandManager {
      * @return A {@link List} of {@link String} representing the suggestions for the next argument, empty if the player doesn't has permissions
      * @see CommandManager#getSuggestions(NamespaceAccesor, List)
      */
-    List<String> getSuggestions(NamespaceAccesor accessor, String line) throws NoPermissionException;
+    List<String> getSuggestions(NamespaceAccesor accessor, String line);
 
     /**
      * Converts the specified line into a {@link List} of Strings using the {@link InputTokenizer} returned by {@link CommandManager#getInputTokenizer()}
