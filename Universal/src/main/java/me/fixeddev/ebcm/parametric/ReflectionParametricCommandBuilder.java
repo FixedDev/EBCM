@@ -78,10 +78,8 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         commandBuilder.setAction(actionOfMethod(commandClass, method));
 
         Usage usage = method.getAnnotation(Usage.class);
-        if (usage != null) {
-            if (!usage.usage()[0].equals("_!!_NOT_OVERRIDE_!!_")) {
-                commandBuilder.setUsage(String.join("\n", usage.usage()));
-            }
+        if (usage != null && !usage.usage()[0].equals("_!!_NOT_OVERRIDE_!!_")) {
+            commandBuilder.setUsage(String.join("\n", usage.usage()));
         }
 
 
@@ -155,7 +153,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
             if (classesAnnotation != null) {
                 for (Class<? extends CommandClass> subCommandClass : classesAnnotation.value()) {
-                    if (subCommandClass == clazz) {
+                    if (subCommandClass.equals(clazz)) {
                         continue;
                     }
 
@@ -223,8 +221,9 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
     private CommandClass createSubCommandInstance(Class<?> clazz, Class<?> upperCommandClass, CommandClass upperCommand) {
         try {
-            Constructor constructor;
+            Constructor<?> constructor;
             boolean useUpperClass = true;
+
             try {
                 constructor = clazz.getConstructor(upperCommandClass);
             } catch (NoSuchMethodException e) {
@@ -247,7 +246,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
             return instance;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new CommandBuildException("Failed to create a " + clazz.getSimpleName() + " instance", ex);
         }
     }
 
