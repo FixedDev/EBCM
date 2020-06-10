@@ -10,8 +10,8 @@ public class BukkitMessenger implements Messenger {
     public void sendMessage(NamespaceAccesor namespace, String message, Object... parameters) {
         CommandSender sender = namespace.getObject(CommandSender.class, BukkitCommandManager.SENDER_NAMESPACE);
 
-        message = String.format(message, (Object[]) parameters);
+        String newMessage = String.format(message, parameters);
 
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', newMessage));
     }
 }

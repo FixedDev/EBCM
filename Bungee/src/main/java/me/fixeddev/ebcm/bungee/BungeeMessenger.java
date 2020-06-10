@@ -11,9 +11,9 @@ public class BungeeMessenger implements Messenger {
     public void sendMessage(NamespaceAccesor namespace, String message, Object... parameters) {
         CommandSender sender = namespace.getObject(CommandSender.class, BungeeCommandManager.SENDER_NAMESPACE);
 
-        message = String.format(message, parameters);
+        String newMessage = String.format(message, parameters);
 
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        sender.sendMessage(TextComponent.fromLegacyText(message));
+        newMessage = ChatColor.translateAlternateColorCodes('&', newMessage);
+        sender.sendMessage(TextComponent.fromLegacyText(newMessage));
     }
 }
