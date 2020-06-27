@@ -269,6 +269,72 @@ public class CommandLineParser {
         return optionalArgumentsToBound;
     }
 
+    /**
+     * Adds the specified part as the last part to parse
+     *
+     * @param partToAdd The part to add
+     * @throws CommandParseException If with the addition of this part an infinite part gets on an invalid state(infinite part before required part)
+     */
+    public void addPart(CommandPart partToAdd) throws CommandParseException {
+        currentCommandParts.add(partToAdd);
+        try {
+            checkForInvalidInfiniteParts();
+        } catch (CommandParseException ex) {
+            currentCommandParts.remove(currentCommandParts.size() - 1);
+
+            throw ex;
+        }
+
+        partsLeft++;
+
+        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
+        neededArguments = calculateNeededArgs();
+        allNeededArguments = calculateAllNeededArgs();
+        optionalArgumentsToBound = argumentStack.getArgumentsLeft() - neededArguments;
+    }
+
+    /**
+     * Adds the specified part as the next part to parse
+     *
+     * @param partToAdd The part to use
+     * @throws CommandParseException If with the addition of this part an infinite part gets on an invalid state(infinite part before required part)
+     */
+    public void usePart(CommandPart partToUse) throws CommandParseException {
+        partsIterator.add(partToUse);
+        try {
+            checkForInvalidInfiniteParts();
+        } catch (CommandParseException ex) {
+            partsIterator.next();
+            partsIterator.remove();
+            partsIterator.previous();
+
+            throw ex;
+        }
+
+        partsLeft++;
+
+        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
+        neededArguments = calculateNeededArgs();
+        allNeededArguments = calculateAllNeededArgs();
+        optionalArgumentsToBound = argumentStack.getArgumentsLeft() - neededArguments;
+    }
+
+    /**
+     *  Removes from part's list the next available part
+     */
+    public void removeNextPart() {
+        partsIterator.next();
+        partsIterator.remove();
+        partsIterator.previous();
+
+        partsLeft--;
+
+        hasSubCommand = currentCommandParts.subList(partsIterator.nextIndex(), currentCommandParts.size()).stream().anyMatch(part -> part instanceof SubCommandPart && part.isRequired());
+        neededArguments = calculateNeededArgs();
+        allNeededArguments = calculateAllNeededArgs();
+        optionalArgumentsToBound = argumentStack.getArgumentsLeft() - neededArguments;
+    }
+
     private void parseFlags() throws NoMoreArgumentsException {
         Map<Character, FlagPart> flagParts = currentCommandParts.stream()
                 .filter(part -> part instanceof FlagPart)
