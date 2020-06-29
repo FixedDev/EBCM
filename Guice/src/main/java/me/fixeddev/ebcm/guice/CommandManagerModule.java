@@ -13,6 +13,8 @@ public class CommandManagerModule implements Module {
 
     @Override
     public void configure(Binder binder) {
+		binder.bind(CommandBinder.class).to(SimpleCommandBinder.class);
+		
         OptionalBinder.newOptionalBinder(binder, CommandManager.class)
                 .setDefault()
                 .to(SimpleCommandManager.class)
