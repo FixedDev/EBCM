@@ -210,6 +210,12 @@ public class CommandLineParser {
         int sum = 0;
 
         for (CommandPart part : currentCommandParts) {
+            if (part instanceof SubCommandPart && part.isRequired()) {
+                sum++;
+
+                continue;
+            }
+
             if (!(part instanceof ArgumentPart) || !part.isRequired()) {
                 continue;
             }
@@ -230,6 +236,11 @@ public class CommandLineParser {
         int sum = 0;
 
         for (CommandPart part : currentCommandParts) {
+            if (part instanceof SubCommandPart) {
+                sum++;
+                continue;
+            }
+
             if (!(part instanceof ArgumentPart)) {
                 continue;
             }
@@ -475,7 +486,7 @@ public class CommandLineParser {
             object = provider.transform(argumentsToUse, namespaceAccesor, part);
         } catch (NoMoreArgumentsException ex) {
             if (part.isRequired()) {
-                if(!getUsageHandler(currentCommand).handleMissing(new ParsingContextData(this), part)){
+                if (!getUsageHandler(currentCommand).handleMissing(new ParsingContextData(this), part)) {
                     stopParse();
                 }
 
@@ -540,12 +551,12 @@ public class CommandLineParser {
 
         if (!argumentStack.hasNext()) {
             if (partToBind.isRequired()) {
-                if(!usageHandler.handleMissing(new ParsingContextData(this), subCommandPart)){
+                if (!usageHandler.handleMissing(new ParsingContextData(this), subCommandPart)) {
                     stopParse();
                 }
-
-                return;
             }
+
+            return;
         }
 
         String argument = argumentStack.next();
@@ -553,7 +564,7 @@ public class CommandLineParser {
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
-            if(!usageHandler.handleInvalid(new ParsingContextData(this), subCommandPart, Collections.singletonList(argument.toLowerCase()))){
+            if (!usageHandler.handleInvalid(new ParsingContextData(this), subCommandPart, Collections.singletonList(argument.toLowerCase()))) {
                 stopParse();
             }
 
