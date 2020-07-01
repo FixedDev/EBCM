@@ -200,6 +200,11 @@ public class CommandLineParser {
         return arguments;
     }
 
+
+    public int getPartsLeft() {
+        return partsLeft;
+    }
+
     public int calculateNeededArgs() {
         int sum = 0;
 
@@ -625,6 +630,11 @@ public class CommandLineParser {
         @Override
         public NamespaceAccesor getNamespace() {
             return parser.namespaceAccesor;
+        }
+
+        @Override
+        public List<Command> getExecutionPath() {
+            return parser.commandExecutionPath;
         }
 
         @Override
