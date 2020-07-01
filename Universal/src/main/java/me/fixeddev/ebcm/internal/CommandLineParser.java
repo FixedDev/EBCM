@@ -200,6 +200,9 @@ public class CommandLineParser {
         return arguments;
     }
 
+    public String getCommandLabel() {
+        return commandLabel;
+    }
 
     public int getPartsLeft() {
         return partsLeft;
