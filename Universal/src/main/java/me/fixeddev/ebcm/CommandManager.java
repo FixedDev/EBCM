@@ -10,6 +10,7 @@ import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Manages the command register and command execution.
@@ -30,11 +31,40 @@ public interface CommandManager {
 
     /**
      * Registers the specified {@link List} of {@link Command} into the internal command map doing a for loop and calling {@link CommandManager#registerCommand(Command)} for every command
-     *
+     * @see CommandManager#registerCommand(Command)  
+     * 
      * @param commandList The commands to register
      * @throws IllegalArgumentException If the main name of any command is already registered
      */
     void registerCommands(List<Command> commandList);
+
+    /**
+     * Unregisters the specified {@link Command} from the internal command map including all of it's aliases 
+     * 
+     * @param command The {@linkplain Command} to unregister
+     */
+    void unregisterCommand(Command command);
+
+    /**
+     * Unregisters the specified {@link List} of {@link Command} from the internal command map doing a for loop and calling {@link CommandManager#unregisterCommand(Command)} for every command
+     * @see CommandManager#unregisterCommand(Command) 
+     * 
+     * @param commands The {@linkplain Command} to unregister
+     */
+    void unregisterCommands(List<Command> commands);
+
+    /**
+     * Unregisters all the registered commands on this command manager
+     * @see CommandManager#unregisterCommand(Command)
+     */
+    void unregisterAll();
+
+    /**
+     * A {@linkplain Set} of all the registered {@link Command} instances on this command manager
+     *
+     * @return An immutable set representing the registered commands
+     */
+    Set<Command> getCommands();
 
     /**
      * Checks if the specified {@link String} is the name or alias of a registered command
