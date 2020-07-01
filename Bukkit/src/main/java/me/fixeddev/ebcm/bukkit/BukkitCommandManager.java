@@ -18,20 +18,26 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 
 public class BukkitCommandManager implements CommandManager {
     public static final String SENDER_NAMESPACE = "SENDER";
+
     private CommandManager delegate;
     private CommandMap bukkitCommandMap;
     private String fallbackPrefix;
 
+    private Map<String, BukkitCommandWrapper> wrapperMap;
 
     public BukkitCommandManager(CommandManager delegate, String fallbackPrefix) {
         this.delegate = delegate;
         this.fallbackPrefix = fallbackPrefix;
+        wrapperMap = new HashMap<>();
 
         try {
             Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
@@ -55,7 +61,9 @@ public class BukkitCommandManager implements CommandManager {
     public void registerCommand(Command command) {
         delegate.registerCommand(command);
 
-        org.bukkit.command.Command bukkitCommand = new BukkitCommandWrapper(command, this);
+        BukkitCommandWrapper bukkitCommand = new BukkitCommandWrapper(command, this);
+
+        wrapperMap.put(command.getData().getName(), bukkitCommand);
         bukkitCommandMap.register(fallbackPrefix, bukkitCommand);
     }
 
@@ -63,6 +71,31 @@ public class BukkitCommandManager implements CommandManager {
         for (Command command : commandList) {
             registerCommand(command);
         }
+    }
+
+    @Override
+    public void unregisterCommand(Command command) {
+        delegate.unregisterCommand(command);
+
+        BukkitCommandWrapper wrapper = wrapperMap.get(command.getData().getName());
+        if (wrapper != null) {
+            wrapper.unregister(bukkitCommandMap);
+        }
+    }
+
+    @Override
+    public void unregisterCommands(List<Command> commands) {
+        delegate.unregisterCommands(commands);
+    }
+
+    @Override
+    public void unregisterAll() {
+        delegate.unregisterAll();
+    }
+
+    @Override
+    public Set<Command> getCommands() {
+        return delegate.getCommands();
     }
 
     @Override

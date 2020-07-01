@@ -17,18 +17,26 @@ import me.fixeddev.ebcm.parameter.provider.ParameterProviderRegistry;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class BungeeCommandManager implements CommandManager {
 
     public static final String SENDER_NAMESPACE = "SENDER";
+
     private CommandManager parent;
     private Plugin plugin;
+
+    private Map<String, BungeeCommandWrapper> wrapperMap;
 
     public BungeeCommandManager(CommandManager parent, Plugin plugin) {
         this.parent = parent;
         this.plugin = plugin;
+
+        wrapperMap = new HashMap<>();
     }
 
     public BungeeCommandManager(Plugin plugin) {
@@ -45,7 +53,9 @@ public class BungeeCommandManager implements CommandManager {
     @Override
     public void registerCommand(Command command) {
         parent.registerCommand(command);
-        net.md_5.bungee.api.plugin.Command bungeeCommand = new BungeeCommandWrapper(command, this);
+        BungeeCommandWrapper bungeeCommand = new BungeeCommandWrapper(command, this);
+        wrapperMap.put(command.getData().getName(), bungeeCommand);
+
         ProxyServer.getInstance().getPluginManager().registerCommand(plugin, bungeeCommand);
     }
 
@@ -54,6 +64,32 @@ public class BungeeCommandManager implements CommandManager {
         for (Command command : commandList) {
             registerCommand(command);
         }
+    }
+
+    @Override
+    public void unregisterCommand(Command command) {
+        parent.unregisterCommand(command);
+
+        BungeeCommandWrapper wrapper = wrapperMap.get(command.getData().getName());
+        if (wrapper != null) {
+            ProxyServer.getInstance().getPluginManager().unregisterCommand(wrapper);
+        }
+
+    }
+
+    @Override
+    public void unregisterCommands(List<Command> commands) {
+        parent.unregisterCommands(commands);
+    }
+
+    @Override
+    public void unregisterAll() {
+        parent.unregisterAll();
+    }
+
+    @Override
+    public Set<Command> getCommands() {
+        return parent.getCommands();
     }
 
     @Override
@@ -128,7 +164,7 @@ public class BungeeCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(NamespaceAccesor accessor, String line)  {
+    public List<String> getSuggestions(NamespaceAccesor accessor, String line) {
         return parent.getSuggestions(accessor, line);
     }
 

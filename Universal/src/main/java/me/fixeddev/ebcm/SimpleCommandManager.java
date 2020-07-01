@@ -3,7 +3,6 @@ package me.fixeddev.ebcm;
 import me.fixeddev.ebcm.exception.CommandException;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
-import me.fixeddev.ebcm.exception.NoPermissionException;
 import me.fixeddev.ebcm.i18n.DefaultI18n;
 import me.fixeddev.ebcm.i18n.I18n;
 import me.fixeddev.ebcm.i18n.Message;
@@ -20,10 +19,12 @@ import me.fixeddev.ebcm.util.UsageBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -87,6 +88,48 @@ public class SimpleCommandManager implements CommandManager {
         for (Command command : commandList) {
             registerCommand(command);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unregisterCommand(Command command) {
+        commandMap.remove(command.getData().getName());
+
+        for (String alias : command.getData().getAliases()) {
+            commandMap.remove(alias);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unregisterCommands(List<Command> commands) {
+        for (Command command : commands) {
+            unregisterCommand(command);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unregisterAll() {
+        Set<Command> commands = new HashSet<>(commandMap.values());
+
+        for (Command command : commands) {
+            unregisterCommand(command);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Command> getCommands() {
+        return new HashSet<>(commandMap.values());
     }
 
     /**
