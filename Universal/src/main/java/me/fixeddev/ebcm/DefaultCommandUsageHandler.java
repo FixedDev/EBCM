@@ -1,5 +1,6 @@
 package me.fixeddev.ebcm;
 
+import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.i18n.Message;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.SubCommandPart;
@@ -36,5 +37,16 @@ public class DefaultCommandUsageHandler implements CommandUsageHandler {
             context.getCommandManager().getMessenger().sendMessage(context.getNamespace(), UsageBuilder.getUsageForCommand(null, context.getCurrentCommand(), context.getParser().getCommandLabel()));
         }
         return false;
+    }
+
+    @Override
+    public void handleExecution(CommandContext commandContext, ParseResult result, CommandManager manager) throws CommandUsageException {
+        String message = manager.getI18n().getMessage(Message.COMMAND_USAGE, result.getCommandExecutionPath(), commandContext);
+
+        if (message == null) {
+            message = "Usage: %1$s";
+        }
+
+        manager.getMessenger().sendMessage(commandContext, message, UsageBuilder.getUsageForCommand(result.getMainCommand(), result.getCommandToExecute(), result.getLabel()));
     }
 }

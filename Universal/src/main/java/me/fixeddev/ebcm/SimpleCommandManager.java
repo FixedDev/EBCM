@@ -5,7 +5,6 @@ import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.i18n.DefaultI18n;
 import me.fixeddev.ebcm.i18n.I18n;
-import me.fixeddev.ebcm.i18n.Message;
 import me.fixeddev.ebcm.input.InputTokenizer;
 import me.fixeddev.ebcm.internal.CommandLineParser;
 import me.fixeddev.ebcm.internal.namespace.SimpleCommandContext;
@@ -14,7 +13,6 @@ import me.fixeddev.ebcm.part.ArgumentPart;
 import me.fixeddev.ebcm.part.CommandPart;
 import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.SubCommandPart;
-import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -293,13 +291,7 @@ public class SimpleCommandManager implements CommandManager {
         }
 
         if (usage) {
-            String message = i18n.getMessage(Message.COMMAND_USAGE, result.getCommandExecutionPath(), accessor);
-
-            if (message == null) {
-                message = "Usage: %1$s";
-            }
-
-            messenger.sendMessage(accessor, message, UsageBuilder.getUsageForCommand(result.getMainCommand(), toExecute, result.getLabel()));
+            usageHandler.handleExecution(context, result, this);
         }
 
         return true;
