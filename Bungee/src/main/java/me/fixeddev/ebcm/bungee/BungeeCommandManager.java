@@ -3,6 +3,7 @@ package me.fixeddev.ebcm.bungee;
 import me.fixeddev.ebcm.Authorizer;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandManager;
+import me.fixeddev.ebcm.CommandUsageHandler;
 import me.fixeddev.ebcm.Messenger;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
@@ -95,6 +96,16 @@ public class BungeeCommandManager implements CommandManager {
     @Override
     public boolean exists(String commandName) {
         return parent.exists(commandName);
+    }
+
+    @Override
+    public CommandUsageHandler getUsageHandler() {
+        return parent.getUsageHandler();
+    }
+
+    @Override
+    public void setUsageHandler(CommandUsageHandler usageHandler) {
+        parent.setUsageHandler(usageHandler);
     }
 
     @Override

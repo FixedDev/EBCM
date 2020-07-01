@@ -2,12 +2,12 @@ package me.fixeddev.ebcm.internal;
 
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.CommandManager;
+import me.fixeddev.ebcm.CommandUsageHandler;
 import me.fixeddev.ebcm.NamespaceAccesor;
 import me.fixeddev.ebcm.ParseResult;
 import me.fixeddev.ebcm.ParsingContext;
 import me.fixeddev.ebcm.exception.CommandNotFound;
 import me.fixeddev.ebcm.exception.CommandParseException;
-import me.fixeddev.ebcm.exception.CommandUsageException;
 import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
 import me.fixeddev.ebcm.i18n.Message;
 import me.fixeddev.ebcm.parameter.provider.Key;
@@ -25,10 +25,9 @@ import me.fixeddev.ebcm.stack.NoOpStackSlice;
 import me.fixeddev.ebcm.stack.SimpleArgumentStack;
 import me.fixeddev.ebcm.stack.StackSlice;
 import me.fixeddev.ebcm.stack.StackSnapshot;
-import me.fixeddev.ebcm.util.UsageBuilder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -304,7 +303,7 @@ public class CommandLineParser {
     /**
      * Adds the specified part as the next part to parse
      *
-     * @param partToAdd The part to use
+     * @param partToUse The part to use
      * @throws CommandParseException If with the addition of this part an infinite part gets on an invalid state(infinite part before required part)
      */
     public void usePart(CommandPart partToUse) throws CommandParseException {
@@ -328,7 +327,7 @@ public class CommandLineParser {
     }
 
     /**
-     *  Removes from part's list the next available part
+     * Removes from part's list the next available part
      */
     public void removeNextPart() {
         partsIterator.next();
@@ -477,15 +476,11 @@ public class CommandLineParser {
             object = provider.transform(argumentsToUse, namespaceAccesor, part);
         } catch (NoMoreArgumentsException ex) {
             if (part.isRequired()) {
-                String message = commandManager.getI18n().getMessage(Message.MISSING_ARGUMENT, commandExecutionPath, namespaceAccesor);
-
-                if (message == null) {
-                    message = "Missing arguments for required part %s minimum arguments required: %s";
+                if(getUsageHandler(currentCommand).handleMissing(new ParsingContextData(this), part)){
+                    stopParse();
                 }
 
-                commandManager.getMessenger().sendMessage(namespaceAccesor, message, part.getName(), neededArguments + "");
-
-                throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
+                return;
             }
 
             if (partsLeft > 0) {
@@ -501,6 +496,10 @@ public class CommandLineParser {
         bindPart(part, getUsedArguments(start, usedArguments));
 
         valueBindings.put(part, unwrapObject(object, part).orElse(null));
+    }
+
+    private CommandUsageHandler getUsageHandler(Command command) {
+        return command.getUsageHandler().orElse(commandManager.getUsageHandler());
     }
 
     private Optional<?> unwrapObject(ParameterProvider.Result<?> result, CommandPart part) throws CommandParseException {
@@ -536,32 +535,18 @@ public class CommandLineParser {
         }
 
         SubCommandPart subCommandPart = (SubCommandPart) partToBind;
-        Map<String, Command> availableValues = new HashMap<>();
+        Map<String, Command> availableValues = subCommandPart.getCommandMappings();
 
-        for (Command command : subCommandPart.getCommandsToCall()) {
-            availableValues.put(command.getData().getName(), command);
-
-            for (String value : command.getData().getAliases()) {
-                availableValues.put(value.toLowerCase(), command);
-            }
-        }
-
-        String availableValuesString = String.join(", ", availableValues.keySet());
+        CommandUsageHandler usageHandler = getUsageHandler(currentCommand);
 
         if (!argumentStack.hasNext()) {
             if (partToBind.isRequired()) {
-                String message = commandManager.getI18n().getMessage(Message.MISSING_SUBCOMMAND, commandExecutionPath, namespaceAccesor);
-
-                if (message == null) {
-                    message = "Missing argument for required part %s, available values: %s";
+                if(usageHandler.handleMissing(new ParsingContextData(this), subCommandPart)){
+                    stopParse();
                 }
 
-                commandManager.getMessenger().sendMessage(namespaceAccesor, message, partToBind.getName(), availableValuesString);
-
-                throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
+                return;
             }
-
-            return;
         }
 
         String argument = argumentStack.next();
@@ -569,15 +554,11 @@ public class CommandLineParser {
         Command command = availableValues.get(argument.toLowerCase());
 
         if (command == null) {
-            String message = commandManager.getI18n().getMessage(Message.INVALID_SUBCOMMAND, commandExecutionPath, namespaceAccesor);
-
-            if (message == null) {
-                message = "Invalid sub-command, valid values: %s";
+            if(usageHandler.handleInvalid(new ParsingContextData(this), subCommandPart, Collections.singletonList(argument.toLowerCase()))){
+                stopParse();
             }
 
-            commandManager.getMessenger().sendMessage(namespaceAccesor, message, availableValuesString);
-
-            throw new CommandUsageException(UsageBuilder.getUsageForCommand(null, currentCommand, commandLabel));
+            return;
         }
 
         useCommand(command);

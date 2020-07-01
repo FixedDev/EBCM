@@ -37,6 +37,8 @@ public abstract class ImmutableCommand implements Command {
 
         public abstract Builder setAction(CommandAction newAction);
 
+        public abstract Builder setUsageHandler(CommandUsageHandler usageHandler);
+
         protected abstract Builder setParts(List<CommandPart> newParts);
 
         public abstract ImmutableCommand autoBuild();

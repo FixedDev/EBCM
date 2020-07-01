@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * The default implementation for {@link CommandManager} using a HashMap for the internal commandMap
  * And delegating the parse calls to the {@link CommandLineParser}
- *
+ * <p>
  * This class is not threadsafe, we can't ensure that registering/executing commands on more than 1 thread concurrently works correctly
  */
 public class SimpleCommandManager implements CommandManager {
@@ -42,12 +42,14 @@ public class SimpleCommandManager implements CommandManager {
     private ParameterProviderRegistry registry;
     private InputTokenizer tokenizer;
     private I18n i18n;
+    private CommandUsageHandler usageHandler;
 
     public SimpleCommandManager(Authorizer authorizer, Messenger messenger, ParameterProviderRegistry registry) {
         this.authorizer = authorizer;
         this.messenger = messenger;
         this.registry = registry;
         this.i18n = new DefaultI18n();
+        usageHandler = new DefaultCommandUsageHandler();
 
         commandMap = new HashMap<>();
     }
@@ -138,6 +140,26 @@ public class SimpleCommandManager implements CommandManager {
     @Override
     public boolean exists(String commandName) {
         return commandMap.containsKey(commandName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CommandUsageHandler getUsageHandler() {
+        return usageHandler;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUsageHandler(CommandUsageHandler usageHandler) {
+        if (usageHandler == null) {
+            throw new IllegalArgumentException("Trying to set a null usageHandler!");
+        }
+
+        this.usageHandler = usageHandler;
     }
 
     /**

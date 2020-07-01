@@ -76,6 +76,21 @@ public interface CommandManager {
     boolean exists(String commandName);
 
     /**
+     *  The {@link CommandUsageHandler} used on the Command's parse phase when a {@link Command} doesn't has a {@linkplain CommandUsageHandler} defined
+     *
+     * @return The default {@link CommandUsageHandler} used to parse commands
+     */
+    CommandUsageHandler getUsageHandler();
+
+    /**
+     * Changes the {@link CommandUsageHandler} used on this CommandManager instance
+     *
+     * @param usageHandler A non null instance of a {@link CommandUsageHandler}
+     * @throws IllegalArgumentException If the specified authorizer is null
+     */
+    void setUsageHandler(CommandUsageHandler usageHandler);
+
+    /**
      * The {@link ParameterProviderRegistry} used to parse the command's {@link me.fixeddev.ebcm.parameter.provider.ParameterProvider}'s on this instance of the CommandManager
      *
      * @return The {@link ParameterProviderRegistry} used to parse commands

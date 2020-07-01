@@ -4,6 +4,7 @@ import me.fixeddev.ebcm.part.CommandPart;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface Command {
     CommandData getData();
@@ -17,6 +18,8 @@ public interface Command {
     CommandAction getAction();
 
     List<CommandPart> getParts();
+
+    Optional<CommandUsageHandler> getUsageHandler();
 
     default List<CommandPart> getPartWithName(String name) {
         List<CommandPart> matchingParts = new ArrayList<>();
