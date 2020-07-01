@@ -5,10 +5,14 @@ import com.google.auto.value.extension.memoized.Memoized;
 import me.fixeddev.ebcm.Command;
 import me.fixeddev.ebcm.util.ListAppender;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AutoValue
 public abstract class SubCommandPart implements LineConsumingPart {
+
+    private Map<String, Command> labels;
 
     public static Builder builder(String name) {
         return new AutoValue_SubCommandPart.Builder()
@@ -18,6 +22,22 @@ public abstract class SubCommandPart implements LineConsumingPart {
     }
 
     public abstract List<Command> getCommandsToCall();
+
+    public Map<String, Command> getCommandMappings() {
+        if (labels == null) {
+            labels = new HashMap<>();
+
+            for (Command command : getCommandsToCall()) {
+                labels.put(command.getData().getName(), command);
+
+                for (String value : command.getData().getAliases()) {
+                    labels.put(value.toLowerCase(), command);
+                }
+            }
+        }
+
+        return labels;
+    }
 
     @Override
     @Memoized
