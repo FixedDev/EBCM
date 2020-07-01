@@ -1,7 +1,7 @@
 package me.fixeddev.ebcm.exception;
 
 public class CommandParseException extends Exception {
-    private boolean stackTrace = false;
+    protected boolean stackTrace = false;
 
     public CommandParseException() {
         super();
