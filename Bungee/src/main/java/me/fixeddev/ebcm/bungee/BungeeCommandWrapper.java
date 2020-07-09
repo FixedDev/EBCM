@@ -49,7 +49,7 @@ public class BungeeCommandWrapper extends Command implements TabExecutor {
                 sender.sendMessage(TextComponent.fromLegacyText(usage));
             }
         } catch (CommandParseException exception) {
-            throw new UnknownFormatConversionException("An internal parse exception occurred while executing the command " + getName());
+            throw new RuntimeException("An internal parse exception occurred while executing the command " + getName(), exception);
         } catch (CommandException exception) {
             throw new RuntimeException("An unexpected exception occurred while executing the command " + getName(), exception);
         }
