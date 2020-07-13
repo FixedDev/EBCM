@@ -1,7 +1,6 @@
 package me.fixeddev.ebcm.exception;
 
 public class CommandParseException extends Exception {
-    protected boolean stackTrace = false;
 
     public CommandParseException() {
         super();
@@ -13,24 +12,10 @@ public class CommandParseException extends Exception {
 
     public CommandParseException(String message, Throwable cause) {
         super(message, cause);
-        stackTrace = true;
-
-        fillInStackTrace();
     }
 
     public CommandParseException(Throwable cause) {
         super(cause);
-        stackTrace = true;
-
-        fillInStackTrace();
     }
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        if (!stackTrace) {
-            return this;
-        }
-
-        return super.fillInStackTrace();
-    }
 }
