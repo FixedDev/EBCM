@@ -39,7 +39,7 @@ public class BasicStackSlice implements StackSlice {
 
     @Override
     public boolean hasNext() {
-        return (size - 1) > position;
+        return (size - 1) > position + 1;
     }
 
     @Override
