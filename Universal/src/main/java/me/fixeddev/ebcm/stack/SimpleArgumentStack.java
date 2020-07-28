@@ -22,7 +22,7 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     @Override
     public boolean hasNext() {
-        return (originalArguments.size() - 1) > position;
+        return originalArguments.size() > position + 1;
     }
 
     @Override
