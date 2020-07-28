@@ -158,7 +158,7 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     @Override
     public StackSlice getSlice(int start, int end) {
-        return new BasicStackSlice(start, end, position, this);
+        return new BasicStackSlice(start, end - 1, position, this);
     }
 
     @Override
