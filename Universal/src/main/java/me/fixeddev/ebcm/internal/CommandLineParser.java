@@ -455,8 +455,11 @@ public class CommandLineParser {
         boolean usingDefaults = false;
 
         if (!part.isRequired()) {
-            if ((optionalArgumentsToBound <= 0 || argumentStack.getArgumentsLeft() < neededArguments + part.getConsumedArguments()) ||
-                    (allNeededArguments == -1 || part.getConsumedArguments() == -1 || hasSubCommand)) {
+            if ((optionalArgumentsToBound <= 0
+                    || argumentStack.getArgumentsLeft() < neededArguments + part.getConsumedArguments())
+                    || (allNeededArguments == -1
+                            || part.getConsumedArguments() == -1
+                            || hasSubCommand)) {
                 if (part.getDefaultValues().isEmpty()) {
                     return;
                 }
@@ -485,12 +488,8 @@ public class CommandLineParser {
         try {
             object = provider.transform(argumentsToUse, namespaceAccesor, part);
         } catch (NoMoreArgumentsException ex) {
-            if (part.isRequired()) {
-                if (!getUsageHandler(currentCommand).handleMissing(new ParsingContextData(this), part)) {
-                    stopParse();
-                }
-
-                return;
+            if ((part.isRequired() || !hasNextUnboundPart()) && !getUsageHandler(currentCommand).handleMissing(new ParsingContextData(this), part)) {
+                stopParse();
             }
 
             if (partsLeft > 0) {
@@ -531,7 +530,10 @@ public class CommandLineParser {
             }).ifPresent(s -> {
                 commandManager.getMessenger().sendMessage(namespaceAccesor, s, result.getMessageParameters().toArray());
             });
-            stopParse();
+
+            if (part.isRequired() && !getUsageHandler(currentCommand).handleInvalid(new ParsingContextData(this), part, bindings.get(bindings.size() - 1).getRaw())) {
+                stopParse();
+            }
 
             return Optional.empty();
         }
