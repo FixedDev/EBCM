@@ -12,6 +12,8 @@ public interface CommandContext extends NamespaceAccesor {
      */
     Command getCommand();
 
+    List<Command> getCommandExecutionPath();
+
     /**
      * @return The raw arguments passed to the command manager
      */

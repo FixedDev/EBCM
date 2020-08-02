@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public class SimpleCommandContext extends NamespaceAccessorDelegate implements CommandContext {
     private final Command executedCommand;
+    private final List<Command> commandExecutionPath;
     private final List<String> rawArguments;
     private final String label;
 
@@ -47,11 +48,17 @@ public class SimpleCommandContext extends NamespaceAccessorDelegate implements C
         label = result.getLabel();
         rawArguments = result.getCommandLine();
         executedCommand = result.getCommandToExecute();
+        commandExecutionPath = result.getCommandExecutionPath();
     }
 
     @Override
     public Command getCommand() {
         return executedCommand;
+    }
+
+    @Override
+    public List<Command> getCommandExecutionPath() {
+        return commandExecutionPath;
     }
 
     @Override
