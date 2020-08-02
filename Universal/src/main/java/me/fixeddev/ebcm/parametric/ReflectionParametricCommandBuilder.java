@@ -66,6 +66,10 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                 .setPermissionMessage(commandAnnotation.permissionMessage());
 
         for (Parameter parameter : method.getParameters()) {
+            if(parameter.getType() == CommandContext.class){
+                continue;
+            }
+
             CommandPart part = fromParameter(parameter);
 
             if (part == null) {
@@ -310,7 +314,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
     private CommandAction actionOfMethod(CommandClass commandClass, Method method) {
         class ParametricCommandAction implements CommandAction {
 
-            List<CommandPart> commandParts = new ArrayList<>();
+            final List<ValueGetter> commandParts = new ArrayList<>();
 
             @Override
             public boolean execute(CommandContext parameters) throws CommandException {
@@ -320,17 +324,8 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
                 List<Object> params = new ArrayList<>();
 
-                for (CommandPart part : commandParts) {
-                    if (part instanceof FlagPart || part instanceof ArgumentPart || part instanceof InjectedValuePart) {
-                        if (parameters.hasValue(part)) {
-                            params.add(parameters.getRawValue(part));
-                        } else {
-                            if (part.isRequired()) {
-                                throw new CommandException("The value for the required part" + part.getName() + " is missing!");
-                            }
-                            params.add(null);
-                        }
-                    }
+                for (ValueGetter getter : commandParts) {
+                    params.add(getter.get(commandClass, parameters));
                 }
 
                 boolean accessible = method.isAccessible();
@@ -349,6 +344,11 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
 
             private void computeParts(CommandContext parameters) {
                 for (Parameter parameter : method.getParameters()) {
+                    if (parameter.getType() == CommandContext.class) {
+                        commandParts.add((commandClass1, commandContext) -> commandContext);
+
+                        continue;
+                    }
                     String name = getName(parameter);
                     int indexOf = 0;
 
@@ -357,13 +357,34 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                         indexOf = parentArg.value();
                     }
 
-                    commandParts.add(parameters.getParts(name).get(indexOf));
+                    int finalIndexOf = indexOf;
+
+                    CommandPart part = parameters.getParts(name).get(finalIndexOf);
+
+                    if (part instanceof FlagPart || part instanceof ArgumentPart || part instanceof InjectedValuePart) {
+                        commandParts.add((object, commandContext) -> {
+                            if (parameters.hasValue(part)) {
+                                return parameters.getRawValue(part);
+                            } else {
+                                if (part.isRequired()) {
+                                    throw new CommandException("The value for the required part" + part.getName() + " is missing!");
+                                }
+
+                                return null;
+                            }
+                        });
+                    }
                 }
+
             }
 
         }
 
         return new ParametricCommandAction();
+    }
+
+    private interface ValueGetter {
+        Object get(CommandClass commandClass, CommandContext commandContext) throws CommandException;
     }
 
     private String getName(Parameter parameter) {
