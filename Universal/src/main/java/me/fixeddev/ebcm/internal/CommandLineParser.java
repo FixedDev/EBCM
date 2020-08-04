@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 public class CommandLineParser {
 
-    private List<Command> commandExecutionPath;
+    private final List<Command> commandExecutionPath;
     private String commandLabel;
 
     // Per command fields start
@@ -45,16 +45,16 @@ public class CommandLineParser {
     private CommandPart currentPart;
     // Per command fields end
 
-    private ArgumentStack argumentStack;
+    private final ArgumentStack argumentStack;
 
-    private List<ParseResult.ParameterBinding> bindings;
-    private Map<CommandPart, Object> valueBindings;
+    private final List<ParseResult.ParameterBinding> bindings;
+    private final Map<CommandPart, Object> valueBindings;
 
-    private NamespaceAccesor namespaceAccesor;
+    private final NamespaceAccesor namespaceAccesor;
 
-    private CommandManager commandManager;
+    private final CommandManager commandManager;
 
-    private ParameterProviderRegistry providerRegistry;
+    private final ParameterProviderRegistry providerRegistry;
 
     private boolean hasSubCommand;
     private int neededArguments;
@@ -472,7 +472,12 @@ public class CommandLineParser {
             if (part.getConsumedArguments() == -1) {
                 argumentsToUse = argumentStack.getSliceFrom(argumentStack.getPosition());
             } else {
-                argumentsToUse = argumentStack.getSliceTo(argumentStack.getPosition() + part.getConsumedArguments());
+                if ((argumentStack.getArgumentsLeft() < part.getConsumedArguments()) && !getUsageHandler(currentCommand).handleMissing(new ParsingContextData(this), part)) {
+                    stopParse();
+                    return;
+                }
+
+                argumentsToUse = argumentStack.getSlice(part.getConsumedArguments());
             }
         }
 
@@ -522,9 +527,7 @@ public class CommandLineParser {
                 }
 
                 return s;
-            }).ifPresent(s -> {
-                commandManager.getMessenger().sendMessage(namespaceAccesor, s, result.getMessageParameters().toArray());
-            });
+            }).ifPresent(s -> commandManager.getMessenger().sendMessage(namespaceAccesor, s, result.getMessageParameters().toArray()));
 
             if (part.isRequired() && !getUsageHandler(currentCommand).handleInvalid(new ParsingContextData(this), part, bindings.get(bindings.size() - 1).getRaw())) {
                 stopParse();
@@ -602,7 +605,7 @@ public class CommandLineParser {
 
     static class ParsingContextData implements ParsingContext {
 
-        private CommandLineParser parser;
+        private final CommandLineParser parser;
 
         public ParsingContextData(CommandLineParser parser) {
             this.parser = parser;
@@ -646,8 +649,8 @@ public class CommandLineParser {
 
     static class ParameterBindingData implements ParseResult.ParameterBinding {
 
-        private List<String> raw;
-        private CommandPart boundPart;
+        private final List<String> raw;
+        private final CommandPart boundPart;
 
         public ParameterBindingData(String raw, CommandPart boundPart) {
             this.raw = new ArrayList<>(1);
@@ -674,11 +677,11 @@ public class CommandLineParser {
 
     static class ParseResultData implements ParseResult {
 
-        private String label;
-        private List<String> commandLine;
-        private List<Command> executionPath;
-        private List<ParameterBinding> parameterBindings;
-        private Map<CommandPart, Object> valueBindings;
+        private final String label;
+        private final List<String> commandLine;
+        private final List<Command> executionPath;
+        private final List<ParameterBinding> parameterBindings;
+        private final Map<CommandPart, Object> valueBindings;
 
         public ParseResultData(String label,
                                List<String> commandLine,
