@@ -7,6 +7,7 @@ import java.util.List;
 
 public class SimpleArgumentStack implements ArgumentStack {
     protected List<String> originalArguments;
+
     protected SimpleArgumentStack parent;
 
     private int position = 0;
@@ -17,7 +18,6 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     protected SimpleArgumentStack(List<String> originalArguments, int position) {
         this.originalArguments = originalArguments;
-
         this.position = position;
     }
 
@@ -26,67 +26,65 @@ public class SimpleArgumentStack implements ArgumentStack {
         this.parent = parent;
     }
 
-
-    @Override
     public boolean hasNext() {
-        return originalArguments.size() > position;
+        return (this.originalArguments.size() > this.position);
     }
 
-    @Override
     public String next() throws NoMoreArgumentsException {
         if (!hasNext()) {
-            throw new NoMoreArgumentsException(originalArguments.size(), position);
+            throw new NoMoreArgumentsException(this.originalArguments.size(), this.position);
         }
 
-        if (parent != null) {
-            parent.position++;
+        if (this.parent != null) {
+            this.parent.position++;
         }
 
-        return originalArguments.get(position++);
+        return this.originalArguments.get(this.position++);
     }
 
-    @Override
     public String peek() throws NoMoreArgumentsException {
-        int nextPosition = position + 1;
-
         if (!hasNext()) {
-            throw new NoMoreArgumentsException(originalArguments.size(), position);
+            throw new NoMoreArgumentsException(this.originalArguments.size(), this.position);
         }
 
-        return originalArguments.get(nextPosition);
+        return this.originalArguments.get(this.position);
     }
 
-    @Override
     public String current() {
-        return originalArguments.get(position);
+        return this.originalArguments.get(this.position - 1);
     }
 
-    @Override
     public String remove() {
+        if (this.position == 0) {
+            throw new IllegalStateException("You must advance the stack at least 1 time before calling remove!");
+        }
+
         String toRemove = current();
-        getBacking().remove(current());
+        getBacking().remove(toRemove);
+        this.position--;
+
+        if (this.parent != null) {
+            this.position--;
+        }
 
         return toRemove;
     }
 
-    @Override
     public int getPosition() {
-        return position;
+        return this.position;
     }
 
-    @Override
     public int getSize() {
-        return originalArguments.size();
+        return this.originalArguments.size();
     }
 
-    @Override
     public int getArgumentsLeft() {
         return getSize() - getPosition();
     }
 
-    @Override
     public int nextInt() throws CommandParseException {
         String next = next();
+
         try {
             return Integer.parseInt(next);
         } catch (NumberFormatException e) {
@@ -94,7 +92,6 @@ public class SimpleArgumentStack implements ArgumentStack {
         }
     }
 
-    @Override
     public float nextFloat() throws CommandParseException {
         String next = next();
 
@@ -105,7 +102,6 @@ public class SimpleArgumentStack implements ArgumentStack {
         }
     }
 
-    @Override
     public double nextDouble() throws CommandParseException {
         String next = next();
 
@@ -116,7 +112,6 @@ public class SimpleArgumentStack implements ArgumentStack {
         }
     }
 
-    @Override
     public byte nextByte() throws CommandParseException {
         String next = next();
 
@@ -127,7 +122,6 @@ public class SimpleArgumentStack implements ArgumentStack {
         }
     }
 
-    @Override
     public boolean nextBoolean() throws CommandParseException {
         String next = next();
 
@@ -138,39 +132,44 @@ public class SimpleArgumentStack implements ArgumentStack {
         return Boolean.parseBoolean(next);
     }
 
-
-    @Override
     public void markAsConsumed() {
-        this.position = originalArguments.size();
+        this.position = this.originalArguments.size();
     }
 
-    @Override
     public void applySnapshot(StackSnapshot snapshot, boolean changeArgs) {
+        int offset = snapshot.position - this.position;
         this.position = snapshot.position;
+
+        if (this.parent != null) {
+            if (offset < 0) {
+                this.parent.position += offset;
+            } else {
+                this.parent.position -= offset;
+            }
+        }
 
         if (changeArgs) {
             int index = 0;
-
             for (String arg : snapshot.backing) {
-                originalArguments.set(index, arg);
-
+                this.originalArguments.set(index, arg);
                 index++;
             }
         }
     }
 
-    @Override
     public List<String> getBacking() {
-        return originalArguments;
+        return this.originalArguments;
     }
 
-    @Override
     public StackSlice getSlice(int start, int end) {
-        return new BasicStackSlice(new SimpleArgumentStack(originalArguments.subList(start, end), this));
+        try {
+            return new BasicStackSlice(new SimpleArgumentStack(this.originalArguments.subList(start, end), this));
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("The end shouldn't be after the end of the ArgumentStack!");
+        }
     }
 
-    @Override
     public StackSnapshot getSnapshot(boolean useCurrentPos) {
-        return new StackSnapshot(this, useCurrentPos ? position : -1);
+        return new StackSnapshot(this, useCurrentPos ? this.position : -1);
     }
 }
