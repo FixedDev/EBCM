@@ -7,154 +7,83 @@ import java.util.List;
 
 public class BasicStackSlice implements StackSlice {
 
-    private int start;
-    private int end;
-
-    private int size;
-    private int position;
-
     private ArgumentStack backing;
 
-    public BasicStackSlice(int start, int end, int position, ArgumentStack backing) {
-        this.start = start;
-        this.end = end;
-        this.size = end - start;
-        this.position = -1;
-
+    public BasicStackSlice(ArgumentStack backing) {
         this.backing = backing;
-
-        if (position + 1 < start) {
-            throw new IllegalArgumentException("The position should be after the start of the slice!");
-        }
-
-        if (position >= end) {
-            throw new IllegalArgumentException("The position should be before the end of the slice!");
-        }
-
-        if (end > backing.getSize()) {
-            throw new IllegalArgumentException("The end shouldn't be after the end of the ArgumentStack!");
-        }
     }
-
 
     @Override
     public boolean hasNext() {
-        return size > position + 1;
+        return backing.hasNext();
     }
 
     @Override
     public String next() throws NoMoreArgumentsException {
-        if (!hasNext()) {
-            throw new NoMoreArgumentsException(getSize(), position);
-        }
-
-        position++;
-
         return backing.next();
     }
 
     @Override
     public String peek() throws NoMoreArgumentsException {
-        if (!hasNext()) {
-            throw new NoMoreArgumentsException(getSize(), position);
-        }
-
         return backing.peek();
     }
 
     @Override
     public String current() {
-        if (!hasAdvanced()) {
-            throw new IllegalStateException("You must advance the slice at least once before using the current() method!");
-        }
-
         return backing.current();
     }
 
     @Override
     public String remove() {
-        if (!hasAdvanced()) {
-            throw new IllegalStateException("You must advance the slice at least once before using the remove() method!");
-        }
         return backing.remove();
     }
 
     @Override
     public int getPosition() {
-        return position;
+        return backing.getPosition();
     }
 
     @Override
     public int getSize() {
-        return size;
+        return backing.getSize();
     }
 
     @Override
     public int getArgumentsLeft() {
-        return (getSize() - 1) - getPosition();
+        return backing.getArgumentsLeft();
     }
 
     @Override
     public int nextInt() throws CommandParseException {
-        String next = next();
-        try {
-            return Integer.parseInt(next);
-        } catch (NumberFormatException e) {
-            throw new CommandParseException("Failed to parse the string " + next + " as int!");
-        }
+        return backing.nextInt();
     }
 
     @Override
     public float nextFloat() throws CommandParseException {
-        String next = next();
-
-        try {
-            return Float.parseFloat(next);
-        } catch (NumberFormatException e) {
-            throw new CommandParseException("Failed to parse the string " + next + " as float!");
-        }
+        return backing.nextFloat();
     }
 
     @Override
     public double nextDouble() throws CommandParseException {
-        String next = next();
-
-        try {
-            return Double.parseDouble(next);
-        } catch (NumberFormatException e) {
-            throw new CommandParseException("Failed to parse the string " + next + " as double!");
-        }
+        return backing.nextDouble();
     }
 
     @Override
     public byte nextByte() throws CommandParseException {
-        String next = next();
-
-        try {
-            return Byte.parseByte(next);
-        } catch (NumberFormatException e) {
-            throw new CommandParseException("Failed to parse the string " + next + " as byte!");
-        }
+        return backing.nextByte();
     }
 
     @Override
     public boolean nextBoolean() throws CommandParseException {
-        String next = next();
-
-        if (!next.equalsIgnoreCase("true") && !next.equalsIgnoreCase("false")) {
-            throw new CommandParseException("Failed to parse the string " + next + " as boolean!");
-        }
-
-        return Boolean.parseBoolean(next);
+        return backing.nextBoolean();
     }
 
     @Override
     public List<String> getBacking() {
-        return backing.getBacking().subList(start, end);
+        return backing.getBacking();
     }
 
 
-    private boolean hasAdvanced() {
-        return position > -1;
-    }
+
+
 }

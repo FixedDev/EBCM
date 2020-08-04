@@ -2,6 +2,8 @@ package me.fixeddev.ebcm.stack;
 
 import me.fixeddev.ebcm.exception.CommandParseException;
 import me.fixeddev.ebcm.exception.NoMoreArgumentsException;
+import me.fixeddev.ebcm.stack.StackSlice;
+import me.fixeddev.ebcm.stack.StackSnapshot;
 
 import java.util.List;
 
@@ -44,6 +46,11 @@ public interface ArgumentStack {
 
     default StackSlice getSliceTo(int end) {
         return getSlice(getPosition(), end);
+    }
+
+    default StackSlice getSlice(int size) {
+        // Add + 1 to considerate the exclusive end position.
+        return getSliceTo(getPosition() + size);
     }
 
     default StackSnapshot getSnapshot() {

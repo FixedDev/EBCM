@@ -7,6 +7,13 @@ import me.fixeddev.ebcm.part.CommandPart;
 import java.util.List;
 
 public interface CommandUsageHandler {
+    /**
+     *
+     * @param context
+     * @param part
+     * @return
+     * @throws CommandParseException
+     */
     boolean handleMissing(ParsingContext context, CommandPart part) throws CommandParseException;
 
     boolean handleInvalid(ParsingContext context, CommandPart part, List<String> arguments) throws CommandParseException;

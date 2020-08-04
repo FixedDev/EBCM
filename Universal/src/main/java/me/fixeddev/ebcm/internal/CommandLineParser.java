@@ -19,12 +19,7 @@ import me.fixeddev.ebcm.part.CommandPartParser;
 import me.fixeddev.ebcm.part.FlagPart;
 import me.fixeddev.ebcm.part.InjectedValuePart;
 import me.fixeddev.ebcm.part.SubCommandPart;
-import me.fixeddev.ebcm.stack.ArgumentStack;
-import me.fixeddev.ebcm.stack.BasicStackSlice;
-import me.fixeddev.ebcm.stack.NoOpStackSlice;
-import me.fixeddev.ebcm.stack.SimpleArgumentStack;
-import me.fixeddev.ebcm.stack.StackSlice;
-import me.fixeddev.ebcm.stack.StackSnapshot;
+import me.fixeddev.ebcm.stack.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -458,15 +453,15 @@ public class CommandLineParser {
             if ((optionalArgumentsToBound <= 0
                     || argumentStack.getArgumentsLeft() < neededArguments + part.getConsumedArguments())
                     || (allNeededArguments == -1
-                            || part.getConsumedArguments() == -1
-                            || hasSubCommand)) {
+                    || part.getConsumedArguments() == -1
+                    || hasSubCommand)) {
                 if (part.getDefaultValues().isEmpty()) {
                     return;
                 }
                 List<String> defaults = part.getDefaultValues();
 
                 usingDefaults = true;
-                argumentsToUse = new BasicStackSlice(0, defaults.size(), -1, new SimpleArgumentStack(defaults));
+                argumentsToUse = new BasicStackSlice(new SimpleArgumentStack(defaults));
                 allNeededArguments = allNeededArguments - part.getConsumedArguments();
             }
         }

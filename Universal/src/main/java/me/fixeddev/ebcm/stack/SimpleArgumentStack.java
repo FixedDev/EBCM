@@ -7,8 +7,9 @@ import java.util.List;
 
 public class SimpleArgumentStack implements ArgumentStack {
     protected List<String> originalArguments;
+    protected SimpleArgumentStack parent;
 
-    private int position = -1;
+    private int position = 0;
 
     public SimpleArgumentStack(List<String> originalArguments) {
         this.originalArguments = originalArguments;
@@ -20,9 +21,15 @@ public class SimpleArgumentStack implements ArgumentStack {
         this.position = position;
     }
 
+    protected SimpleArgumentStack(List<String> originalArguments, SimpleArgumentStack parent) {
+        this.originalArguments = originalArguments;
+        this.parent = parent;
+    }
+
+
     @Override
     public boolean hasNext() {
-        return originalArguments.size() > position + 1;
+        return originalArguments.size() > position;
     }
 
     @Override
@@ -31,9 +38,11 @@ public class SimpleArgumentStack implements ArgumentStack {
             throw new NoMoreArgumentsException(originalArguments.size(), position);
         }
 
-        position++;
+        if (parent != null) {
+            parent.position++;
+        }
 
-        return originalArguments.get(position);
+        return originalArguments.get(position++);
     }
 
     @Override
@@ -49,19 +58,11 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     @Override
     public String current() {
-        if (position == -1) {
-            throw new IllegalStateException("You must advance the stack at least once before using the current() method!");
-        }
-
         return originalArguments.get(position);
     }
 
     @Override
     public String remove() {
-        if (position == -1) {
-            throw new IllegalStateException("You must advance the stack at least once before using the remove() method!");
-        }
-
         String toRemove = current();
         getBacking().remove(current());
 
@@ -80,7 +81,7 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     @Override
     public int getArgumentsLeft() {
-        return (getSize() - 1) - getPosition();
+        return getSize() - getPosition();
     }
 
     @Override
@@ -137,6 +138,7 @@ public class SimpleArgumentStack implements ArgumentStack {
         return Boolean.parseBoolean(next);
     }
 
+
     @Override
     public void markAsConsumed() {
         this.position = originalArguments.size();
@@ -147,7 +149,13 @@ public class SimpleArgumentStack implements ArgumentStack {
         this.position = snapshot.position;
 
         if (changeArgs) {
-            this.originalArguments = snapshot.backing;
+            int index = 0;
+
+            for (String arg : snapshot.backing) {
+                originalArguments.set(index, arg);
+
+                index++;
+            }
         }
     }
 
@@ -158,7 +166,7 @@ public class SimpleArgumentStack implements ArgumentStack {
 
     @Override
     public StackSlice getSlice(int start, int end) {
-        return new BasicStackSlice(start, end - 1, position, this);
+        return new BasicStackSlice(new SimpleArgumentStack(originalArguments.subList(start, end), this));
     }
 
     @Override
