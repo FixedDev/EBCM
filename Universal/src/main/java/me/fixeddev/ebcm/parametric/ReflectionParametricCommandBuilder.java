@@ -362,17 +362,7 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
                     CommandPart part = parameters.getParts(name).get(finalIndexOf);
 
                     if (part instanceof FlagPart || part instanceof ArgumentPart || part instanceof InjectedValuePart) {
-                        commandParts.add((object, commandContext) -> {
-                            if (parameters.hasValue(part)) {
-                                return parameters.getRawValue(part);
-                            } else {
-                                if (part.isRequired()) {
-                                    throw new CommandException("The value for the required part" + part.getName() + " is missing!");
-                                }
-
-                                return null;
-                            }
-                        });
+                        commandParts.add(new ParameterValueGetter(part));
                     }
                 }
 
@@ -381,6 +371,28 @@ public class ReflectionParametricCommandBuilder implements ParametricCommandBuil
         }
 
         return new ParametricCommandAction();
+    }
+
+    private static class ParameterValueGetter implements ValueGetter{
+
+        private CommandPart part;
+
+        public ParameterValueGetter(CommandPart part) {
+            this.part = part;
+        }
+
+        @Override
+        public Object get(CommandClass commandClass, CommandContext commandContext) throws CommandException {
+            if (commandContext.hasValue(part)) {
+                return commandContext.getRawValue(part);
+            } else {
+                if (part.isRequired()) {
+                    throw new CommandException("The value for the required part" + part.getName() + " is missing!");
+                }
+
+                return null;
+            }
+        }
     }
 
     private interface ValueGetter {
