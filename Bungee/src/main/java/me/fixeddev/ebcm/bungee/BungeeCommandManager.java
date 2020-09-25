@@ -49,6 +49,8 @@ public class BungeeCommandManager implements CommandManager {
 
         getProviderRegistry().installModule(new BungeeModule());
         setI18n(new BungeeDefaultI18n());
+        
+        wrapperMap = new HashMap<>();
     }
 
     @Override
