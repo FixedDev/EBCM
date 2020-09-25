@@ -41,16 +41,13 @@ public class BungeeCommandManager implements CommandManager {
     }
 
     public BungeeCommandManager(Plugin plugin) {
-        this.plugin = plugin;
-        parent = new SimpleCommandManager();
+        this(new SimpleCommandManager(), plugin);
 
         setAuthorizer(new BungeeAuthorizer());
         setMessenger(new BungeeMessenger());
 
         getProviderRegistry().installModule(new BungeeModule());
         setI18n(new BungeeDefaultI18n());
-        
-        wrapperMap = new HashMap<>();
     }
 
     @Override
